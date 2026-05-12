@@ -1,0 +1,298 @@
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Window = Library:CreateWindow({
+    Title = "HiruZ Hub",
+    Subtitle = ": b l o x f r u i t",
+    Image = "rbxassetid://128185233852701"
+})
+
+--========================
+-- TABS
+--========================
+
+local ShopTab = Window:AddTab("Shop")
+local StatusTab = Window:AddTab("Status And Server")
+local LocalTab = Window:AddTab("LocalPlayer")
+local SkillTab = Window:AddTab("Hold And Select Skill")
+local FarmTab = Window:AddTab("Farming")
+local StackTab = Window:AddTab("Stack Farming")
+local FruitTab = Window:AddTab("Fruit And Raid Dungeon")
+local SeaTab = Window:AddTab("Sea Event")
+local RaceTab = Window:AddTab("Upgrade Race")
+local ItemTab = Window:AddTab("Get And Upgrade Item")
+local VolcanoTab = Window:AddTab("Volcano Event")
+local ESPTab = Window:AddTab("ESP")
+local PVPTab = Window:AddTab("PVP")
+
+--========================
+-- GROUPBOXES
+--========================
+
+-- Shop
+local ShopGroup = ShopTab:AddLeftGroupbox("Shop")
+
+-- Fighting Shop
+local FightingGroup = ShopTab:AddLeftGroupbox("Fighting Shop")
+
+-- Ability Shop
+local AbilityGroup = ShopTab:AddLeftGroupbox("Ability Shop")
+
+-- Status
+local StatusGroup = StatusTab:AddLeftGroupbox("Player Status")
+local ServerGroup = StatusTab:AddLeftGroupbox("Server")
+
+-- LocalPlayer
+local LocalGroup = LocalTab:AddLeftGroupbox("Player Mods")
+
+-- Skill
+local SkillGroup = SkillTab:AddLeftGroupbox("Skills")
+
+-- Farming
+local FarmGroup = FarmTab:AddLeftGroupbox("Auto Farm")
+
+-- Stack Farming
+local StackGroup = StackTab:AddLeftGroupbox("Mob Stack")
+
+-- Fruit
+local FruitGroup = FruitTab:AddLeftGroupbox("Fruit")
+local RaidGroup = FruitTab:AddLeftGroupbox("Raid")
+
+-- Sea Event
+local SeaGroup = SeaTab:AddLeftGroupbox("Sea Features")
+
+-- Race
+local RaceGroup = RaceTab:AddLeftGroupbox("Race Upgrade")
+
+-- Item
+local ItemGroup = ItemTab:AddLeftGroupbox("Items")
+
+-- Volcano
+local VolcanoGroup = VolcanoTab:AddLeftGroupbox("Volcano")
+
+-- ESP
+local ESPGroup = ESPTab:AddLeftGroupbox("ESP Features")
+
+-- PVP
+local PVPGroup = PVPTab:AddLeftGroupbox("PVP Features")
+
+--========================
+-- SHOP BUTTONS
+--========================
+
+ShopGroup:AddButton({
+    Text = "Redeem Code",
+
+    Func = function()
+        print("Redeem Code")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Teleport Old World",
+
+    Func = function()
+        print("Teleport Old World")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Teleport Third Sea",
+
+    Func = function()
+        print("Teleport Third Sea")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Dual Flintlock",
+
+    Func = function()
+        print("Buy Dual Flintlock")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Reroll Race",
+
+    Func = function()
+        print("Reroll Race")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Ghoul Race",
+
+    Func = function()
+        print("Buy Ghoul Race")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Cyborg Race",
+
+    Func = function()
+        print("Buy Cyborg Race")
+    end
+})
+
+--========================
+-- FIGHTING SHOP TOGGLES
+--========================
+
+FightingGroup:AddToggle("BlackLeg", {
+    Text = "Black Leg",
+    Default = false,
+
+    Callback = function(Value)
+        print("Black Leg:", Value)
+    end
+})
+
+FightingGroup:AddToggle("FishmanKarate", {
+    Text = "Fishman Karate",
+    Default = false,
+
+    Callback = function(Value)
+        print("Fishman Karate:", Value)
+    end
+})
+
+FightingGroup:AddToggle("Electro", {
+    Text = "Electro",
+    Default = false,
+
+    Callback = function(Value)
+        print("Electro:", Value)
+    end
+})
+
+FightingGroup:AddToggle("SuperHuman", {
+    Text = "Super Human",
+    Default = false,
+
+    Callback = function(Value)
+        print("Super Human:", Value)
+    end
+})
+
+FightingGroup:AddToggle("DeathStep", {
+    Text = "Death Step",
+    Default = false,
+
+    Callback = function(Value)
+        print("Death Step:", Value)
+    end
+})
+
+FightingGroup:AddToggle("SharkmanKarate", {
+    Text = "Sharkman Karate",
+    Default = false,
+
+    Callback = function(Value)
+        print("Sharkman Karate:", Value)
+    end
+})
+
+FightingGroup:AddToggle("ElectricClaw", {
+    Text = "Electric Claw",
+    Default = false,
+
+    Callback = function(Value)
+        print("Electric Claw:", Value)
+    end
+})
+
+FightingGroup:AddToggle("Godhuman", {
+    Text = "Godhuman",
+    Default = false,
+
+    Callback = function(Value)
+        print("Godhuman:", Value)
+    end
+})
+
+FightingGroup:AddToggle("SanguineArt", {
+    Text = "Sanguine Art",
+    Default = false,
+
+    Callback = function(Value)
+        print("Sanguine Art:", Value)
+    end
+})
+
+--========================
+-- ABILITY SHOP BUTTONS
+--========================
+
+AbilityGroup:AddButton({
+    Text = "Skyjump [$10,000 Beli]",
+
+    Func = function()
+        print("Buy Skyjump")
+    end
+})
+
+AbilityGroup:AddButton({
+    Text = "Buso Haki [$25,000 Beli]",
+
+    Func = function()
+        print("Buy Buso Haki")
+    end
+})
+
+AbilityGroup:AddButton({
+    Text = "Observation Haki [$750,000 Beli]",
+
+    Func = function()
+        print("Buy Observation Haki")
+    end
+})
+
+AbilityGroup:AddButton({
+    Text = "Soru [$100,000 Beli]",
+
+    Func = function()
+        print("Buy Soru")
+    end
+})
+
+--========================
+-- EXAMPLE TOGGLE
+--========================
+
+FarmGroup:AddToggle("AutoFarm", {
+    Text = "Auto Farm",
+    Default = false,
+
+    Callback = function(Value)
+        print("Auto Farm:", Value)
+    end
+})
+
+ESPGroup:AddToggle("PlayerESP", {
+    Text = "Player ESP",
+    Default = false,
+
+    Callback = function(Value)
+        print("ESP:", Value)
+    end
+})
+
+PVPGroup:AddToggle("AttackAura", {
+    Text = "Attack Aura",
+    Default = false,
+
+    Callback = function(Value)
+        print("Aura:", Value)
+    end
+})
+
+--========================
+-- NOTIFY
+--========================
+
+Library:Notify({
+    Title = "HiruZ Loaded",
+    Description = "Hub Loaded Successfully",
+    Duration = 5
+})
