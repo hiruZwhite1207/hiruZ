@@ -1,0 +1,488 @@
+--// =========================
+--// HIRUZ HUB
+--// =========================
+
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local LocalPlayer = Players.LocalPlayer
+
+--// =========================
+--// WINDOW
+--// =========================
+
+local Window = Library:CreateWindow({
+    Title = "HiruZ Hub",
+    Subtitle = ": b l o x f r u i t",
+    Image = "rbxassetid://128185233852701"
+})
+
+Library.ToggleKeybind = Enum.KeyCode.RightControl
+
+--// =========================
+--// TAB
+--// =========================
+
+local ShopTab = Window:AddTab("Shop")
+local StatusTab = Window:AddTab("Status And Server")
+local LocalTab = Window:AddTab("Local Player")
+
+--// =========================
+--// GROUPBOX
+--// =========================
+
+local ShopGroup = ShopTab:AddLeftGroupbox("Shop")
+local FightingGroup = ShopTab:AddRightGroupbox("Fighting Shop")
+local AbilityGroup = ShopTab:AddRightGroupbox("Ability Shop")
+
+local StatusGroup = StatusTab:AddLeftGroupbox("Status And Server")
+local ServerGroup = StatusTab:AddRightGroupbox("Server")
+
+local LocalGroup = LocalTab:AddLeftGroupbox("Local Player")
+
+--// =========================
+--// SHOP
+--// =========================
+
+ShopGroup:AddButton({
+    Text = "Redeem Code",
+
+    Func = function()
+        print("Redeem Code")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Random Fruit",
+
+    Func = function()
+        print("Buy Random Fruit")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Teleport Old World",
+
+    Func = function()
+        print("Teleport Old World")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Teleport Second Sea",
+
+    Func = function()
+        print("Teleport Second Sea")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Teleport Third Sea",
+
+    Func = function()
+        print("Teleport Third Sea")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Dual Flintlock",
+
+    Func = function()
+        print("Buy Dual Flintlock")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Reroll Race",
+
+    Func = function()
+        print("Reroll Race")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Ghoul Race",
+
+    Func = function()
+        print("Buy Ghoul Race")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Cyborg Race",
+
+    Func = function()
+        print("Buy Cyborg Race")
+    end
+})
+
+--// =========================
+--// FIGHTING SHOP
+--// =========================
+
+local FightingStyle = {
+    "Black Leg",
+    "Fishman Karate",
+    "Electro",
+    "Super Human",
+    "Death Step",
+    "Sharkman Karate",
+    "Electric Claw",
+    "Godhuman",
+    "Sanguine Art"
+}
+
+for _,v in pairs(FightingStyle) do
+
+    FightingGroup:AddToggle(v, {
+        Text = v,
+        Default = false,
+
+        Callback = function(Value)
+            print(v, Value)
+        end
+    })
+
+end
+
+--// =========================
+--// ABILITY SHOP
+--// =========================
+
+AbilityGroup:AddButton({
+    Text = "Skyjump [$10,000 Beli]",
+
+    Func = function()
+        print("Skyjump")
+    end
+})
+
+AbilityGroup:AddButton({
+    Text = "Buso Haki [$25,000 Beli]",
+
+    Func = function()
+        print("Buso Haki")
+    end
+})
+
+AbilityGroup:AddButton({
+    Text = "Observation Haki [$750,000 Beli]",
+
+    Func = function()
+        print("Observation Haki")
+    end
+})
+
+AbilityGroup:AddButton({
+    Text = "Soru [$100,000 Beli]",
+
+    Func = function()
+        print("Soru")
+    end
+})
+
+--// =========================
+--// STATUS
+--// =========================
+
+StatusGroup:AddLabel(
+    os.date("%d/%m/%Y - %H:%M:%S [VN]")
+)
+
+StatusGroup:AddLabel("Ping : 0 ms")
+StatusGroup:AddLabel("FPS : 60")
+
+StatusGroup:AddDivider()
+
+StatusGroup:AddLabel("Mirage Island : ❌")
+StatusGroup:AddLabel("Kitsune Island : ❌")
+StatusGroup:AddLabel("Prehistoric Island : ❌")
+StatusGroup:AddLabel("Frozen Dimension : ❌")
+
+--// =========================
+--// SERVER
+--// =========================
+
+getgenv().JoinJobId = ""
+
+ServerGroup:AddInput("JobIdInput", {
+    Default = "",
+    Numeric = false,
+    Finished = false,
+
+    Text = "Input Your JobID Here",
+    Placeholder = "Input Here",
+
+    Callback = function(Value)
+        getgenv().JoinJobId = Value
+    end
+})
+
+ServerGroup:AddToggle("SpamJoin", {
+    Text = "Spam Join",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().SpamJoin = Value
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Join Server",
+
+    Func = function()
+
+        if getgenv().JoinJobId ~= "" then
+
+            TeleportService:TeleportToPlaceInstance(
+                game.PlaceId,
+                getgenv().JoinJobId,
+                LocalPlayer
+            )
+
+        end
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Copy JobId",
+
+    Func = function()
+        setclipboard(game.JobId)
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Rejoin Server",
+
+    Func = function()
+        TeleportService:Teleport(game.PlaceId, LocalPlayer)
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Hop Server",
+
+    Func = function()
+        print("Hop Server")
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Hop Server Less Player",
+
+    Func = function()
+        print("Hop Less Player")
+    end
+})
+
+--// =========================
+--// LOCAL PLAYER
+--// =========================
+
+LocalGroup:AddButton({
+    Text = "Open Devil Fruit Shop",
+
+    Func = function()
+        print("Open Devil Fruit Shop")
+    end
+})
+
+LocalGroup:AddButton({
+    Text = "Open Devil Fruit Shop Mirage",
+
+    Func = function()
+        print("Open Mirage Fruit Shop")
+    end
+})
+
+LocalGroup:AddButton({
+    Text = "Open Titles",
+
+    Func = function()
+        print("Open Titles")
+    end
+})
+
+LocalGroup:AddButton({
+    Text = "Boost FPS",
+
+    Func = function()
+
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+
+        for _,v in pairs(game:GetDescendants()) do
+
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.Plastic
+                v.Reflectance = 0
+            end
+
+            if v:IsA("Texture")
+            or v:IsA("Decal") then
+
+                v:Destroy()
+
+            end
+        end
+    end
+})
+
+LocalGroup:AddButton({
+    Text = "Change Team To Pirates",
+
+    Func = function()
+        print("Pirates")
+    end
+})
+
+LocalGroup:AddButton({
+    Text = "Change Team To Marines",
+
+    Func = function()
+        print("Marines")
+    end
+})
+
+LocalGroup:AddToggle("AutoSummonCakePrince", {
+    Text = "Auto Summon Cake Prince",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AutoSummonCakePrince = Value
+    end
+})
+
+LocalGroup:AddToggle("RemoveDamageText", {
+    Text = "Remove Damage Text",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().RemoveDamageText = Value
+    end
+})
+
+LocalGroup:AddToggle("RemoveNotification", {
+    Text = "Remove Notification",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().RemoveNotification = Value
+    end
+})
+
+--// =========================
+--// STATS
+--// =========================
+
+LocalGroup:AddDivider()
+
+LocalGroup:AddDropdown("SelectStats", {
+
+    Values = {
+        "Melee",
+        "Sword",
+        "Gun",
+        "Devil Fruit",
+        "Defense"
+    },
+
+    Default = 1,
+    Multi = false,
+
+    Text = "Select Stats",
+
+    Callback = function(Value)
+        getgenv().SelectStats = Value
+    end
+})
+
+LocalGroup:AddInput("PointStats", {
+    Default = "1",
+    Numeric = true,
+    Finished = false,
+
+    Text = "Point Stats [Max 6600]",
+    Placeholder = "Input Here",
+
+    Callback = function(Value)
+        getgenv().PointStats = Value
+    end
+})
+
+LocalGroup:AddToggle("AutoStats", {
+    Text = "Auto Stats",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AutoStats = Value
+    end
+})
+
+--// =========================
+--// ISLAND
+--// =========================
+
+LocalGroup:AddDivider()
+
+LocalGroup:AddDropdown("SelectIsland", {
+
+    Values = {
+
+        "Trial of Strength",
+        "Trial of the Machine",
+        "Trial of the King",
+        "North Pole",
+        "Sea of Treats",
+        "Hell Dimension",
+        "Trial of Water",
+        "Submerged Island",
+        "Trial of Flames",
+        "Hydra Island",
+        "Tiki Outpost",
+        "L'Église de Prophétie",
+        "Island 4",
+        "Frozen Dimension",
+        "Heavenly Dimension",
+        "Island 3",
+        "Floating Turtle",
+        "Castle on the Sea",
+        "Island 1",
+        "Dragon Dojo",
+        "Friendly Arena",
+        "Haunted Castle",
+        "Ancient Clock",
+        "Island 2",
+        "Island 5"
+
+    },
+
+    Default = 1,
+    Multi = false,
+
+    Text = "Select Island",
+
+    Callback = function(Value)
+        getgenv().SelectIsland = Value
+    end
+})
+
+LocalGroup:AddToggle("TeleportIsland", {
+    Text = "Teleport To Island",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().TeleportIsland = Value
+    end
+})
+
+--// =========================
+--// NOTIFY
+--// =========================
+
+Library:Notify({
+    Title = "HiruZ Loaded",
+    Description = "Hub Loaded Successfully",
+    Duration = 5
+})
