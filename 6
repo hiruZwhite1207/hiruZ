@@ -1,0 +1,634 @@
+--========================
+-- HIRUZ HUB
+--========================
+
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local LocalPlayer = Players.LocalPlayer
+
+--========================
+-- WINDOW
+--========================
+
+local Window = Library:CreateWindow({
+    Title = "HiruZ Hub",
+    Subtitle = ": b l o x f r u i t",
+    Image = "rbxassetid://128185233852701"
+})
+
+--========================
+-- TABS
+--========================
+
+local ShopTab = Window:AddTab("Shop")
+local StatusTab = Window:AddTab("Status And Server")
+local LocalTab = Window:AddTab("Local Player")
+local SettingFarmTab = Window:AddTab("Settings Farm")
+local SkillTab = Window:AddTab("Skill")
+local FarmTab = Window:AddTab("Farming")
+local StackTab = Window:AddTab("Stack Farming")
+local FarmOtherTab = Window:AddTab("Farming Other")
+local FruitTab = Window:AddTab("Fruit And Raid")
+local SeaTab = Window:AddTab("Sea Event")
+local ESPTab = Window:AddTab("ESP")
+local PVPTab = Window:AddTab("PVP")
+
+--========================
+-- GROUPBOX
+--========================
+
+local ShopGroup = ShopTab:AddLeftGroupbox("Shop")
+
+local StatusGroup = StatusTab:AddLeftGroupbox("Player Status")
+local ServerGroup = StatusTab:AddRightGroupbox("Server")
+
+local LocalGroup = LocalTab:AddLeftGroupbox("Local Player")
+
+local SettingFarmGroup = SettingFarmTab:AddLeftGroupbox("Settings")
+
+local SkillGroup = SkillTab:AddLeftGroupbox("Skill")
+
+local FarmGroup = FarmTab:AddLeftGroupbox("Farm")
+
+local StackGroup = StackTab:AddLeftGroupbox("Stack")
+
+local FarmOtherGroup = FarmOtherTab:AddLeftGroupbox("Other")
+
+local FruitGroup = FruitTab:AddLeftGroupbox("Fruit")
+local RaidGroup = FruitTab:AddRightGroupbox("Raid")
+
+local SeaGroup = SeaTab:AddLeftGroupbox("Sea")
+
+local ESPGroup = ESPTab:AddLeftGroupbox("ESP")
+
+local PVPGroup = PVPTab:AddLeftGroupbox("PVP")
+
+--========================
+-- SHOP
+--========================
+
+ShopGroup:AddButton({
+    Text = "Redeem Code",
+    Func = function()
+        print("Redeem")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Random Fruit",
+    Func = function()
+        print("Fruit")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Teleport Second Sea",
+    Func = function()
+        print("Sea 2")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Teleport Third Sea",
+    Func = function()
+        print("Sea 3")
+    end
+})
+
+--========================
+-- STATUS
+--========================
+
+local TimeLabel = StatusGroup:AddLabel("Loading Time...")
+local FPSLabel = StatusGroup:AddLabel("FPS : 0")
+local PingLabel = StatusGroup:AddLabel("Ping : 0")
+
+StatusGroup:AddDivider()
+
+local MirageLabel = StatusGroup:AddLabel("Mirage Island : Checking...")
+local KitsuneLabel = StatusGroup:AddLabel("Kitsune Island : Checking...")
+local PrehistoricLabel = StatusGroup:AddLabel("Prehistoric Island : Checking...")
+local FrozenLabel = StatusGroup:AddLabel("Frozen Dimension : Checking...")
+
+StatusGroup:AddDivider()
+
+local RipIndraLabel = StatusGroup:AddLabel("Rip_Indra : Checking...")
+local DoughKingLabel = StatusGroup:AddLabel("Dough King : Checking...")
+local EliteLabel = StatusGroup:AddLabel("Elite Hunter : Checking...")
+local MoonLabel = StatusGroup:AddLabel("Moon : Checking...")
+
+--========================
+-- STATUS LOOP
+--========================
+
+task.spawn(function()
+    while task.wait(1) do
+
+        TimeLabel:SetText(os.date("%d/%m/%Y - %H:%M:%S [VN]"))
+
+        FPSLabel:SetText("FPS : "..math.floor(workspace:GetRealPhysicsFPS()))
+
+        PingLabel:SetText(
+            "Ping : "..
+            math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())
+            .." ms"
+        )
+
+    end
+end)
+
+task.spawn(function()
+    while task.wait(5) do
+
+        local Enemies = workspace:FindFirstChild("Enemies")
+
+        -- Mirage
+        if workspace:FindFirstChild("Mirage Island") then
+            MirageLabel:SetText("Mirage Island : ✅")
+        else
+            MirageLabel:SetText("Mirage Island : ❌")
+        end
+
+        -- Kitsune
+        if workspace:FindFirstChild("Kitsune Island") then
+            KitsuneLabel:SetText("Kitsune Island : ✅")
+        else
+            KitsuneLabel:SetText("Kitsune Island : ❌")
+        end
+
+        -- Prehistoric
+        if workspace:FindFirstChild("Prehistoric Island") then
+            PrehistoricLabel:SetText("Prehistoric Island : ✅")
+        else
+            PrehistoricLabel:SetText("Prehistoric Island : ❌")
+        end
+
+        -- Frozen
+        if workspace:FindFirstChild("Frozen Dimension") then
+            FrozenLabel:SetText("Frozen Dimension : ✅")
+        else
+            FrozenLabel:SetText("Frozen Dimension : ❌")
+        end
+
+        -- Bosses
+        if Enemies then
+
+            if Enemies:FindFirstChild("rip_indra True Form") then
+                RipIndraLabel:SetText("Rip_Indra : ✅")
+            else
+                RipIndraLabel:SetText("Rip_Indra : ❌")
+            end
+
+            if Enemies:FindFirstChild("Dough King") then
+                DoughKingLabel:SetText("Dough King : ✅")
+            else
+                DoughKingLabel:SetText("Dough King : ❌")
+            end
+
+        end
+
+        -- Elite
+        EliteLabel:SetText("Elite Hunter : "..tostring(LocalPlayer.Data.Fragments.Value))
+
+        -- Moon
+        local Lighting = game:GetService("Lighting")
+
+        if Lighting.ClockTime >= 0 and Lighting.ClockTime <= 5 then
+            MoonLabel:SetText("Moon : 🌕")
+        else
+            MoonLabel:SetText("Moon : 🌑")
+        end
+
+    end
+end)
+
+--========================
+-- SERVER
+--========================
+
+getgenv().JoinJobId = ""
+
+ServerGroup:AddInput("JobIdInput", {
+    Default = "",
+    Numeric = false,
+    Finished = false,
+
+    Text = "Input Your JobID Here",
+    Placeholder = "Input Here",
+
+    Callback = function(Value)
+        getgenv().JoinJobId = Value
+    end
+})
+
+ServerGroup:AddToggle("SpamJoin", {
+    Text = "Spam Join",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().SpamJoin = Value
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Join Server",
+
+    Func = function()
+
+        if getgenv().JoinJobId ~= "" then
+
+            TeleportService:TeleportToPlaceInstance(
+                game.PlaceId,
+                getgenv().JoinJobId,
+                LocalPlayer
+            )
+
+        end
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Copy JobId",
+
+    Func = function()
+        setclipboard(game.JobId)
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Rejoin Server",
+
+    Func = function()
+        TeleportService:Teleport(game.PlaceId, LocalPlayer)
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Hop Server",
+
+    Func = function()
+        print("Hop Server")
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Hop Server Less Player",
+
+    Func = function()
+        print("Hop Less Player")
+    end
+})
+
+--========================
+-- LOCAL PLAYER
+--========================
+
+LocalGroup:AddSlider("WalkSpeed", {
+    Text = "Walk Speed",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+
+    Callback = function(Value)
+
+        LocalPlayer.Character.Humanoid.WalkSpeed = Value
+
+    end
+})
+
+LocalGroup:AddSlider("JumpPower", {
+    Text = "Jump Power",
+    Min = 50,
+    Max = 300,
+    Default = 50,
+
+    Callback = function(Value)
+
+        LocalPlayer.Character.Humanoid.JumpPower = Value
+
+    end
+})
+
+LocalGroup:AddToggle("NoClip", {
+    Text = "No Clip",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().NoClip = Value
+    end
+})
+
+task.spawn(function()
+    while task.wait() do
+
+        if getgenv().NoClip then
+
+            for _,v in pairs(LocalPlayer.Character:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.CanCollide = false
+                end
+            end
+
+        end
+
+    end
+end)
+
+--========================
+-- SETTINGS FARM
+--========================
+
+SettingFarmGroup:AddToggle("AutoHaki", {
+    Text = "Auto Haki",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AutoHaki = Value
+    end
+})
+
+SettingFarmGroup:AddToggle("FastAttack", {
+    Text = "Fast Attack",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().FastAttack = Value
+    end
+})
+
+SettingFarmGroup:AddSlider("FarmDistance", {
+    Text = "Farm Distance",
+    Min = 0,
+    Max = 500,
+    Default = 300,
+
+    Callback = function(Value)
+        getgenv().FarmDistance = Value
+    end
+})
+
+--========================
+-- SKILL
+--========================
+
+SkillGroup:AddDropdown("SelectSkill", {
+    Values = {"Z","X","C","V","F"},
+    Default = 1,
+    Multi = true,
+
+    Text = "Select Skill",
+
+    Callback = function(Value)
+        print(Value)
+    end
+})
+
+--========================
+-- FARM
+--========================
+
+FarmGroup:AddToggle("AutoFarm", {
+    Text = "Auto Farm",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AutoFarm = Value
+    end
+})
+
+FarmGroup:AddToggle("AutoQuest", {
+    Text = "Auto Quest",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AutoQuest = Value
+    end
+})
+
+FarmGroup:AddDropdown("Weapon", {
+    Values = {"Melee","Sword","Gun","Blox Fruit"},
+    Default = 1,
+    Multi = false,
+
+    Text = "Select Weapon",
+
+    Callback = function(Value)
+        getgenv().SelectWeapon = Value
+    end
+})
+
+--========================
+-- STACK
+--========================
+
+StackGroup:AddToggle("StackMob", {
+    Text = "Stack Mob",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().StackMob = Value
+    end
+})
+
+StackGroup:AddSlider("StackDistance", {
+    Text = "Stack Distance",
+    Min = 0,
+    Max = 100,
+    Default = 25,
+
+    Callback = function(Value)
+        getgenv().StackDistance = Value
+    end
+})
+
+--========================
+-- FARM OTHER
+--========================
+
+FarmOtherGroup:AddToggle("BringMob", {
+    Text = "Bring Mob",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().BringMob = Value
+    end
+})
+
+FarmOtherGroup:AddToggle("TweenFarm", {
+    Text = "Tween Farm",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().TweenFarm = Value
+    end
+})
+
+FarmOtherGroup:AddToggle("AutoChest", {
+    Text = "Auto Chest",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AutoChest = Value
+    end
+})
+
+--========================
+-- FRUIT
+--========================
+
+FruitGroup:AddToggle("FruitESP", {
+    Text = "Fruit ESP",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().FruitESP = Value
+    end
+})
+
+FruitGroup:AddToggle("AutoFruit", {
+    Text = "Auto Collect Fruit",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AutoFruit = Value
+    end
+})
+
+--========================
+-- RAID
+--========================
+
+RaidGroup:AddToggle("AutoRaid", {
+    Text = "Auto Raid",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AutoRaid = Value
+    end
+})
+
+RaidGroup:AddDropdown("SelectRaid", {
+    Values = {
+        "Flame",
+        "Ice",
+        "Dark",
+        "Light",
+        "Magma",
+        "Buddha",
+        "Dough"
+    },
+
+    Default = 1,
+    Multi = false,
+
+    Text = "Select Raid",
+
+    Callback = function(Value)
+        getgenv().Raid = Value
+    end
+})
+
+--========================
+-- SEA
+--========================
+
+SeaGroup:AddToggle("SeaEvent", {
+    Text = "Auto Sea Event",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().SeaEvent = Value
+    end
+})
+
+SeaGroup:AddToggle("SharkHunter", {
+    Text = "Shark Hunter",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().SharkHunter = Value
+    end
+})
+
+--========================
+-- ESP
+--========================
+
+ESPGroup:AddToggle("PlayerESP", {
+    Text = "Player ESP",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().PlayerESP = Value
+    end
+})
+
+ESPGroup:AddToggle("ChestESP", {
+    Text = "Chest ESP",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().ChestESP = Value
+    end
+})
+
+ESPGroup:AddToggle("IslandESP", {
+    Text = "Island ESP",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().IslandESP = Value
+    end
+})
+
+--========================
+-- PVP
+--========================
+
+PVPGroup:AddToggle("AttackAura", {
+    Text = "Attack Aura",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AttackAura = Value
+    end
+})
+
+PVPGroup:AddToggle("AutoSkill", {
+    Text = "Auto Skill",
+    Default = false,
+
+    Callback = function(Value)
+        getgenv().AutoSkill = Value
+    end
+})
+
+PVPGroup:AddDropdown("PVPWeapon", {
+    Values = {"Melee","Sword","Gun","Blox Fruit"},
+    Default = 1,
+    Multi = false,
+
+    Text = "Select Weapon",
+
+    Callback = function(Value)
+        getgenv().PVPWeapon = Value
+    end
+})
+
+--========================
+-- CONFIG
+--========================
+
+Library:SetFolder("HiruZHub")
+
+--========================
+-- NOTIFY
+--========================
+
+Library:Notify({
+    Title = "HiruZ Loaded",
+    Description = "Hub Loaded Successfully",
+    Duration = 5
+})
