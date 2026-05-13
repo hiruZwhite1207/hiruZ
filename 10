@@ -1,0 +1,262 @@
+-- =============================================
+--          HIRUZ ULTIMATE MAX - FLUENT UI
+--          Blade Ball Script (English)
+-- =============================================
+
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Hiruz Ultimate Max - Blade Ball",
+    SubTitle = "by Grok",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.RightControl
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "sword" }),
+    Movement = Window:AddTab({ Title = "Movement", Icon = "move" }),
+    Visual = Window:AddTab({ Title = "Visual", Icon = "eye" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local root = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+
+local remotes = ReplicatedStorage:FindFirstChild("Remotes") or ReplicatedStorage
+local parryRemote = remotes:FindFirstChild("ParryButtonPress") or remotes:FindFirstChildOfClass("RemoteEvent")
+
+getgenv().Hiruz = {
+    AutoParry = true,
+    KillAura = false,
+    AutoCurve = false,
+    SpeedHack = false,
+    Fly = false,
+    GodMode = false,
+    ParryDistance = 34,
+    AuraRange = 30,
+    ParryDelay = 0.02,
+    FlySpeed = 65,
+    WalkSpeed = 75,
+    Visualizer = true,
+    ESP = true,
+}
+
+-- Fly System
+local flyBV
+local function startFly()
+    if flyBV then return end
+    flyBV = Instance.new("BodyVelocity")
+    flyBV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    flyBV.Parent = root
+end
+
+local function updateFly()
+    if not getgenv().Hiruz.Fly or not flyBV then return end
+    local cam = workspace.CurrentCamera
+    local dir = Vector3.new()
+    if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir += cam.CFrame.LookVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir -= cam.CFrame.LookVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir -= cam.CFrame.RightVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir += cam.CFrame.RightVector end
+    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then dir += Vector3.new(0,1,0) end
+    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then dir -= Vector3.new(0,1,0) end
+    
+    if dir.Magnitude > 0 then
+        flyBV.Velocity = dir.Unit * getgenv().Hiruz.FlySpeed
+    else
+        flyBV.Velocity = Vector3.new(0,0,0)
+    end
+end
+
+local function stopFly()
+    if flyBV then 
+        flyBV:Destroy() 
+        flyBV = nil 
+    end
+end
+
+local function getNearestEnemy()
+    local nearest, dist = nil, math.huge
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr \~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local d = (plr.Character.HumanoidRootPart.Position - root.Position).Magnitude
+            if d < dist and d < getgenv().Hiruz.AuraRange then
+                dist = d
+                nearest = plr.Character.HumanoidRootPart
+            end
+        end
+    end
+    return nearest
+end
+
+-- Main Loop
+RunService.Heartbeat:Connect(function()
+    if not character or not root then return end
+    updateFly()
+
+    if getgenv().Hiruz.SpeedHack and humanoid then
+        humanoid.WalkSpeed = getgenv().Hiruz.WalkSpeed
+    end
+
+    if getgenv().Hiruz.GodMode and humanoid then
+        humanoid.Health = humanoid.MaxHealth
+    end
+
+    for _, obj in ipairs(Workspace:GetChildren()) do
+        if string.find(obj.Name:lower(), "ball") then
+            local ball = obj:IsA("BasePart") and obj or obj:FindFirstChildWhichIsA("BasePart")
+            if ball then
+                local distance = (ball.Position - root.Position).Magnitude
+                local vel = ball.Velocity.Magnitude
+                local predicted = distance / (vel + 15)
+
+                if getgenv().Hiruz.AutoParry and distance < getgenv().Hiruz.ParryDistance and predicted < 0.6 then
+                    task.wait(getgenv().Hiruz.ParryDelay)
+                    if parryRemote then 
+                        parryRemote:FireServer() 
+                    end
+                end
+
+                if getgenv().Hiruz.AutoCurve and distance < 25 then
+                    if getNearestEnemy() and parryRemote then
+                        parryRemote:FireServer()
+                    end
+                end
+
+                if getgenv().Hiruz.Visualizer and not ball:FindFirstChild("Highlight") then
+                    local hl = Instance.new("Highlight")
+                    hl.FillColor = Color3.fromRGB(0, 255, 100)
+                    hl.OutlineColor = Color3.fromRGB(255, 255, 0)
+                    hl.FillTransparency = 0.4
+                    hl.Parent = ball
+                end
+            end
+        end
+    end
+
+    if getgenv().Hiruz.KillAura then
+        if getNearestEnemy() and parryRemote then
+            parryRemote:FireServer()
+        end
+    end
+end)
+
+-- ================== GUI ==================
+Tabs.Main:AddToggle({
+    Title = "Auto Parry",
+    Default = true,
+    Callback = function(v) getgenv().Hiruz.AutoParry = v end
+})
+
+Tabs.Main:AddToggle({
+    Title = "Kill Aura",
+    Default = false,
+    Callback = function(v) getgenv().Hiruz.KillAura = v end
+})
+
+Tabs.Main:AddToggle({
+    Title = "Auto Curve (Redirect)",
+    Default = false,
+    Callback = function(v) getgenv().Hiruz.AutoCurve = v end
+})
+
+Tabs.Movement:AddToggle({
+    Title = "Speed Hack",
+    Default = false,
+    Callback = function(v) getgenv().Hiruz.SpeedHack = v end
+})
+
+Tabs.Movement:AddSlider({
+    Title = "WalkSpeed",
+    Min = 16,
+    Max = 250,
+    Default = 75,
+    Increment = 2,
+    Callback = function(v) getgenv().Hiruz.WalkSpeed = v end
+})
+
+Tabs.Movement:AddToggle({
+    Title = "Fly (WASD + Space/Ctrl)",
+    Default = false,
+    Callback = function(v) 
+        getgenv().Hiruz.Fly = v 
+        if v then startFly() else stopFly() end 
+    end
+})
+
+Tabs.Movement:AddSlider({
+    Title = "Fly Speed",
+    Min = 30,
+    Max = 250,
+    Default = 65,
+    Increment = 5,
+    Callback = function(v) getgenv().Hiruz.FlySpeed = v end
+})
+
+Tabs.Main:AddToggle({
+    Title = "God Mode",
+    Default = false,
+    Callback = function(v) getgenv().Hiruz.GodMode = v end
+})
+
+Tabs.Visual:AddToggle({
+    Title = "Ball Visualizer",
+    Default = true,
+    Callback = function(v) getgenv().Hiruz.Visualizer = v end
+})
+
+Tabs.Visual:AddToggle({
+    Title = "Player ESP",
+    Default = true,
+    Callback = function(v) getgenv().Hiruz.ESP = v end
+})
+
+Tabs.Settings:AddSlider({
+    Title = "Parry Distance",
+    Min = 15,
+    Max = 60,
+    Default = 34,
+    Increment = 1,
+    Callback = function(v) getgenv().Hiruz.ParryDistance = v end
+})
+
+Tabs.Settings:AddSlider({
+    Title = "Kill Aura Range",
+    Min = 10,
+    Max = 50,
+    Default = 30,
+    Increment = 1,
+    Callback = function(v) getgenv().Hiruz.AuraRange = v end
+})
+
+Tabs.Settings:AddSlider({
+    Title = "Parry Delay (ms)",
+    Min = 0,
+    Max = 80,
+    Default = 20,
+    Increment = 5,
+    Callback = function(v) getgenv().Hiruz.ParryDelay = v/1000 end
+})
+
+Fluent:Notify({
+    Title = "Hiruz Loaded",
+    Content = "Fluent UI version loaded successfully!",
+    Duration = 5
+})
+
+player.CharacterAdded:Connect(function(new)
+    character = new
+    root = new:WaitForChild("HumanoidRootPart")
+    humanoid = new:WaitForChild("Humanoid")
+end)
