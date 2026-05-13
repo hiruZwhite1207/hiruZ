@@ -1,0 +1,364 @@
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Window = Library:CreateWindow({
+    Title = "HiruZ Hub",
+    Subtitle = ": b l o x f r u i t",
+    Image = "rbxassetid://128185233852701"
+})
+
+--========================
+-- TABS
+--========================
+
+local ShopTab = Window:AddTab("Shop")
+local StatusTab = Window:AddTab("Status And Server")
+local LocalTab = Window:AddTab("LocalPlayer")
+local SkillTab = Window:AddTab("Hold And Select Skill")
+local FarmTab = Window:AddTab("Farming")
+local StackTab = Window:AddTab("Stack Farming")
+local FruitTab = Window:AddTab("Fruit And Raid Dungeon")
+local SeaTab = Window:AddTab("Sea Event")
+local RaceTab = Window:AddTab("Upgrade Race")
+local ItemTab = Window:AddTab("Get And Upgrade Item")
+local VolcanoTab = Window:AddTab("Volcano Event")
+local ESPTab = Window:AddTab("ESP")
+local PVPTab = Window:AddTab("PVP")
+
+--========================
+-- GROUPBOXES
+--========================
+
+-- Shop
+local ShopGroup = ShopTab:AddLeftGroupbox("Shop")
+
+-- Fighting Shop
+local FightingGroup = ShopTab:AddRightGroupbox("Fighting Shop")
+
+-- Ability Shop
+local AbilityGroup = ShopTab:AddRightGroupbox("Ability Shop")
+
+-- Status
+local StatusGroup = StatusTab:AddLeftGroupbox("Player Status")
+local ServerGroup = StatusTab:AddRightGroupbox("Server")
+
+-- LocalPlayer
+local LocalGroup = LocalTab:AddLeftGroupbox("Player Mods")
+
+-- Skill
+local SkillGroup = SkillTab:AddLeftGroupbox("Skills")
+
+-- Farming
+local FarmGroup = FarmTab:AddLeftGroupbox("Framing")
+
+-- Framing Other
+local FarmOtherGroup = FarmTab:AddRightGroupbox("Framing Other")
+
+-- Stack Farming
+local StackGroup = StackTab:AddLeftGroupbox("Stack Framing")
+
+-- Fruit
+local FruitGroup = FruitTab:AddLeftGroupbox("Fruit")
+local RaidGroup = FruitTab:AddRightGroupbox("Raid")
+
+-- Sea Event
+local SeaGroup = SeaTab:AddLeftGroupbox("Sea Features")
+
+-- Race
+local RaceGroup = RaceTab:AddLeftGroupbox("Race Upgrade")
+
+-- Item
+local ItemGroup = ItemTab:AddLeftGroupbox("Items")
+
+-- Volcano
+local VolcanoGroup = VolcanoTab:AddLeftGroupbox("Volcano")
+
+-- ESP
+local ESPGroup = ESPTab:AddLeftGroupbox("ESP Features")
+
+-- PVP
+local PVPGroup = PVPTab:AddLeftGroupbox("PVP Features")
+
+--========================
+-- SHOP BUTTONS
+--========================
+
+ShopGroup:AddButton({
+    Text = "Redeem Code",
+
+    Func = function()
+        print("Redeem Code")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Teleport Old World",
+
+    Func = function()
+        print("Teleport Old World")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Teleport Third Sea",
+
+    Func = function()
+        print("Teleport Third Sea")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Dual Flintlock",
+
+    Func = function()
+        print("Buy Dual Flintlock")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Reroll Race",
+
+    Func = function()
+        print("Reroll Race")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Ghoul Race",
+
+    Func = function()
+        print("Buy Ghoul Race")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Cyborg Race",
+
+    Func = function()
+        print("Buy Cyborg Race")
+    end
+})
+
+--========================
+-- FIGHTING SHOP
+--========================
+
+local FightingStyles = {
+    "Black Leg",
+    "Fishman Karate",
+    "Electro",
+    "Super Human",
+    "Death Step",
+    "Sharkman Karate",
+    "Electric Claw",
+    "Godhuman",
+    "Sanguine Art"
+}
+
+for _, v in pairs(FightingStyles) do
+    FightingGroup:AddToggle(v, {
+        Text = v,
+        Default = false,
+
+        Callback = function(Value)
+            print(v, Value)
+        end
+    })
+end
+
+--========================
+-- ABILITY SHOP
+--========================
+
+local AbilityShop = {
+    "Skyjump [$10,000 Beli]",
+    "Buso Haki [$25,000 Beli]",
+    "Observation Haki [$750,000 Beli]",
+    "Soru [$100,000 Beli]"
+}
+
+for _, v in pairs(AbilityShop) do
+    AbilityGroup:AddButton({
+        Text = v,
+
+        Func = function()
+            print(v)
+        end
+    })
+end
+
+--========================
+-- FARMING
+--========================
+
+FarmGroup:AddToggle("AutoFarm", {
+    Text = "Auto Farm",
+    Default = false,
+
+    Callback = function(Value)
+        print("Auto Farm:", Value)
+    end
+})
+
+FarmGroup:AddToggle("AutoQuest", {
+    Text = "Auto Quest",
+    Default = false,
+
+    Callback = function(Value)
+        print("Auto Quest:", Value)
+    end
+})
+
+FarmGroup:AddDropdown("SelectWeapon", {
+    Values = {"Melee", "Sword", "Blox Fruit"},
+    Default = 1,
+    Multi = false,
+
+    Text = "Select Weapon",
+
+    Callback = function(Value)
+        print(Value)
+    end
+})
+
+FarmGroup:AddSlider("FarmDistance", {
+    Text = "Distance Farm Aura",
+    Min = 0,
+    Max = 500,
+    Default = 300,
+    Rounding = 0,
+
+    Callback = function(Value)
+        print(Value)
+    end
+})
+
+--========================
+-- FRAMING OTHER
+--========================
+
+FarmOtherGroup:AddToggle("AutoHaki", {
+    Text = "Auto Haki",
+    Default = false,
+
+    Callback = function(Value)
+        print("Auto Haki:", Value)
+    end
+})
+
+FarmOtherGroup:AddToggle("BringMob", {
+    Text = "Bring Mob",
+    Default = false,
+
+    Callback = function(Value)
+        print("Bring Mob:", Value)
+    end
+})
+
+FarmOtherGroup:AddToggle("FastAttack", {
+    Text = "Fast Attack",
+    Default = false,
+
+    Callback = function(Value)
+        print("Fast Attack:", Value)
+    end
+})
+
+--========================
+-- STACK FARMING
+--========================
+
+StackGroup:AddToggle("StackMob", {
+    Text = "Stack Mob",
+    Default = false,
+
+    Callback = function(Value)
+        print("Stack Mob:", Value)
+    end
+})
+
+StackGroup:AddSlider("StackDistance", {
+    Text = "Stack Distance",
+    Min = 0,
+    Max = 100,
+    Default = 25,
+    Rounding = 0,
+
+    Callback = function(Value)
+        print(Value)
+    end
+})
+
+--========================
+-- ESP
+--========================
+
+ESPGroup:AddToggle("PlayerESP", {
+    Text = "Player ESP",
+    Default = false,
+
+    Callback = function(Value)
+        print("ESP:", Value)
+    end
+})
+
+ESPGroup:AddToggle("ChestESP", {
+    Text = "Chest ESP",
+    Default = false,
+
+    Callback = function(Value)
+        print("Chest ESP:", Value)
+    end
+})
+
+ESPGroup:AddToggle("FruitESP", {
+    Text = "Fruit ESP",
+    Default = false,
+
+    Callback = function(Value)
+        print("Fruit ESP:", Value)
+    end
+})
+
+--========================
+-- PVP
+--========================
+
+PVPGroup:AddToggle("AttackAura", {
+    Text = "Attack Aura",
+    Default = false,
+
+    Callback = function(Value)
+        print("Aura:", Value)
+    end
+})
+
+PVPGroup:AddToggle("AutoSkill", {
+    Text = "Auto Skill",
+    Default = false,
+
+    Callback = function(Value)
+        print("Auto Skill:", Value)
+    end
+})
+
+PVPGroup:AddDropdown("PVPWeapon", {
+    Values = {"Melee", "Sword", "Gun", "Blox Fruit"},
+    Default = 1,
+    Multi = false,
+
+    Text = "Select Weapon",
+
+    Callback = function(Value)
+        print(Value)
+    end
+})
+
+--========================
+-- NOTIFY
+--========================
+
+Library:Notify({
+    Title = "HiruZ Loaded",
+    Description = "Hub Loaded Successfully",
+    Duration = 5
+})
