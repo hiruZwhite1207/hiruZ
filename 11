@@ -1,0 +1,119 @@
+--// UI
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "hiruZ Hub | Blade Ball",
+    LoadingTitle = "hiruZ",
+    LoadingSubtitle = "Final Build",
+    ConfigurationSaving = {Enabled = false}
+})
+
+local CombatTab = Window:CreateTab("Combat")
+local VisualTab = Window:CreateTab("Visual")
+local MiscTab = Window:CreateTab("Misc")
+
+--// Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+--// SETTINGS
+local Settings = {
+    AutoParry = false,
+    AutoDodge = false,
+    PanicParry = true,
+    Shader = false,
+    SwordSkin = "Blue"
+}
+
+--// =========================
+--// UI
+--// =========================
+
+CombatTab:CreateToggle({
+    Name = "Auto Parry (AI)",
+    Callback = function(v)
+        Settings.AutoParry = v
+    end
+})
+
+CombatTab:CreateToggle({
+    Name = "Auto Dodge",
+    Callback = function(v)
+        Settings.AutoDodge = v
+    end
+})
+
+CombatTab:CreateToggle({
+    Name = "Panic Parry",
+    Callback = function(v)
+        Settings.PanicParry = v
+    end
+})
+
+VisualTab:CreateDropdown({
+    Name = "Sword Skin",
+    Options = {"Blue","Red","Green"},
+    Callback = function(v)
+        Settings.SwordSkin = v
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "Shader",
+    Callback = function(v)
+        Settings.Shader = v
+        if v then enableShader() else disableShader() end
+    end
+})
+
+--// =========================
+--// FUNCTIONS (paste code cũ vào đây)
+--// =========================
+
+-- ví dụ:
+-- getBall()
+-- AI parry
+-- fake sword
+-- prediction
+-- highlight
+-- hitEffect()
+-- cameraEffect()
+-- anti lag
+-- rejoin
+
+--// =========================
+--// MAIN LOOP
+--// =========================
+
+RunService.RenderStepped:Connect(function(dt)
+
+    -- tìm ball
+    -- tính velocity
+
+    -- player
+    local char = player.Character
+    if not char then return end
+
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    -- AI COMBAT
+    if Settings.AutoParry then
+        -- code parry của bạn
+    end
+
+    if Settings.AutoDodge then
+        -- code dodge
+    end
+
+    if Settings.PanicParry then
+        -- code panic
+    end
+
+    -- VISUAL
+    -- fake sword update
+    -- prediction line
+    -- ESP
+
+end)
