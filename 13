@@ -1,0 +1,401 @@
+--// HIRUZ TRAINING HUB ⚡
+
+-- services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
+
+local player = Players.LocalPlayer
+
+-- theme
+local Theme = {
+    Main = Color3.fromRGB(18,18,18),
+    Sidebar = Color3.fromRGB(12,12,12),
+    Accent = Color3.fromRGB(170,0,255),
+    Text = Color3.new(1,1,1)
+}
+
+-- config
+local Config = {
+    TrainingEnabled = true,
+    BallESP = true,
+    DistanceWarn = 20,
+    ShowVelocity = true,
+    Watermark = true
+}
+
+-- blur
+local blur = Instance.new("BlurEffect")
+blur.Size = 10
+blur.Parent = Lighting
+
+-- gui
+local gui = Instance.new("ScreenGui")
+gui.Name = "HIRUZ_TRAINING"
+gui.ResetOnSpawn = false
+gui.Parent = game.CoreGui
+
+-- main
+local frame = Instance.new("Frame")
+frame.Parent = gui
+
+frame.Size = UDim2.new(0,700,0,430)
+frame.Position = UDim2.new(0.5,-350,0.5,-215)
+
+frame.BackgroundColor3 = Theme.Main
+frame.BorderSizePixel = 0
+
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0,14)
+
+-- sidebar
+local sidebar = Instance.new("Frame")
+sidebar.Parent = frame
+
+sidebar.Size = UDim2.new(0,180,1,0)
+sidebar.BackgroundColor3 = Theme.Sidebar
+sidebar.BorderSizePixel = 0
+
+Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0,14)
+
+-- title
+local title = Instance.new("TextLabel")
+title.Parent = sidebar
+
+title.Size = UDim2.new(1,0,0,60)
+title.BackgroundTransparency = 1
+
+title.Text = "HIRUZ HUB"
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 24
+
+title.TextColor3 = Theme.Text
+title.TextStrokeTransparency = 0
+title.TextStrokeColor3 = Theme.Accent
+
+-- content
+local content = Instance.new("Frame")
+content.Parent = frame
+
+content.Size = UDim2.new(1,-200,1,-20)
+content.Position = UDim2.new(0,190,0,10)
+
+content.BackgroundTransparency = 1
+
+-- watermark
+local watermark = Instance.new("TextLabel")
+watermark.Parent = gui
+
+watermark.Size = UDim2.new(0,260,0,30)
+watermark.Position = UDim2.new(0,10,0,10)
+
+watermark.BackgroundTransparency = 1
+watermark.TextXAlignment = Enum.TextXAlignment.Left
+
+watermark.Font = Enum.Font.GothamBold
+watermark.TextSize = 16
+watermark.TextColor3 = Theme.Accent
+
+-- info label
+local info = Instance.new("TextLabel")
+info.Parent = content
+
+info.Size = UDim2.new(1,0,0,120)
+info.BackgroundTransparency = 1
+
+info.Font = Enum.Font.GothamBold
+info.TextSize = 22
+info.TextColor3 = Theme.Text
+
+info.TextXAlignment = Enum.TextXAlignment.Left
+info.TextYAlignment = Enum.TextYAlignment.Top
+
+-- notification
+local function Notify(txt)
+
+    local notif = Instance.new("Frame")
+    notif.Parent = gui
+
+    notif.Size = UDim2.new(0,250,0,60)
+    notif.Position = UDim2.new(1,300,1,-80)
+
+    notif.BackgroundColor3 = Theme.Main
+    notif.BorderSizePixel = 0
+
+    Instance.new("UICorner", notif).CornerRadius = UDim.new(0,12)
+
+    local label = Instance.new("TextLabel")
+    label.Parent = notif
+
+    label.Size = UDim2.new(1,0,1,0)
+    label.BackgroundTransparency = 1
+
+    label.Text = txt
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 18
+    label.TextColor3 = Theme.Text
+
+    TweenService:Create(
+        notif,
+        TweenInfo.new(0.35),
+        {
+            Position = UDim2.new(1,-270,1,-80)
+        }
+    ):Play()
+
+    task.wait(2)
+
+    TweenService:Create(
+        notif,
+        TweenInfo.new(0.35),
+        {
+            Position = UDim2.new(1,300,1,-80)
+        }
+    ):Play()
+
+    task.wait(0.4)
+    notif:Destroy()
+end
+
+Notify("HIRUZ TRAINING LOADED ⚡")
+
+-- button system
+local currentY = 80
+
+local function CreateButton(name, callback)
+
+    local button = Instance.new("TextButton")
+    button.Parent = sidebar
+
+    button.Size = UDim2.new(1,-20,0,42)
+    button.Position = UDim2.new(0,10,0,currentY)
+
+    button.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    button.BorderSizePixel = 0
+
+    button.Text = name
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 16
+    button.TextColor3 = Theme.Text
+
+    Instance.new("UICorner", button).CornerRadius = UDim.new(0,10)
+
+    button.MouseEnter:Connect(function()
+
+        TweenService:Create(
+            button,
+            TweenInfo.new(0.15),
+            {
+                BackgroundColor3 = Theme.Accent
+            }
+        ):Play()
+
+    end)
+
+    button.MouseLeave:Connect(function()
+
+        TweenService:Create(
+            button,
+            TweenInfo.new(0.15),
+            {
+                BackgroundColor3 = Color3.fromRGB(30,30,30)
+            }
+        ):Play()
+
+    end)
+
+    button.MouseButton1Click:Connect(function()
+
+        callback()
+        Notify(name)
+
+    end)
+
+    currentY += 55
+end
+
+-- training systems
+local Training = {}
+
+function Training:GetBall()
+
+    for _,v in pairs(workspace:GetChildren()) do
+
+        if v.Name == "Ball" then
+            return v
+        end
+
+    end
+end
+
+function Training:CreateESP(ball)
+
+    if ball:FindFirstChild("HIRUZ_ESP") then
+        return
+    end
+
+    local hl = Instance.new("Highlight")
+    hl.Name = "HIRUZ_ESP"
+
+    hl.FillColor = Theme.Accent
+    hl.OutlineColor = Color3.new(1,1,1)
+
+    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    hl.Parent = ball
+
+end
+
+function Training:Update()
+
+    local char = player.Character
+    if not char then return end
+
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local ball = self:GetBall()
+
+    if not ball then
+        info.Text = "No Ball Found"
+        return
+    end
+
+    if Config.BallESP then
+        self:CreateESP(ball)
+    end
+
+    local distance =
+        (ball.Position - hrp.Position).Magnitude
+
+    local velocity =
+        ball.AssemblyLinearVelocity.Magnitude
+
+    local text =
+        "Distance : "..math.floor(distance).."\n"
+
+    if Config.ShowVelocity then
+        text = text ..
+            "Velocity : "..math.floor(velocity).."\n"
+    end
+
+    if distance <= Config.DistanceWarn then
+        text = text .. "⚠ TIMING WINDOW"
+    end
+
+    info.Text = text
+
+end
+
+-- buttons
+CreateButton("Toggle Training", function()
+
+    Config.TrainingEnabled =
+        not Config.TrainingEnabled
+
+end)
+
+CreateButton("Toggle Ball ESP", function()
+
+    Config.BallESP =
+        not Config.BallESP
+
+end)
+
+CreateButton("Velocity Display", function()
+
+    Config.ShowVelocity =
+        not Config.ShowVelocity
+
+end)
+
+CreateButton("UI Theme Pulse", function()
+
+    TweenService:Create(
+        frame,
+        TweenInfo.new(0.5),
+        {
+            BackgroundColor3 = Theme.Accent
+        }
+    ):Play()
+
+    task.wait(0.5)
+
+    TweenService:Create(
+        frame,
+        TweenInfo.new(0.5),
+        {
+            BackgroundColor3 = Theme.Main
+        }
+    ):Play()
+
+end)
+
+-- draggable
+local dragging
+local dragStart
+local startPos
+
+frame.InputBegan:Connect(function(input)
+
+    if input.UserInputType ==
+        Enum.UserInputType.MouseButton1 then
+
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+
+        input.Changed:Connect(function()
+
+            if input.UserInputState ==
+                Enum.UserInputState.End then
+
+                dragging = false
+
+            end
+        end)
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+
+    if dragging and
+        input.UserInputType ==
+        Enum.UserInputType.MouseMovement then
+
+        local delta = input.Position - dragStart
+
+        frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- keybind
+UIS.InputBegan:Connect(function(input,gp)
+
+    if gp then return end
+
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        frame.Visible = not frame.Visible
+    end
+end)
+
+-- update loop
+RunService.RenderStepped:Connect(function()
+
+    if Config.TrainingEnabled then
+        Training:Update()
+    end
+
+    if Config.Watermark then
+
+        watermark.Text =
+            "HIRUZ HUB ⚡ | fps : " ..
+            math.floor(workspace:GetRealPhysicsFPS())
+
+    end
+end)
