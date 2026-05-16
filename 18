@@ -1,0 +1,330 @@
+--// hiruZ Auto Chest V5
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local TeleportService = game:GetService("TeleportService")
+local StarterGui = game:GetService("StarterGui")
+local VirtualUser = game:GetService("VirtualUser")
+local UIS = game:GetService("UserInputService")
+
+local plr = Players.LocalPlayer
+
+getgenv().AutoChest = false
+getgenv().FarmMode = "Teleport"
+getgenv().LootedChests = {}
+
+-- anti afk
+plr.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
+
+-- auto rejoin
+game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(v)
+
+    if tostring(v) == "ErrorPrompt" then
+
+        task.wait(2)
+
+        TeleportService:Teleport(game.PlaceId)
+    end
+end)
+
+-- character
+local function HRP()
+
+    local char = plr.Character or plr.CharacterAdded:Wait()
+
+    return char:WaitForChild("HumanoidRootPart")
+end
+
+-- chest id
+local function ChestID(pos)
+
+    return math.floor(pos.X)
+    .."_"
+    ..math.floor(pos.Y)
+    .."_"
+    ..math.floor(pos.Z)
+end
+
+-- notify
+local function Notify(text)
+
+    StarterGui:SetCore("SendNotification",{
+        Title = "hiruZ",
+        Text = text,
+        Duration = 2
+    })
+end
+
+-- ui
+local gui = Instance.new("ScreenGui")
+gui.Name = "hiruZ"
+gui.ResetOnSpawn = false
+
+pcall(function()
+    gui.Parent = game.CoreGui
+end)
+
+local main = Instance.new("Frame",gui)
+main.Size = UDim2.new(0,210,0,125)
+main.Position = UDim2.new(0.73,0,0.2,0)
+main.BackgroundColor3 = Color3.fromRGB(12,12,12)
+main.BorderSizePixel = 0
+
+Instance.new("UICorner",main).CornerRadius = UDim.new(0,14)
+
+local title = Instance.new("TextLabel",main)
+title.Size = UDim2.new(1,0,0,28)
+title.BackgroundTransparency = 1
+title.Text = "hiruZ"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextColor3 = Color3.fromRGB(255,255,255)
+
+local toggle = Instance.new("TextButton",main)
+toggle.Size = UDim2.new(0,170,0,30)
+toggle.Position = UDim2.new(0.09,0,0.28,0)
+toggle.BackgroundColor3 = Color3.fromRGB(30,30,30)
+toggle.Text = "Auto Chest : OFF"
+toggle.Font = Enum.Font.GothamBold
+toggle.TextSize = 13
+toggle.TextColor3 = Color3.fromRGB(255,255,255)
+
+Instance.new("UICorner",toggle).CornerRadius = UDim.new(0,9)
+
+local mode = Instance.new("TextButton",main)
+mode.Size = UDim2.new(0,170,0,24)
+mode.Position = UDim2.new(0.09,0,0.58,0)
+mode.BackgroundColor3 = Color3.fromRGB(22,22,22)
+mode.Text = "Mode : Teleport"
+mode.Font = Enum.Font.GothamBold
+mode.TextSize = 12
+mode.TextColor3 = Color3.fromRGB(255,255,255)
+
+Instance.new("UICorner",mode).CornerRadius = UDim.new(0,9)
+
+local hop = Instance.new("TextButton",main)
+hop.Size = UDim2.new(0,170,0,24)
+hop.Position = UDim2.new(0.09,0,0.81,0)
+hop.BackgroundColor3 = Color3.fromRGB(18,18,18)
+hop.Text = "Hop Server"
+hop.Font = Enum.Font.GothamBold
+hop.TextSize = 12
+hop.TextColor3 = Color3.fromRGB(255,255,255)
+
+Instance.new("UICorner",hop).CornerRadius = UDim.new(0,9)
+
+-- drag
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+
+    local delta = input.Position - dragStart
+
+    main.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
+
+main.InputBegan:Connect(function(input)
+
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+        dragging = true
+        dragStart = input.Position
+        startPos = main.Position
+
+        input.Changed:Connect(function()
+
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+main.InputChanged:Connect(function(input)
+
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+-- mode switch
+mode.MouseButton1Click:Connect(function()
+
+    if getgenv().FarmMode == "Teleport" then
+
+        getgenv().FarmMode = "Tween"
+
+        mode.Text = "Mode : Tween"
+
+    else
+
+        getgenv().FarmMode = "Teleport"
+
+        mode.Text = "Mode : Teleport"
+    end
+end)
+
+-- toggle
+toggle.MouseButton1Click:Connect(function()
+
+    getgenv().AutoChest = not getgenv().AutoChest
+
+    if getgenv().AutoChest then
+
+        toggle.Text = "Auto Chest : ON"
+        toggle.BackgroundColor3 = Color3.fromRGB(0,170,255)
+
+    else
+
+        toggle.Text = "Auto Chest : OFF"
+        toggle.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    end
+end)
+
+-- hop
+hop.MouseButton1Click:Connect(function()
+
+    TeleportService:Teleport(game.PlaceId)
+end)
+
+-- finder
+local function GetChest()
+
+    local hrp = HRP()
+
+    local nearest = nil
+    local dist = math.huge
+
+    for _,v in pairs(workspace:GetDescendants()) do
+
+        if string.find(v.Name:lower(),"chest") then
+
+            local pos
+
+            if v:IsA("BasePart") then
+                pos = v.Position
+            end
+
+            if v:IsA("Model") then
+
+                local part = v.PrimaryPart
+                or v:FindFirstChildWhichIsA("BasePart",true)
+
+                if part then
+                    pos = part.Position
+                end
+            end
+
+            if pos then
+
+                local id = ChestID(pos)
+
+                if not getgenv().LootedChests[id] then
+
+                    local mag = (hrp.Position - pos).Magnitude
+
+                    if mag < dist then
+
+                        dist = mag
+
+                        nearest = {
+                            obj = v,
+                            pos = pos,
+                            id = id
+                        }
+                    end
+                end
+            end
+        end
+    end
+
+    return nearest
+end
+
+-- move
+local function MoveTo(pos)
+
+    local hrp = HRP()
+
+    if getgenv().FarmMode == "Teleport" then
+
+        hrp.CFrame = CFrame.new(
+            pos + Vector3.new(
+                math.random(-2,2),
+                2,
+                math.random(-2,2)
+            )
+        )
+
+    else
+
+        local tween = TweenService:Create(
+            hrp,
+            TweenInfo.new(
+                (hrp.Position - pos).Magnitude / 250,
+                Enum.EasingStyle.Linear
+            ),
+            {
+                CFrame = CFrame.new(pos + Vector3.new(0,2,0))
+            }
+        )
+
+        tween:Play()
+        tween.Completed:Wait()
+    end
+
+    hrp.AssemblyLinearVelocity = Vector3.zero
+    hrp.AssemblyAngularVelocity = Vector3.zero
+end
+
+-- farm
+task.spawn(function()
+
+    while task.wait(0.15) do
+
+        pcall(function()
+
+            if getgenv().AutoChest then
+
+                local chest = GetChest()
+
+                if chest then
+
+                    Notify("Đang qua rương khác")
+
+                    MoveTo(chest.pos)
+
+                    getgenv().LootedChests[chest.id] = true
+
+                    task.wait(math.random(12,18)/100)
+
+                else
+
+                    table.clear(getgenv().LootedChests)
+
+                    Notify("Đang tìm rương mới")
+
+                    task.wait(2)
+                end
+            end
+        end)
+    end
+end)
