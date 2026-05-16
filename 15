@@ -1,0 +1,222 @@
+--// hiruZ 🌴 Auto Chest V2
+--// Fix chest ẩn + không kéo về đảo cũ
+
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+
+local plr = Players.LocalPlayer
+
+getgenv().AutoChest = false
+getgenv().TweenSpeed = 350
+getgenv().Collected = {}
+
+--// Character
+local function GetChar()
+    return plr.Character or plr.CharacterAdded:Wait()
+end
+
+local function GetHRP()
+    return GetChar():WaitForChild("HumanoidRootPart")
+end
+
+--// UI
+local gui = Instance.new("ScreenGui")
+pcall(function()
+    gui.Parent = game.CoreGui
+end)
+
+gui.Name = "hiruZ"
+gui.ResetOnSpawn = false
+
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0,210,0,95)
+main.Position = UDim2.new(0.72,0,0.2,0)
+main.BackgroundColor3 = Color3.fromRGB(12,12,12)
+main.BorderSizePixel = 0
+
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,14)
+
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1,0,0,28)
+title.BackgroundTransparency = 1
+title.Text = "hiruZ"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextColor3 = Color3.fromRGB(255,255,255)
+
+local toggle = Instance.new("TextButton", main)
+toggle.Size = UDim2.new(0,170,0,32)
+toggle.Position = UDim2.new(0.09,0,0.37,0)
+toggle.BackgroundColor3 = Color3.fromRGB(30,30,30)
+toggle.Text = "Auto Chest : OFF"
+toggle.Font = Enum.Font.GothamBold
+toggle.TextSize = 13
+toggle.TextColor3 = Color3.fromRGB(255,255,255)
+
+Instance.new("UICorner", toggle).CornerRadius = UDim.new(0,9)
+
+local hop = Instance.new("TextButton", main)
+hop.Size = UDim2.new(0,170,0,26)
+hop.Position = UDim2.new(0.09,0,0.73,0)
+hop.BackgroundColor3 = Color3.fromRGB(22,22,22)
+hop.Text = "Hop Server"
+hop.Font = Enum.Font.GothamBold
+hop.TextSize = 12
+hop.TextColor3 = Color3.fromRGB(255,255,255)
+
+Instance.new("UICorner", hop).CornerRadius = UDim.new(0,9)
+
+--// Drag
+local UIS = game:GetService("UserInputService")
+
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    main.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
+
+main.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = main.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+main.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+--// Find chest kể cả chest ẩn
+local function GetNearestChest()
+    local hrp = GetHRP()
+
+    local nearest = nil
+    local distance = math.huge
+
+    for _,v in pairs(workspace:GetDescendants()) do
+        if string.find(v.Name:lower(),"chest") then
+
+            local pos = nil
+
+            if v:IsA("Model") then
+                if v.PrimaryPart then
+                    pos = v.PrimaryPart.Position
+                end
+
+            elseif v:IsA("BasePart") then
+                pos = v.Position
+            end
+
+            if pos and not getgenv().Collected[v] then
+                local mag = (hrp.Position - pos).Magnitude
+
+                if mag < distance then
+                    distance = mag
+                    nearest = {
+                        obj = v,
+                        pos = pos
+                    }
+                end
+            end
+        end
+    end
+
+    return nearest
+end
+
+--// Tween không bị kéo ngược
+local function TweenTo(pos)
+    local hrp = GetHRP()
+
+    local dist = (hrp.Position - pos).Magnitude
+    local time = dist / getgenv().TweenSpeed
+
+    local tween = TweenService:Create(
+        hrp,
+        TweenInfo.new(time, Enum.EasingStyle.Linear),
+        {CFrame = CFrame.new(pos)}
+    )
+
+    tween:Play()
+
+    local done = false
+
+    tween.Completed:Connect(function()
+        done = true
+    end)
+
+    repeat
+        hrp.Velocity = Vector3.zero
+        task.wait()
+    until done or not getgenv().AutoChest
+
+    tween:Cancel()
+end
+
+--// Toggle
+toggle.MouseButton1Click:Connect(function()
+
+    getgenv().AutoChest = not getgenv().AutoChest
+
+    if getgenv().AutoChest then
+        toggle.Text = "Auto Chest : ON"
+        toggle.BackgroundColor3 = Color3.fromRGB(0,170,255)
+    else
+        toggle.Text = "Auto Chest : OFF"
+        toggle.BackgroundColor3 = Color3.fromRGB(30,30,30)
+    end
+end)
+
+--// Hop
+hop.MouseButton1Click:Connect(function()
+    TeleportService:Teleport(game.PlaceId, plr)
+end)
+
+--// Farm
+task.spawn(function()
+    while task.wait(0.15) do
+        pcall(function()
+
+            if getgenv().AutoChest then
+
+                local chest = GetNearestChest()
+
+                if chest then
+
+                    TweenTo(chest.pos + Vector3.new(0,3,0))
+
+                    task.wait(0.4)
+
+                    getgenv().Collected[chest.obj] = true
+                else
+                    table.clear(getgenv().Collected)
+                end
+            end
+        end)
+    end
+end)
