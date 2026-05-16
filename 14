@@ -1,0 +1,219 @@
+--// HIRUZ HUB UI ⚡
+
+local UIS = game:GetService("UserInputService")
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "hiruZ_Hub"
+gui.ResetOnSpawn = false
+gui.Parent = game.CoreGui
+
+-- MAIN FRAME
+local frame = Instance.new("Frame")
+frame.Parent = gui
+
+frame.Size = UDim2.new(0,320,0,190)
+frame.Position = UDim2.new(0.32,0,0.3,0)
+
+frame.BackgroundColor3 =
+    Color3.fromRGB(15,15,15)
+
+frame.BorderSizePixel = 0
+
+Instance.new("UICorner",frame)
+    .CornerRadius = UDim.new(0,16)
+
+-- TITLE
+local title = Instance.new("TextLabel")
+title.Parent = frame
+
+title.Size = UDim2.new(1,0,0,50)
+title.BackgroundTransparency = 1
+
+title.Text = "hiruZ Hub - Auto Chest"
+
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+
+title.TextColor3 =
+    Color3.fromRGB(255,255,255)
+
+-- LABEL
+local label = Instance.new("TextLabel")
+label.Parent = frame
+
+label.Position = UDim2.new(0,20,0,70)
+label.Size = UDim2.new(0,180,0,40)
+
+label.BackgroundTransparency = 1
+
+label.Text = "Auto Farm Chest"
+
+label.Font = Enum.Font.Gotham
+label.TextSize = 20
+
+label.TextXAlignment =
+    Enum.TextXAlignment.Left
+
+label.TextColor3 =
+    Color3.fromRGB(220,220,220)
+
+-- TOGGLE BG
+local toggleBg = Instance.new("Frame")
+toggleBg.Parent = frame
+
+toggleBg.Position = UDim2.new(1,-90,0,75)
+toggleBg.Size = UDim2.new(0,70,0,35)
+
+toggleBg.BackgroundColor3 =
+    Color3.fromRGB(45,45,45)
+
+Instance.new("UICorner",toggleBg)
+    .CornerRadius = UDim.new(1,0)
+
+-- TOGGLE BUTTON
+local toggleBtn = Instance.new("Frame")
+toggleBtn.Parent = toggleBg
+
+toggleBtn.Size = UDim2.new(0,30,0,30)
+toggleBtn.Position = UDim2.new(0,3,0,2)
+
+toggleBtn.BackgroundColor3 =
+    Color3.fromRGB(255,255,255)
+
+Instance.new("UICorner",toggleBtn)
+    .CornerRadius = UDim.new(1,0)
+
+-- BUTTON
+local hopBtn = Instance.new("TextButton")
+hopBtn.Parent = frame
+
+hopBtn.Position = UDim2.new(0,20,0,125)
+hopBtn.Size = UDim2.new(1,-40,0,45)
+
+hopBtn.BackgroundColor3 =
+    Color3.fromRGB(35,35,35)
+
+hopBtn.Text = "HOP SERVER"
+
+hopBtn.Font = Enum.Font.GothamBold
+hopBtn.TextSize = 22
+
+hopBtn.TextColor3 =
+    Color3.fromRGB(255,255,255)
+
+Instance.new("UICorner",hopBtn)
+    .CornerRadius = UDim.new(0,12)
+
+-- TOGGLE LOGIC
+local enabled = false
+
+local TweenService =
+    game:GetService("TweenService")
+
+local function updateToggle()
+
+    if enabled then
+
+        TweenService:Create(
+            toggleBtn,
+            TweenInfo.new(0.15),
+            {
+                Position =
+                    UDim2.new(0,37,0,2)
+            }
+        ):Play()
+
+        toggleBg.BackgroundColor3 =
+            Color3.fromRGB(0,170,255)
+
+    else
+
+        TweenService:Create(
+            toggleBtn,
+            TweenInfo.new(0.15),
+            {
+                Position =
+                    UDim2.new(0,3,0,2)
+            }
+        ):Play()
+
+        toggleBg.BackgroundColor3 =
+            Color3.fromRGB(45,45,45)
+    end
+end
+
+toggleBg.InputBegan:Connect(function(input)
+
+    if input.UserInputType ==
+        Enum.UserInputType.MouseButton1
+    or input.UserInputType ==
+        Enum.UserInputType.Touch then
+
+        enabled = not enabled
+
+        updateToggle()
+    end
+end)
+
+-- DRAG SYSTEM (mobile + pc)
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+
+    local delta =
+        input.Position - dragStart
+
+    frame.Position =
+        UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+end
+
+frame.InputBegan:Connect(function(input)
+
+    if input.UserInputType ==
+        Enum.UserInputType.MouseButton1
+    or input.UserInputType ==
+        Enum.UserInputType.Touch then
+
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+
+        input.Changed:Connect(function()
+
+            if input.UserInputState ==
+                Enum.UserInputState.End then
+
+                dragging = false
+            end
+        end)
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+
+    if input.UserInputType ==
+        Enum.UserInputType.MouseMovement
+    or input.UserInputType ==
+        Enum.UserInputType.Touch then
+
+        dragInput = input
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+
+    if input == dragInput
+    and dragging then
+
+        update(input)
+    end
+end)
