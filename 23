@@ -1,0 +1,91 @@
+--// TSB MAX FPS CLEANER
+--// remove fog + remove shake + remove flash + clear vision
+
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+
+pcall(function()
+
+    ------------------------------------------------
+    -- REMOVE ALL LIGHTING EFFECTS
+    ------------------------------------------------
+
+    for _,v in pairs(Lighting:GetChildren()) do
+
+        if v:IsA("Atmosphere")
+        or v:IsA("BloomEffect")
+        or v:IsA("BlurEffect")
+        or v:IsA("ColorCorrectionEffect")
+        or v:IsA("DepthOfFieldEffect")
+        or v:IsA("SunRaysEffect")
+        or v:IsA("Sky") then
+
+            v:Destroy()
+        end
+    end
+
+    ------------------------------------------------
+    -- CLEAN LIGHTING
+    ------------------------------------------------
+
+    Lighting.Brightness = 1.5
+    Lighting.ClockTime = 14
+
+    Lighting.FogEnd = 1000000
+    Lighting.FogStart = 1000000
+
+    Lighting.GlobalShadows = false
+
+    Lighting.Ambient = Color3.fromRGB(140,140,140)
+    Lighting.OutdoorAmbient = Color3.fromRGB(140,140,140)
+
+    ------------------------------------------------
+    -- REMOVE SHAKE + EFFECTS
+    ------------------------------------------------
+
+    local cam = workspace.CurrentCamera
+
+    RunService.RenderStepped:Connect(function()
+
+        -- fix zoom shake feel
+        cam.FieldOfView = 70
+
+        for _,v in pairs(workspace:GetDescendants()) do
+
+            ------------------------------------------------
+            -- REMOVE PARTICLES
+            ------------------------------------------------
+
+            if v:IsA("ParticleEmitter")
+            or v:IsA("Trail")
+            or v:IsA("Smoke")
+            or v:IsA("Fire")
+            or v:IsA("Sparkles") then
+
+                v.Enabled = false
+            end
+
+            ------------------------------------------------
+            -- REMOVE EXPLOSIONS
+            ------------------------------------------------
+
+            if v:IsA("Explosion") then
+                v.BlastPressure = 0
+            end
+
+            ------------------------------------------------
+            -- REMOVE LIGHTS
+            ------------------------------------------------
+
+            if v:IsA("PointLight")
+            or v:IsA("SpotLight")
+            or v:IsA("SurfaceLight") then
+
+                v.Enabled = false
+            end
+        end
+    end)
+
+end)
+
+print("MAX FPS MODE ENABLED 🚀")
