@@ -1,0 +1,250 @@
+--// TSB ULTRA RTX CINEMATIC V4
+--// hyper realism + fake ray tracing + wet ground + dynamic world
+
+local Lighting = game:GetService("Lighting")
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+local RunService = game:GetService("RunService")
+
+pcall(function()
+
+    ---------------------------------------------------
+    -- CLEAR OLD
+    ---------------------------------------------------
+
+    for _,v in pairs(Lighting:GetChildren()) do
+        if v:IsA("PostEffect")
+        or v:IsA("Atmosphere")
+        or v:IsA("Sky") then
+            v:Destroy()
+        end
+    end
+
+    ---------------------------------------------------
+    -- LIGHTING ENGINE
+    ---------------------------------------------------
+
+    Lighting.Technology = Enum.Technology.Future
+    Lighting.GlobalShadows = true
+    Lighting.ShadowSoftness = 0.04
+
+    Lighting.ClockTime = 16.7
+    Lighting.Brightness = 2.4
+    Lighting.ExposureCompensation = 0.3
+
+    Lighting.EnvironmentDiffuseScale = 0.7
+    Lighting.EnvironmentSpecularScale = 1
+
+    Lighting.Ambient = Color3.fromRGB(30,30,35)
+    Lighting.OutdoorAmbient = Color3.fromRGB(160,160,165)
+
+    ---------------------------------------------------
+    -- ATMOSPHERE
+    ---------------------------------------------------
+
+    local atm = Instance.new("Atmosphere")
+    atm.Density = 0.48
+    atm.Offset = 0.01
+    atm.Color = Color3.fromRGB(230,215,195)
+    atm.Decay = Color3.fromRGB(75,82,95)
+    atm.Glare = 0.45
+    atm.Haze = 2
+    atm.Parent = Lighting
+
+    ---------------------------------------------------
+    -- SUN RAYS
+    ---------------------------------------------------
+
+    local rays = Instance.new("SunRaysEffect")
+    rays.Intensity = 0.22
+    rays.Spread = 0.97
+    rays.Parent = Lighting
+
+    ---------------------------------------------------
+    -- DEPTH
+    ---------------------------------------------------
+
+    local dof = Instance.new("DepthOfFieldEffect")
+    dof.FocusDistance = 55
+    dof.InFocusRadius = 42
+    dof.FarIntensity = 0.23
+    dof.NearIntensity = 0.04
+    dof.Parent = Lighting
+
+    ---------------------------------------------------
+    -- COLOR
+    ---------------------------------------------------
+
+    local cc = Instance.new("ColorCorrectionEffect")
+    cc.Brightness = 0.04
+    cc.Contrast = 0.32
+    cc.Saturation = -0.01
+    cc.TintColor = Color3.fromRGB(255,242,220)
+    cc.Parent = Lighting
+
+    ---------------------------------------------------
+    -- BLOOM
+    ---------------------------------------------------
+
+    local bloom = Instance.new("BloomEffect")
+    bloom.Intensity = 0.35
+    bloom.Size = 70
+    bloom.Threshold = 2
+    bloom.Parent = Lighting
+
+    ---------------------------------------------------
+    -- SHARPEN FEEL
+    ---------------------------------------------------
+
+    local sharpen = Instance.new("ColorCorrectionEffect")
+    sharpen.Contrast = 0.05
+    sharpen.Saturation = 0.04
+    sharpen.Parent = Lighting
+
+    ---------------------------------------------------
+    -- SKY
+    ---------------------------------------------------
+
+    local sky = Instance.new("Sky")
+
+    sky.SkyboxBk = "rbxassetid://6444884337"
+    sky.SkyboxDn = "rbxassetid://6444884785"
+    sky.SkyboxFt = "rbxassetid://6444884337"
+    sky.SkyboxLf = "rbxassetid://6444884337"
+    sky.SkyboxRt = "rbxassetid://6444884337"
+    sky.SkyboxUp = "rbxassetid://6412503613"
+
+    sky.SunAngularSize = 20
+    sky.StarCount = 0
+    sky.Parent = Lighting
+
+    ---------------------------------------------------
+    -- WATER RTX
+    ---------------------------------------------------
+
+    if Terrain then
+        Terrain.WaterColor = Color3.fromRGB(40,75,100)
+        Terrain.WaterTransparency = 0.08
+        Terrain.WaterReflectance = 0.5
+        Terrain.WaterWaveSize = 0.28
+        Terrain.WaterWaveSpeed = 15
+    end
+
+    ---------------------------------------------------
+    -- WORLD MATERIAL REALISM
+    ---------------------------------------------------
+
+    for _,obj in pairs(workspace:GetDescendants()) do
+
+        if obj:IsA("BasePart") then
+
+            local n = string.lower(obj.Name)
+
+            ---------------------------------------------------
+            -- TREES + LEAVES
+            ---------------------------------------------------
+
+            if string.find(n,"tree")
+            or string.find(n,"leaf")
+            or string.find(n,"bush") then
+
+                obj.CastShadow = true
+                obj.Material = Enum.Material.LeafyGrass
+
+                obj.Color = obj.Color:Lerp(
+                    Color3.fromRGB(
+                        math.random(55,95),
+                        math.random(100,145),
+                        math.random(55,85)
+                    ),
+                    0.2
+                )
+
+                obj.Reflectance = 0.01
+
+            end
+
+            ---------------------------------------------------
+            -- WOOD
+            ---------------------------------------------------
+
+            if string.find(n,"wood")
+            or string.find(n,"log") then
+
+                obj.Material = Enum.Material.Wood
+                obj.CastShadow = true
+                obj.Reflectance = 0
+
+            end
+
+            ---------------------------------------------------
+            -- WET GROUND EFFECT
+            ---------------------------------------------------
+
+            if obj.Material == Enum.Material.Concrete
+            or obj.Material == Enum.Material.Asphalt then
+
+                obj.Reflectance = 0.05
+
+            end
+
+            ---------------------------------------------------
+            -- GRASS FEEL
+            ---------------------------------------------------
+
+            if obj.Material == Enum.Material.Grass then
+
+                obj.Color = obj.Color:Lerp(
+                    Color3.fromRGB(80,120,65),
+                    0.12
+                )
+
+                obj.Reflectance = 0.01
+
+            end
+        end
+    end
+
+    ---------------------------------------------------
+    -- FAKE WIND SYSTEM
+    ---------------------------------------------------
+
+    local t = 0
+
+    RunService.RenderStepped:Connect(function(dt)
+
+        t += dt * 1.5
+
+        for _,obj in pairs(workspace:GetDescendants()) do
+
+            if obj:IsA("BasePart") then
+
+                local n = string.lower(obj.Name)
+
+                if string.find(n,"leaf")
+                or string.find(n,"bush") then
+
+                    local sway =
+                        math.sin(t + obj.Position.X * 0.05) * 0.002
+
+                    obj.CFrame =
+                        obj.CFrame *
+                        CFrame.Angles(0,sway,0)
+                end
+            end
+        end
+    end)
+
+    ---------------------------------------------------
+    -- LIGHT FLICKER FEEL
+    ---------------------------------------------------
+
+    RunService.RenderStepped:Connect(function()
+
+        Lighting.ExposureCompensation =
+            0.28 + math.sin(t * 0.2) * 0.01
+
+    end)
+
+end)
+
+print("ULTRA RTX WORLD ENABLED ☀️🌳🌊")
