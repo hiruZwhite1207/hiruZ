@@ -1,0 +1,397 @@
+--// hiruZ hub : blox fruit
+
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Window = Library:CreateWindow({
+    Title = "hiruZ hub",
+    Subtitle = ": blox fruit",
+    Image = "rbxassetid://128185233852701"
+})
+
+--// =========================
+--// SHOP
+--// =========================
+
+local ShopTab = Window:AddTab("Shop")
+local ShopGroup = ShopTab:AddLeftGroupbox("Shop Features")
+
+ShopGroup:AddButton({
+    Text = "Buy Random Fruit",
+    Func = function()
+        print("Buying Fruit...")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Aura",
+    Func = function()
+        print("Buying Aura...")
+    end
+})
+
+ShopGroup:AddButton({
+    Text = "Buy Fighting Style",
+    Func = function()
+        print("Buying Fighting Style...")
+    end
+})
+
+--// =========================
+--// START AND SERVER
+--// =========================
+
+local ServerTab = Window:AddTab("Start And Server")
+local ServerGroup = ServerTab:AddLeftGroupbox("Server Features")
+
+ServerGroup:AddButton({
+    Text = "Rejoin Server",
+    Func = function()
+        game:GetService("TeleportService"):Teleport(game.PlaceId)
+    end
+})
+
+ServerGroup:AddButton({
+    Text = "Server Hop",
+    Func = function()
+        print("Server Hopping...")
+    end
+})
+
+ServerGroup:AddInput("JobID", {
+    Text = "Join JobID",
+    Default = "",
+    Placeholder = "Paste JobID...",
+    Callback = function(Value)
+        print(Value)
+    end
+})
+
+--// =========================
+--// LOCALPLAYER
+--// =========================
+
+local PlayerTab = Window:AddTab("LocalPlayer")
+local PlayerGroup = PlayerTab:AddLeftGroupbox("Player Features")
+
+PlayerGroup:AddSlider("WalkSpeed", {
+    Text = "Walk Speed",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Rounding = 0,
+    Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
+    end
+})
+
+PlayerGroup:AddSlider("JumpPower", {
+    Text = "Jump Power",
+    Min = 50,
+    Max = 300,
+    Default = 50,
+    Rounding = 0,
+    Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
+    end
+})
+
+--// =========================
+--// SETTINGS FARM
+--// =========================
+
+local SettingsTab = Window:AddTab("Settings Farm")
+local SettingsGroup = SettingsTab:AddLeftGroupbox("Farm Settings")
+
+SettingsGroup:AddSlider("TweenSpeed", {
+    Text = "Tween Speed",
+    Min = 100,
+    Max = 500,
+    Default = 300,
+    Rounding = 0,
+    Callback = function(Value)
+        getgenv().TweenSpeed = Value
+    end
+})
+
+SettingsGroup:AddToggle("AutoHaki", {
+    Text = "Auto Haki",
+    Default = true,
+    Callback = function(Value)
+        print("Auto Haki:", Value)
+    end
+})
+
+--// =========================
+--// HOLD AND SELECT SKILL
+--// =========================
+
+local SkillTab = Window:AddTab("Hold And Select Skill")
+local SkillGroup = SkillTab:AddLeftGroupbox("Skill Features")
+
+SkillGroup:AddDropdown("SelectSkill", {
+    Text = "Select Skill",
+    Values = {"Z", "X", "C", "V", "F"},
+    Default = 1,
+    Callback = function(Value)
+        print("Selected Skill:", Value)
+    end
+})
+
+SkillGroup:AddSlider("HoldTime", {
+    Text = "Hold Skill Time",
+    Min = 0,
+    Max = 10,
+    Default = 1,
+    Rounding = 1,
+    Callback = function(Value)
+        print("Hold Time:", Value)
+    end
+})
+
+--// =========================
+--// FARMING
+--// =========================
+
+local FarmTab = Window:AddTab("Farming")
+local FarmGroup = FarmTab:AddLeftGroupbox("Farm Features")
+
+FarmGroup:AddToggle("AutoFarm", {
+    Text = "Auto Farm Level",
+    Default = false,
+    Callback = function(Value)
+        getgenv().AutoFarm = Value
+
+        while getgenv().AutoFarm do
+            print("Auto Farming...")
+            task.wait(1)
+        end
+    end
+})
+
+FarmGroup:AddToggle("AutoQuest", {
+    Text = "Auto Quest",
+    Default = false,
+    Callback = function(Value)
+        print("Auto Quest:", Value)
+    end
+})
+
+FarmGroup:AddToggle("AutoChest", {
+    Text = "Auto Chest",
+    Default = false,
+    Callback = function(Value)
+        print("Auto Chest:", Value)
+    end
+})
+
+--// =========================
+--// STACK FARMING
+--// =========================
+
+local StackTab = Window:AddTab("Stack Farming")
+local StackGroup = StackTab:AddLeftGroupbox("Stack Features")
+
+StackGroup:AddToggle("BringMob", {
+    Text = "Bring Mob",
+    Default = false,
+    Callback = function(Value)
+        print("Bring Mob:", Value)
+    end
+})
+
+StackGroup:AddToggle("FastAttack", {
+    Text = "Fast Attack",
+    Default = false,
+    Callback = function(Value)
+        print("Fast Attack:", Value)
+    end
+})
+
+--// =========================
+--// FARMING OTHERS
+--// =========================
+
+local OtherFarmTab = Window:AddTab("Farming Others")
+local OtherFarmGroup = OtherFarmTab:AddLeftGroupbox("Other Farms")
+
+OtherFarmGroup:AddToggle("BoneFarm", {
+    Text = "Bone Farm",
+    Default = false,
+    Callback = function(Value)
+        print("Bone Farm:", Value)
+    end
+})
+
+OtherFarmGroup:AddToggle("FragmentFarm", {
+    Text = "Fragment Farm",
+    Default = false,
+    Callback = function(Value)
+        print("Fragment Farm:", Value)
+    end
+})
+
+--// =========================
+--// FRUIT AND RAID,DUNGEON
+--// =========================
+
+local RaidTab = Window:AddTab("Fruit And Raid,Dungeon")
+local RaidGroup = RaidTab:AddLeftGroupbox("Raid Features")
+
+RaidGroup:AddToggle("AutoRaid", {
+    Text = "Auto Raid",
+    Default = false,
+    Callback = function(Value)
+        print("Auto Raid:", Value)
+    end
+})
+
+RaidGroup:AddToggle("AutoDungeon", {
+    Text = "Auto Dungeon",
+    Default = false,
+    Callback = function(Value)
+        print("Auto Dungeon:", Value)
+    end
+})
+
+--// =========================
+--// SEA EVENT
+--// =========================
+
+local SeaTab = Window:AddTab("Sea Event")
+local SeaGroup = SeaTab:AddLeftGroupbox("Sea Features")
+
+SeaGroup:AddToggle("MirageESP", {
+    Text = "Mirage ESP",
+    Default = false,
+    Callback = function(Value)
+        print("Mirage ESP:", Value)
+    end
+})
+
+SeaGroup:AddToggle("SeaBeast", {
+    Text = "Sea Beast ESP",
+    Default = false,
+    Callback = function(Value)
+        print("Sea Beast:", Value)
+    end
+})
+
+--// =========================
+--// UPGRADE RACE
+--// =========================
+
+local RaceTab = Window:AddTab("Upgrade Race")
+local RaceGroup = RaceTab:AddLeftGroupbox("Race Features")
+
+RaceGroup:AddButton({
+    Text = "Upgrade Race V2",
+    Func = function()
+        print("Upgrade V2")
+    end
+})
+
+RaceGroup:AddButton({
+    Text = "Upgrade Race V3",
+    Func = function()
+        print("Upgrade V3")
+    end
+})
+
+RaceGroup:AddButton({
+    Text = "Upgrade Race V4",
+    Func = function()
+        print("Upgrade V4")
+    end
+})
+
+--// =========================
+--// GET AND UPGRADE ITEM
+--// =========================
+
+local ItemTab = Window:AddTab("Get And Upgrade Item")
+local ItemGroup = ItemTab:AddLeftGroupbox("Item Features")
+
+ItemGroup:AddButton({
+    Text = "Get Saber",
+    Func = function()
+        print("Getting Saber...")
+    end
+})
+
+ItemGroup:AddButton({
+    Text = "Upgrade Weapon",
+    Func = function()
+        print("Upgrading Weapon...")
+    end
+})
+
+--// =========================
+--// VOLCANO EVENT
+--// =========================
+
+local VolcanoTab = Window:AddTab("Volcano Event")
+local VolcanoGroup = VolcanoTab:AddLeftGroupbox("Volcano Features")
+
+VolcanoGroup:AddToggle("AutoVolcano", {
+    Text = "Auto Volcano",
+    Default = false,
+    Callback = function(Value)
+        print("Auto Volcano:", Value)
+    end
+})
+
+--// =========================
+--// ESP
+--// =========================
+
+local ESPTab = Window:AddTab("ESP")
+local ESPGroup = ESPTab:AddLeftGroupbox("ESP Features")
+
+ESPGroup:AddToggle("PlayerESP", {
+    Text = "Player ESP",
+    Default = false,
+    Callback = function(Value)
+        print("Player ESP:", Value)
+    end
+})
+
+ESPGroup:AddToggle("ChestESP", {
+    Text = "Chest ESP",
+    Default = false,
+    Callback = function(Value)
+        print("Chest ESP:", Value)
+    end
+})
+
+--// =========================
+--// PVP
+--// =========================
+
+local PVPTab = Window:AddTab("PVP")
+local PVPGroup = PVPTab:AddLeftGroupbox("PVP Features")
+
+PVPGroup:AddToggle("AimBot", {
+    Text = "AimBot",
+    Default = false,
+    Callback = function(Value)
+        print("AimBot:", Value)
+    end
+})
+
+PVPGroup:AddToggle("KillAura", {
+    Text = "Kill Aura",
+    Default = false,
+    Callback = function(Value)
+        print("Kill Aura:", Value)
+    end
+})
+
+--// =========================
+--// NOTIFICATION
+--// =========================
+
+Library:Notify({
+    Title = "hiruZ hub",
+    Description = "Loaded Successfully!",
+    Duration = 5
+})
