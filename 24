@@ -1,0 +1,230 @@
+ hiruZ hub : blox fruit
+
+```lua
+--// hiruZ hub : blox fruit
+
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Window = Library:CreateWindow({
+    Title = "hiruZ hub",
+    Subtitle = ": blox fruit",
+    Image = "rbxassetid://128185233852701"
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CommF = ReplicatedStorage.Remotes.CommF_
+
+--// =========================
+--// SHOP TAB
+--// =========================
+
+local ShopTab = Window:AddTab("Shop")
+
+--// =========================
+--// MISC SHOP
+--// =========================
+
+local MiscShop = ShopTab:AddLeftGroupbox("Misc Shop")
+
+MiscShop:AddButton({
+    Text = "Redeem Code",
+    Func = function()
+        print("Redeem Codes...")
+    end
+})
+
+MiscShop:AddButton({
+    Text = "Teleport Old World",
+    Func = function()
+        CommF:InvokeServer("TravelMain")
+    end
+})
+
+MiscShop:AddButton({
+    Text = "Teleport New World",
+    Func = function()
+        CommF:InvokeServer("TravelDressrosa")
+    end
+})
+
+MiscShop:AddButton({
+    Text = "Teleport Third Sea",
+    Func = function()
+        CommF:InvokeServer("TravelZou")
+    end
+})
+
+MiscShop:AddButton({
+    Text = "Buy Dual Flintlock",
+    Func = function()
+        print("Buying Dual Flintlock...")
+    end
+})
+
+MiscShop:AddButton({
+    Text = "Reroll Race",
+    Func = function()
+        CommF:InvokeServer("BlackbeardReward","Reroll","2")
+    end
+})
+
+MiscShop:AddButton({
+    Text = "Reset Stats",
+    Func = function()
+        CommF:InvokeServer("RefundPoints")
+    end
+})
+
+MiscShop:AddButton({
+    Text = "Buy Ghoul Race",
+    Func = function()
+        print("Buying Ghoul Race...")
+    end
+})
+
+MiscShop:AddButton({
+    Text = "Buy Cyborg Race",
+    Func = function()
+        print("Buying Cyborg Race...")
+    end
+})
+
+--// =========================
+--// FIGHTING SHOP
+--// =========================
+
+local FightingShop = ShopTab:AddRightGroupbox("Fighting Shop")
+
+FightingShop:AddButton({
+    Text = "Black Leg",
+    Func = function()
+        CommF:InvokeServer("BuyBlackLeg")
+    end
+})
+
+FightingShop:AddButton({
+    Text = "Fishman Karate",
+    Func = function()
+        CommF:InvokeServer("BuyFishmanKarate")
+    end
+})
+
+FightingShop:AddButton({
+    Text = "Electro",
+    Func = function()
+        CommF:InvokeServer("BuyElectro")
+    end
+})
+
+FightingShop:AddButton({
+    Text = "Dragon Breath",
+    Func = function()
+        CommF:InvokeServer("BlackbeardReward","DragonClaw","2")
+    end
+})
+
+FightingShop:AddButton({
+    Text = "Death Step",
+    Func = function()
+        print("Buying Death Step...")
+    end
+})
+
+FightingShop:AddButton({
+    Text = "Sharkman Karate",
+    Func = function()
+        print("Buying Sharkman Karate...")
+    end
+})
+
+FightingShop:AddButton({
+    Text = "Electric Claw",
+    Func = function()
+        print("Buying Electric Claw...")
+    end
+})
+
+FightingShop:AddButton({
+    Text = "Dragon Talon",
+    Func = function()
+        print("Buying Dragon Talon...")
+    end
+})
+
+FightingShop:AddButton({
+    Text = "God Human",
+    Func = function()
+        print("Buying God Human...")
+    end
+})
+
+FightingShop:AddButton({
+    Text = "Sanguine Art",
+    Func = function()
+        print("Buying Sanguine Art...")
+    end
+})
+
+--// =========================
+--// ABILITY SHOP
+--// =========================
+
+local AbilityShop = ShopTab:AddLeftGroupbox("Ability Shop")
+
+AbilityShop:AddButton({
+    Text = "Skyjump",
+    Func = function()
+        CommF:InvokeServer("BuyHaki","Geppo")
+    end
+})
+
+AbilityShop:AddButton({
+    Text = "Buso Haki",
+    Func = function()
+        CommF:InvokeServer("BuyHaki","Buso")
+    end
+})
+
+AbilityShop:AddButton({
+    Text = "Observation Haki",
+    Func = function()
+        CommF:InvokeServer("KenTalk","Buy")
+    end
+})
+
+AbilityShop:AddButton({
+    Text = "Soru",
+    Func = function()
+        CommF:InvokeServer("BuyHaki","Soru")
+    end
+})
+
+--// =========================
+--// NOTIFY
+--// =========================
+
+Library:Notify({
+    Title = "hiruZ hub",
+    Description = "Shop Loaded Successfully!",
+    Duration = 5
+})
+```
+
+---
+
+# TODO NEXT PARTS 
+
+* Start And Server
+* LocalPlayer
+* Settings Farm
+* Hold And Select Skill
+* Farming
+* Stack Farming
+* Farming Others
+* Fruit And Raid,Dungeon
+* Sea Event
+* Upgrade Race
+* Get And Upgrade Item
+* Volcano Event
+* ESP
+* PVP
