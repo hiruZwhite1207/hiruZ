@@ -1,0 +1,70 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local CombatFramework = require(player.PlayerScripts:WaitForChild("CombatFramework"))
+
+-- SETTINGS
+local DISTANCE = 35
+local FAST_ATTACK_SPEED = 0.05
+
+-- Auto Haki
+spawn(function()
+    while task.wait(1) do
+        pcall(function()
+            if not player.Character:FindFirstChild("HasBuso") then
+                ReplicatedStorage.Remotes.CommF_:InvokeServer("Buso")
+            end
+        end)
+    end
+end)
+
+-- No Knockback
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            local char = player.Character
+            if char then
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+
+                if hrp then
+                    hrp.Velocity = Vector3.new(0,0,0)
+                    hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
+                end
+            end
+        end)
+    end
+end)
+
+-- Fast Attack Aura
+spawn(function()
+    while task.wait(FAST_ATTACK_SPEED) do
+        pcall(function()
+            local char = player.Character
+            if not char then return end
+
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
+
+            for _, enemy in pairs(workspace.Enemies:GetChildren()) do
+                local humanoid = enemy:FindFirstChild("Humanoid")
+                local enemyHRP = enemy:FindFirstChild("HumanoidRootPart")
+
+                if humanoid and enemyHRP and humanoid.Health > 0 then
+                    local distance = (hrp.Position - enemyHRP.Position).Magnitude
+
+                    if distance <= DISTANCE then
+                        
+                        -- quay mặt
+                        hrp.CFrame = CFrame.new(hrp.Position, enemyHRP.Position)
+
+                        -- combat framework attack
+                        CombatFramework.activeController:attack()
+
+                    end
+                end
+            end
+        end)
+    end
+end)
