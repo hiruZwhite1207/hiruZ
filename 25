@@ -1,0 +1,208 @@
+--[[
+    BLADE BALL ADVANCED AUTO PARRY WITH FLUENT UI
+    Language: English Comments & Configuration
+    UI Library: Fluent (Windows 11 Style)
+--]]
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
+local LocalPlayer = Players.LocalPlayer
+
+-- --- FLUENT UI BOOTSTRAP ---
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Blade Ball Hub",
+    SubTitle = "by AI Assistant",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true, -- Blur effect (Can cause lag on low-end devices)
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl -- Toggle UI visibility key
+})
+
+-- --- TABS ---
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main Features", Icon = "crosshair" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+local Options = Fluent.Options
+
+-- --- CONFIGURATION STATE ---
+local Config = {
+    Enabled = false,
+    PredictionSafety = 0.045,
+    SpamDistance = 11,
+    Visualizer = false,
+    CircleColor = Color3.fromRGB(0, 255, 150)
+}
+
+-- --- UI COMPONENTS MANAGEMENT ---
+local ToggleParry = Tabs.Main:AddToggle("AutoParry", {Title = "Auto Parry", Default = false })
+ToggleParry:OnChanged(function()
+    Config.Enabled = Options.AutoParry.Value
+end)
+
+local ToggleVisualizer = Tabs.Main:AddToggle("Visualizer", {Title = "Show Safe Zone Ring", Default = false })
+ToggleVisualizer:OnChanged(function()
+    Config.Visualizer = Options.Visualizer.Value
+end)
+
+local SliderSafety = Tabs.Main:AddSlider("SafetySlider", {
+    Title = "Prediction Safety (Buffer)",
+    Description = "Lower if parrying early, higher if late",
+    Default = 0.045,
+    Min = 0.01,
+    Max = 0.1,
+    Rounding = 3,
+    Callback = function(Value)
+        Config.PredictionSafety = Value
+    end
+})
+
+local SliderSpam = Tabs.Main:AddSlider("SpamSlider", {
+    Title = "Clash Spam Distance",
+    Description = "Triggers rapid parry when ball is in close combat range",
+    Default = 11,
+    Min = 5,
+    Max = 20,
+    Rounding = 1,
+    Callback = function(Value)
+        Config.SpamDistance = Value
+    end
+})
+
+local ColorPicker = Tabs.Main:AddColorpicker("RingColor", {
+    Title = "Safe Zone Ring Color",
+    Default = Color3.fromRGB(0, 255, 150)
+})
+ColorPicker:OnChanged(function()
+    Config.CircleColor = Options.RingColor.Value
+    if VisualRing then
+        VisualRing.Color = Config.CircleColor
+    end
+end)
+
+-- --- VISUALIZER INITIALIZATION ---
+local VisualRing = Instance.new("Part")
+VisualRing.Shape = Enum.PartType.Cylinder
+VisualRing.Material = Enum.Material.ForceField
+VisualRing.Anchored = true
+VisualRing.CanCollide = false
+VisualRing.Size = Vector3.new(0.2, 0, 0)
+VisualRing.Parent = Workspace
+
+-- --- CORE SCANNER UTILITIES ---
+local function getActiveBall()
+    local ballsFolder = Workspace:FindFirstChild("Balls") or Workspace
+    for _, obj in pairs(ballsFolder:GetChildren()) do
+        if obj:IsA("BasePart") and (obj.Name:lower():find("ball") or obj:FindFirstChild("BallScript")) then
+            return obj
+        end
+    end
+    return nil
+end
+
+local function getParryRemote()
+    local remotes = ReplicatedStorage:FindFirstChild("Remotes") or ReplicatedStorage
+    for _, child in pairs(remotes:GetDescendants()) do
+        if child:IsA("RemoteEvent") and (child.Name:lower():find("parry") or child.Name:lower():find("deflect")) then
+            return child
+        end
+    end
+    return nil
+end
+
+local ParryRemote = getParryRemote()
+
+local function fireParry()
+    if ParryRemote then
+        ParryRemote:FireServer()
+    else
+        game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.F, false, game)
+    end
+end
+
+-- --- MAIN PROCESSING LOOP ---
+RunService.Heartbeat:Connect(function()
+    if not Config.Enabled then 
+        if VisualRing then VisualRing.Size = Vector3.new(0, 0, 0) end
+        return 
+    end
+    
+    local character = LocalPlayer.Character
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    local ball = getActiveBall()
+    
+    if hrp and ball then
+        local myPos = hrp.Position
+        local ballPos = ball.Position
+        local ballVelocity = ball.AssemblyLinearVelocity
+        local distance = (myPos - ballPos).Magnitude
+        
+        local ping = Stats.Network.ServerToClientPing:GetValue() / 1000
+        
+        local dirToMe = (myPos - ballPos).Unit
+        local ballDir = ballVelocity.Unit
+        local isHeadingToMe = ballDir:Dot(dirToMe) > 0.4 
+        
+        local ballTarget = ball:GetAttribute("Target") or (ball:FindFirstChild("Target") and ball.Target.Value)
+        local isTargetingMe = (ballTarget == LocalPlayer.Name or ballTarget == LocalPlayer) or isHeadingToMe
+        
+        if isTargetingMe then
+            local ballSpeed = ballVelocity.Magnitude
+            
+            if ballSpeed > 0 then
+                local timeToHit = distance / ballSpeed
+                local activationTime = ping + Config.PredictionSafety
+                
+                if Config.Visualizer and VisualRing then
+                    local dangerRadius = ballSpeed * activationTime
+                    VisualRing.Color = Config.CircleColor
+                    VisualRing.CFrame = CFrame.new(myPos - Vector3.new(0, 2.5, 0)) * CFrame.Angles(0, 0, math.rad(90))
+                    VisualRing.Size = Vector3.new(0.2, dangerRadius * 2, dangerRadius * 2)
+                elseif VisualRing then
+                    VisualRing.Size = Vector3.new(0, 0, 0)
+                end
+                
+                -- Dynamic Calculations Check
+                if timeToHit <= activationTime then
+                    fireParry()
+                end
+                
+                -- Close Range Force Spam Check
+                if distance <= Config.SpamDistance then
+                    fireParry()
+                end
+            end
+        else
+            if VisualRing then
+                VisualRing.Size = Vector3.new(0, 0, 0)
+            end
+        end
+    elseif VisualRing then
+        VisualRing.Size = Vector3.new(0, 0, 0)
+    end
+end)
+
+-- --- CONFIG MANAGEMENT LOADING ---
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+Fluent:Notify({
+    Title = "Blade Ball Core",
+    Content = "Script Hub loaded successfully with Fluent Layout.",
+    Duration = 5
+})
+SaveManager:LoadAutoloadConfig()
