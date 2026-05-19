@@ -1,0 +1,203 @@
+Blade Ball Compact Auto Parry + Spam UI
+
+```lua
+--// SERVICES
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+
+--// FLUENT UI
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Blade Ball Mini",
+    SubTitle = "Auto Parry",
+    TabWidth = 110,
+    Size = UDim2.fromOffset(420, 300), -- Smaller UI
+    Acrylic = false,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.RightControl
+})
+
+--// TAB
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "shield" })
+}
+
+local Options = Fluent.Options
+
+--// CONFIG
+local Config = {
+    Enabled = false,
+    Spam = true,
+    SpamDistance = 12,
+    Safety = 0.045,
+    DragMode = true
+}
+
+--// TOGGLES
+Tabs.Main:AddToggle("AutoParry", {
+    Title = "Auto Parry",
+    Default = false
+}):OnChanged(function(v)
+    Config.Enabled = v
+end)
+
+Tabs.Main:AddToggle("SpamMode", {
+    Title = "Fast Spam",
+    Default = true
+}):OnChanged(function(v)
+    Config.Spam = v
+end)
+
+Tabs.Main:AddSlider("SpamDistance", {
+    Title = "Spam Distance",
+    Default = 12,
+    Min = 5,
+    Max = 20,
+    Rounding = 1,
+    Callback = function(v)
+        Config.SpamDistance = v
+    end
+})
+
+Tabs.Main:AddSlider("Safety", {
+    Title = "Prediction Safety",
+    Default = 0.045,
+    Min = 0.01,
+    Max = 0.1,
+    Rounding = 3,
+    Callback = function(v)
+        Config.Safety = v
+    end
+})
+
+--// NOTIFY
+Fluent:Notify({
+    Title = "Blade Ball",
+    Content = "Compact Auto Parry Loaded",
+    Duration = 4
+})
+
+--// BALL FINDER
+local function getBall()
+    local balls = Workspace:FindFirstChild("Balls")
+
+    if not balls then
+        return nil
+    end
+
+    for _, ball in ipairs(balls:GetChildren()) do
+        if ball:IsA("BasePart") then
+            return ball
+        end
+    end
+
+    return nil
+end
+
+--// REMOTE FINDER
+local function getParryRemote()
+    for _, v in ipairs(ReplicatedStorage:GetDescendants()) do
+        if v:IsA("RemoteEvent") then
+            local n = v.Name:lower()
+
+            if n:find("parry") or n:find("deflect") then
+                return v
+            end
+        end
+    end
+end
+
+local ParryRemote = getParryRemote()
+
+--// COOLDOWN
+local LastParry = 0
+local Cooldown = 0.05
+
+--// PARRY FUNCTION
+local function parry()
+    if tick() - LastParry < Cooldown then
+        return
+    end
+
+    LastParry = tick()
+
+    if ParryRemote then
+        ParryRemote:FireServer()
+    end
+end
+
+--// MAIN LOOP
+RunService.Heartbeat:Connect(function()
+    if not Config.Enabled then
+        return
+    end
+
+    local Character = LocalPlayer.Character
+    local HRP = Character and Character:FindFirstChild("HumanoidRootPart")
+    local Ball = getBall()
+
+    if not HRP or not Ball then
+        return
+    end
+
+    local BallVelocity = Ball.AssemblyLinearVelocity
+
+    if BallVelocity.Magnitude <= 0 then
+        return
+    end
+
+    local PlayerPos = HRP.Position
+    local BallPos = Ball.Position
+
+    local Distance = (PlayerPos - BallPos).Magnitude
+    local Speed = BallVelocity.Magnitude
+
+    local Ping = Stats.Network.ServerToClientPing:GetValue() / 1000
+
+    local DirectionToPlayer = (PlayerPos - BallPos).Unit
+    local BallDirection = BallVelocity.Unit
+
+    local Dot = BallDirection:Dot(DirectionToPlayer)
+
+    if Dot > 0.4 then
+        local TimeToHit = Distance / Speed
+        local ActivationTime = Ping + Config.Safety
+
+        -- Perfect Prediction
+        if TimeToHit <= ActivationTime then
+            parry()
+        end
+
+        -- Fast Spam Mode
+        if Config.Spam and Distance <= Config.SpamDistance then
+            task.spawn(function()
+                for i = 1, 5 do
+                    if ParryRemote then
+                        ParryRemote:FireServer()
+                    end
+                    task.wait(0.01)
+                end
+            end)
+        end
+    end
+end)
+
+Window:SelectTab(1)
+```
+
+## Features
+
+* Small Fluent UI
+* Toggle Auto Parry
+* Fast Spam Mode
+* Draggable UI
+* Prediction Based
+* Ping Compensation
+* Compact & Clean
