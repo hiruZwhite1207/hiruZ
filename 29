@@ -1,0 +1,263 @@
+--// HiruZ Hub - Jujutsu Infinite Combat Assist
+--// Lock On + Auto Black Flash + Target UI
+--// Experimental Framework
+
+repeat task.wait() until game:IsLoaded()
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+
+--// SETTINGS
+
+local Settings = {
+    LockOn = true,
+    AutoBlackFlash = true,
+    LockDistance = 80,
+    CameraSmoothness = 0.12,
+    BlackFlashDelay = 0.115,
+    ShowTargetUI = true
+}
+
+--// VARIABLES
+
+local LockedTarget = nil
+local Locking = false
+
+--// GUI
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HiruZCombat"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.CoreGui
+
+local TargetFrame = Instance.new("Frame")
+TargetFrame.Size = UDim2.new(0,200,0,50)
+TargetFrame.Position = UDim2.new(0.5,-100,0.8,0)
+TargetFrame.BackgroundColor3 = Color3.fromRGB(15,15,15)
+TargetFrame.BorderSizePixel = 0
+TargetFrame.Visible = false
+TargetFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0,12)
+UICorner.Parent = TargetFrame
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(0,255,255)
+Stroke.Thickness = 1.5
+Stroke.Parent = TargetFrame
+
+local NameLabel = Instance.new("TextLabel")
+NameLabel.Size = UDim2.new(1,0,0.5,0)
+NameLabel.BackgroundTransparency = 1
+NameLabel.TextColor3 = Color3.new(1,1,1)
+NameLabel.Font = Enum.Font.GothamBold
+NameLabel.TextScaled = true
+NameLabel.Text = "NO TARGET"
+NameLabel.Parent = TargetFrame
+
+local HPBarBG = Instance.new("Frame")
+HPBarBG.Size = UDim2.new(0.9,0,0.18,0)
+HPBarBG.Position = UDim2.new(0.05,0,0.72,0)
+HPBarBG.BackgroundColor3 = Color3.fromRGB(40,40,40)
+HPBarBG.BorderSizePixel = 0
+HPBarBG.Parent = TargetFrame
+
+local HPBar = Instance.new("Frame")
+HPBar.Size = UDim2.new(1,0,1,0)
+HPBar.BackgroundColor3 = Color3.fromRGB(0,255,255)
+HPBar.BorderSizePixel = 0
+HPBar.Parent = HPBarBG
+
+local HPBarCorner = Instance.new("UICorner")
+HPBarCorner.CornerRadius = UDim.new(1,0)
+HPBarCorner.Parent = HPBar
+
+local HPBarBGCorner = Instance.new("UICorner")
+HPBarBGCorner.CornerRadius = UDim.new(1,0)
+HPBarBGCorner.Parent = HPBarBG
+
+--// FUNCTIONS
+
+local function IsAlive(Char)
+    local Hum = Char and Char:FindFirstChildOfClass("Humanoid")
+
+    return Hum and Hum.Health > 0
+end
+
+local function GetClosestTarget()
+    local Closest = nil
+    local ClosestDistance = Settings.LockDistance
+
+    for _,Player in pairs(Players:GetPlayers()) do
+        if Player ~= LocalPlayer then
+            local Char = Player.Character
+
+            if Char and IsAlive(Char) and Char:FindFirstChild("HumanoidRootPart") then
+                local HRP = Char.HumanoidRootPart
+
+                local Distance = (HRP.Position - RootPart.Position).Magnitude
+
+                local ScreenPos, Visible = Camera:WorldToViewportPoint(HRP.Position)
+
+                if Visible and Distance < ClosestDistance then
+                    ClosestDistance = Distance
+                    Closest = Player
+                end
+            end
+        end
+    end
+
+    return Closest
+end
+
+local function UpdateUI()
+    if LockedTarget and LockedTarget.Character and IsAlive(LockedTarget.Character) then
+        local Hum = LockedTarget.Character:FindFirstChildOfClass("Humanoid")
+
+        TargetFrame.Visible = true
+
+        NameLabel.Text = LockedTarget.Name
+
+        local HPPercent = Hum.Health / Hum.MaxHealth
+
+        TweenService:Create(
+            HPBar,
+            TweenInfo.new(0.1),
+            {
+                Size = UDim2.new(HPPercent,0,1,0)
+            }
+        ):Play()
+
+    else
+        TargetFrame.Visible = false
+    end
+end
+
+local function PressM1()
+    VirtualInputManager:SendMouseButtonEvent(
+        0,0,0,true,game,0
+    )
+
+    task.wait()
+
+    VirtualInputManager:SendMouseButtonEvent(
+        0,0,0,false,game,0
+    )
+end
+
+local function TriggerBlackFlash()
+    task.spawn(function()
+        task.wait(Settings.BlackFlashDelay)
+
+        PressM1()
+    end)
+end
+
+--// LOCK ON KEY
+
+UIS.InputBegan:Connect(function(Input,GPE)
+    if GPE then return end
+
+    if Input.KeyCode == Enum.KeyCode.Q then
+        Locking = not Locking
+
+        if Locking then
+            LockedTarget = GetClosestTarget()
+        else
+            LockedTarget = nil
+        end
+    end
+end)
+
+--// CHARACTER UPDATE
+
+LocalPlayer.CharacterAdded:Connect(function(Char)
+    Character = Char
+    Humanoid = Char:WaitForChild("Humanoid")
+    RootPart = Char:WaitForChild("HumanoidRootPart")
+
+    Humanoid.AnimationPlayed:Connect(function(Anim)
+        if not Settings.AutoBlackFlash then
+            return
+        end
+
+        local ID = tostring(Anim.Animation.AnimationId)
+
+        -- chỉnh theo animation game
+        if string.find(ID,"attack")
+        or string.find(ID,"punch")
+        or string.find(ID,"combat") then
+
+            if LockedTarget then
+                TriggerBlackFlash()
+            end
+        end
+    end)
+end)
+
+--// INITIAL ANIMATION DETECT
+
+Humanoid.AnimationPlayed:Connect(function(Anim)
+    if not Settings.AutoBlackFlash then
+        return
+    end
+
+    local ID = tostring(Anim.Animation.AnimationId)
+
+    if string.find(ID,"attack")
+    or string.find(ID,"punch")
+    or string.find(ID,"combat") then
+
+        if LockedTarget then
+            TriggerBlackFlash()
+        end
+    end
+end)
+
+--// MAIN LOOP
+
+RunService.RenderStepped:Connect(function()
+    if Locking and LockedTarget and LockedTarget.Character then
+
+        local EnemyHRP = LockedTarget.Character:FindFirstChild("HumanoidRootPart")
+
+        if EnemyHRP and IsAlive(LockedTarget.Character) then
+
+            local TargetCFrame = CFrame.new(
+                Camera.CFrame.Position,
+                EnemyHRP.Position + Vector3.new(0,2,0)
+            )
+
+            Camera.CFrame = Camera.CFrame:Lerp(
+                TargetCFrame,
+                Settings.CameraSmoothness
+            )
+
+        else
+            LockedTarget = nil
+        end
+    end
+
+    UpdateUI()
+end)
+
+--// NOTIFICATION
+
+game.StarterGui:SetCore("SendNotification",{
+    Title = "HiruZ Hub",
+    Text = "Combat Assist Loaded",
+    Duration = 5
+})
+
+print("HiruZ Hub Loaded")
