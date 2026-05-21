@@ -1,0 +1,60 @@
+-- =======================================================
+-- HIRUZ HUB LOADER - ALL IN ONE
+-- =======================================================
+local CoreGui = game:GetService("CoreGui")
+
+-- Xóa UI cũ nếu có
+if CoreGui:FindFirstChild("HiruZKeySystem") then CoreGui.HiruZKeySystem:Destroy() end
+
+-- 1. GIAO DIỆN KEY
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "HiruZKeySystem"
+
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 300, 0, 150)
+Main.Position = UDim2.new(0.5, -150, 0.5, -75)
+Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+
+local Input = Instance.new("TextBox", Main)
+Input.Size = UDim2.new(0, 260, 0, 40)
+Input.Position = UDim2.new(0.5, -130, 0.4, 0)
+Input.PlaceholderText = "Nhập Key..."
+Input.Text = ""
+Input.Parent = Main
+
+local Btn = Instance.new("TextButton", Main)
+Btn.Size = UDim2.new(0, 260, 0, 40)
+Btn.Position = UDim2.new(0.5, -130, 0.7, 0)
+Btn.Text = "XÁC NHẬN"
+Btn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+Btn.TextColor3 = Color3.new(1, 1, 1)
+Btn.Parent = Main
+
+local CopyBtn = Instance.new("TextButton", Main)
+CopyBtn.Size = UDim2.new(0, 260, 0, 20)
+CopyBtn.Position = UDim2.new(0.5, -130, 0.1, 0)
+CopyBtn.Text = "Lấy Key tại Discord (Click để Copy)"
+CopyBtn.BackgroundTransparency = 1
+CopyBtn.TextColor3 = Color3.fromRGB(88, 101, 242)
+CopyBtn.Parent = Main
+
+-- 2. LOGIC XÁC THỰC
+CopyBtn.MouseButton1Click:Connect(function()
+    setclipboard("https://discord.gg/link_cua_ong") -- THAY LINK DISCORD CỦA ÔNG VÀO ĐÂY
+    CopyBtn.Text = "Đã Copy link!"
+    task.wait(2)
+    CopyBtn.Text = "Lấy Key tại Discord (Click để Copy)"
+end)
+
+Btn.MouseButton1Click:Connect(function()
+    if Input.Text == "hiruZ" then
+        ScreenGui:Destroy()
+        -- GỌI FILE MAIN ĐÃ MÃ HÓA CỦA ÔNG Ở ĐÂY
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HiruZ/Scripts/main/HiruZ_Main.lua"))()
+    else
+        Btn.Text = "KEY SAI!"
+        task.wait(1)
+        Btn.Text = "XÁC NHẬN"
+    end
+end)
