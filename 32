@@ -1,0 +1,158 @@
+-- [[ HIRUZ HUB REMAKE - AUTO CHEST & HUNT BOSS ITEMS ]] --
+-- Lưu ý: Đây là mã nguồn mô phỏng logic để bạn tham khảo hoặc phát triển trong Roblox Studio.
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
+
+----------------------------------------------------------------------
+-- 1. THIẾT KẾ GIAO DIỆN (UI MANIFEST)
+----------------------------------------------------------------------
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HiruZ_Hub_UI"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Khung chính (Đen mờ, bo tròn)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 350, 0, 220)
+MainFrame.Position = UDim2.new(0.5, -175, 0.4, -110)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BackgroundTransparency = 0.25 -- Đen mờ bao phủ
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12) -- Bo tròn góc
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(0, 85, 255) -- Viền xanh đậm
+MainStroke.Thickness = 2
+MainStroke.Parent = MainFrame
+
+-- Tiêu đề (Phông chữ Minecraft/Code)
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "HiruZ Hub v2.721 - Auto Chest"
+Title.Font = Enum.Font.Code -- Phông chữ pixel vuông giống Minecraft
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.BackgroundTransparency = 1
+Title.Parent = MainFrame
+
+-- Trạng thái hoạt động
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -20, 0, 100)
+StatusLabel.Position = UDim2.new(0, 10, 0, 50)
+StatusLabel.Text = "Đang khởi tạo hệ thống..."
+StatusLabel.Font = Enum.Font.Code
+StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 128)
+StatusLabel.TextSize = 14
+StatusLabel.TextWrapped = true
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Parent = MainFrame
+
+function UpdateStatus(text)
+    StatusLabel.Text = "[STATUS]: " .. text
+end
+
+----------------------------------------------------------------------
+-- 2. LOGIC KIỂM TRA BÁU VẬT & TỰ HỦY (SELF-DESTRUCT)
+----------------------------------------------------------------------
+function CheckBautVat()
+    local BackPack = LocalPlayer:FindFirstChild("Backpack")
+    local Character = LocalPlayer.Character
+    
+    -- Danh sách báu vật cần săn
+    local BauVat = {"God's Chalice", "Fist of Darkness", "Chén Thánh", "Chìa Khóa Râu Đen"}
+    
+    for _, item in pairs(BauVat) do
+        if (BackPack and BackPack:FindFirstChild(item)) or (Character and Character:FindFirstChild(item)) then
+            UpdateStatus("ĐÃ NHẶT ĐƯỢC " .. string.upper(item) .. "! TỰ HỦY AUTO ĐỂ BẢO VỆ VẬT PHẨM!")
+            wait(2)
+            ScreenGui:Destroy() -- Xóa Menu hoàn toàn
+            _G.AutoChest = false -- Tắt vòng lặp farm
+            return true
+        end
+    end
+    return false
+end
+
+----------------------------------------------------------------------
+-- 3. BỘ LỌC SERVER (SERVER HOP - 4H+ & < 8 NGƯỜI)
+----------------------------------------------------------------------
+function HopServer()
+    UpdateStatus("Đang tìm Server 4h+ và dưới 8 người...")
+    wait(1)
+    
+    -- API lấy danh sách server công khai của game
+    local GameID = game.PlaceId
+    local ApiUrl = "https://games.roblox.com/v1/games/" .. GameID .. "/servers/Public?sortOrder=Asc&limit=100"
+    
+    local Success, Result = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet(ApiUrl))
+    end)
+    
+    if Success and Result and Result.data then
+        for _, server in pairs(Result.data) do
+            -- Kiểm tra: Server còn chỗ trống và số người chơi hiện tại dưới 8 người
+            if server.playing and server.playing < 8 and server.id ~= game.JobId then
+                -- Lưu ý: Check Server Age (4h+) trên Script cần đọc giá trị từ Workspace hoặc ước lượng qua log game
+                UpdateStatus("Đã tìm thấy Server hợp lệ! Đang chuyển dòng thời gian...")
+                TeleportService:TeleportToPlaceInstance(GameID, server.id, LocalPlayer)
+                wait(5)
+            end
+        end
+    end
+    UpdateStatus("Không tìm thấy server phù hợp, thử lại sau...")
+end
+
+----------------------------------------------------------------------
+-- 4. AUTO TELEPORT NHẶT RƯƠNG & RESET CHUYỂN ĐẢO
+----------------------------------------------------------------------
+_G.AutoChest = true
+
+task.spawn(function()
+    while _G.AutoChest do
+        task.wait(0.1)
+        
+        -- Bước 1: Luôn kiểm tra xem có cầm Chén/Key không trước khi đi nhặt tiếp
+        if CheckBautVat() then break end
+        
+        -- Bước 2: Tìm rương trên đảo hiện tại
+        local TargetChest = nil
+        for _, obj in pairs(workspace:GetChildren()) do
+            if string.find(obj.name, "Chest") and obj:IsA("BasePart") then
+                TargetChest = obj
+                break
+            end
+        end
+        
+        -- Bước 3: Di chuyển hoặc Reset đổi đảo
+        if TargetChest then
+            UpdateStatus("Phát hiện rương: " .. TargetChest.Name .. ". Tiến hành thu thập...")
+            
+            -- Teleport mượt bằng CFrame đến rương
+            local RootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if RootPart then
+                RootPart.CFrame = TargetChest.CFrame
+                task.wait(0.3) -- Đợi 0.3s để game nhận dữ liệu nhặt tiền
+            end
+        else
+            -- ĐẢO HẾT RƯƠNG -> RESET NHÂN VẬT ĐỂ QUA ĐẢO MỚI/HOP SERVER
+            UpdateStatus("Đảo hết rương! Reset nhân vật để chuyển đổi...")
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                LocalPlayer.Character.Humanoid.Health = 0 -- Lệnh tự tử để reset nhanh
+                task.wait(4) -- Chờ hồi sinh
+            end
+            
+            -- Sau khi reset mà map vẫn trống -> Tiến hành nhảy server
+            HopServer()
+        end
+    end
+end)
+
+UpdateStatus("Hệ thống HiruZ Hub đã kích hoạt thành công!")
