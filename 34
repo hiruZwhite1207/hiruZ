@@ -1,0 +1,254 @@
+--// HIRUZ HUB AUTO CHEST FIXED
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+
+---------------------------------------------------
+-- UI
+---------------------------------------------------
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HiruZ_Hub_UI"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0,350,0,220)
+MainFrame.Position = UDim2.new(0.5,-175,0.4,-110)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15,15,15)
+MainFrame.BackgroundTransparency = 0.2
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0,12)
+Corner.Parent = MainFrame
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(0,170,255)
+Stroke.Thickness = 2
+Stroke.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,0,0,40)
+Title.BackgroundTransparency = 1
+Title.Text = "HIRUZ HUB - AUTO CHEST"
+Title.Font = Enum.Font.Code
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextSize = 18
+Title.Parent = MainFrame
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1,-20,0,120)
+Status.Position = UDim2.new(0,10,0,50)
+Status.BackgroundTransparency = 1
+Status.TextColor3 = Color3.fromRGB(0,255,150)
+Status.Font = Enum.Font.Code
+Status.TextWrapped = true
+Status.TextSize = 15
+Status.Text = "Đang khởi tạo..."
+Status.Parent = MainFrame
+
+function UpdateStatus(txt)
+    Status.Text = "[STATUS]: "..txt
+end
+
+---------------------------------------------------
+-- SETTINGS
+---------------------------------------------------
+
+_G.AutoChest = true
+
+local SpecialItems = {
+    "God's Chalice",
+    "Fist of Darkness",
+    "Chén Thánh",
+    "Chìa Khóa Râu Đen"
+}
+
+---------------------------------------------------
+-- CHECK ITEMS
+---------------------------------------------------
+
+function CheckSpecialItems()
+
+    local Backpack = LocalPlayer:FindFirstChild("Backpack")
+    local Character = LocalPlayer.Character
+
+    for _,item in pairs(SpecialItems) do
+
+        if Backpack and Backpack:FindFirstChild(item) then
+            return true,item
+        end
+
+        if Character and Character:FindFirstChild(item) then
+            return true,item
+        end
+    end
+
+    return false,nil
+end
+
+---------------------------------------------------
+-- GET ALL CHESTS
+---------------------------------------------------
+
+function GetAllChests()
+
+    local chests = {}
+
+    for _,obj in pairs(workspace:GetDescendants()) do
+
+        if obj:IsA("BasePart") then
+
+            local name = string.lower(obj.Name)
+
+            if string.find(name,"chest") then
+                table.insert(chests,obj)
+            end
+        end
+    end
+
+    return chests
+end
+
+---------------------------------------------------
+-- TELEPORT
+---------------------------------------------------
+
+function TP(cf)
+
+    local Character = LocalPlayer.Character
+    if not Character then return end
+
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    if not Root then return end
+
+    Root.CFrame = cf + Vector3.new(0,3,0)
+end
+
+---------------------------------------------------
+-- SERVER HOP
+---------------------------------------------------
+
+local JoinedServers = {}
+
+function HopServer()
+
+    UpdateStatus("Đang tìm server mới...")
+
+    local url =
+        "https://games.roblox.com/v1/games/"..
+        game.PlaceId..
+        "/servers/Public?sortOrder=Asc&limit=100"
+
+    local success,result = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet(url))
+    end)
+
+    if success and result and result.data then
+
+        for _,server in pairs(result.data) do
+
+            if server.playing < 8
+            and server.id ~= game.JobId
+            and not JoinedServers[server.id] then
+
+                JoinedServers[server.id] = true
+
+                UpdateStatus("Đang hop server...")
+
+                TeleportService:TeleportToPlaceInstance(
+                    game.PlaceId,
+                    server.id,
+                    LocalPlayer
+                )
+
+                wait(5)
+            end
+        end
+    end
+end
+
+---------------------------------------------------
+-- MAIN
+---------------------------------------------------
+
+task.spawn(function()
+
+    while _G.AutoChest do
+        task.wait(0.15)
+
+        ---------------------------------------------
+        -- CHECK SPECIAL ITEM
+        ---------------------------------------------
+
+        local HasItem,ItemName = CheckSpecialItems()
+
+        if HasItem then
+
+            UpdateStatus("Đã nhặt "..ItemName.." | Auto dừng")
+
+            _G.AutoChest = false
+
+            break
+        end
+
+        ---------------------------------------------
+        -- GET CHESTS
+        ---------------------------------------------
+
+        local Chests = GetAllChests()
+
+        ---------------------------------------------
+        -- IF HAVE CHESTS
+        ---------------------------------------------
+
+        if #Chests > 0 then
+
+            for _,Chest in pairs(Chests) do
+
+                if Chest and Chest.Parent then
+
+                    UpdateStatus("Đang nhặt "..Chest.Name)
+
+                    TP(Chest.CFrame)
+
+                    task.wait(0.4)
+                end
+            end
+
+        else
+
+            -----------------------------------------
+            -- RESET CHARACTER
+            -----------------------------------------
+
+            UpdateStatus("Đảo hết rương | Reset đổi đảo")
+
+            local Character = LocalPlayer.Character
+
+            if Character and Character:FindFirstChild("Humanoid") then
+
+                Character.Humanoid.Health = 0
+            end
+
+            task.wait(6)
+
+            -----------------------------------------
+            -- CHECK AGAIN
+            -----------------------------------------
+
+            if #GetAllChests() <= 0 then
+
+                UpdateStatus("Map vẫn hết rương | Hop server")
+
+                HopServer()
+            end
+        end
+    end
+end)
+
+UpdateStatus("HIRUZ HUB Loaded")
