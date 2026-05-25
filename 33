@@ -1,0 +1,246 @@
+--// HIRUZ HUB - AUTO CHEST KAITUN
+--// Teleport + Reset đổi đảo khi hết rương
+
+--// SERVICES
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+
+local LocalPlayer = Players.LocalPlayer
+
+_G.AutoChest = true
+
+---------------------------------------------------
+-- STATUS
+---------------------------------------------------
+
+function UpdateStatus(text)
+    print("[HIRUZ HUB]: "..text)
+end
+
+---------------------------------------------------
+-- CHECK SPECIAL ITEMS
+---------------------------------------------------
+
+local SpecialItems = {
+    "God's Chalice",
+    "Fist of Darkness",
+    "Chén Thánh",
+    "Chìa Khóa Râu Đen"
+}
+
+function CheckSpecialItems()
+
+    local Backpack = LocalPlayer:FindFirstChild("Backpack")
+    local Character = LocalPlayer.Character
+
+    for _,item in pairs(SpecialItems) do
+
+        if Backpack and Backpack:FindFirstChild(item) then
+            return true,item
+        end
+
+        if Character and Character:FindFirstChild(item) then
+            return true,item
+        end
+    end
+
+    return false,nil
+end
+
+---------------------------------------------------
+-- FIND CHESTS
+---------------------------------------------------
+
+function GetAllChests()
+
+    local chests = {}
+
+    for _,obj in pairs(workspace:GetDescendants()) do
+
+        if obj:IsA("BasePart") then
+
+            local name = string.lower(obj.Name)
+
+            if string.find(name,"chest") then
+                table.insert(chests,obj)
+            end
+        end
+    end
+
+    return chests
+end
+
+---------------------------------------------------
+-- GET NEAREST CHEST
+---------------------------------------------------
+
+function GetNearestChest()
+
+    local Character = LocalPlayer.Character
+    if not Character then return nil end
+
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    if not Root then return nil end
+
+    local nearest = nil
+    local distance = math.huge
+
+    for _,chest in pairs(GetAllChests()) do
+
+        local dist = (Root.Position - chest.Position).Magnitude
+
+        if dist < distance then
+            distance = dist
+            nearest = chest
+        end
+    end
+
+    return nearest
+end
+
+---------------------------------------------------
+-- TELEPORT TO CHEST
+---------------------------------------------------
+
+function TeleportToChest(chest)
+
+    local Character = LocalPlayer.Character
+    if not Character then return end
+
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    if not Root then return end
+
+    Root.CFrame = chest.CFrame + Vector3.new(0,3,0)
+end
+
+---------------------------------------------------
+-- SERVER HOP
+---------------------------------------------------
+
+local JoinedServers = {}
+
+function HopServer()
+
+    UpdateStatus("Đang tìm server mới...")
+
+    local url =
+        "https://games.roblox.com/v1/games/"..
+        game.PlaceId..
+        "/servers/Public?sortOrder=Asc&limit=100"
+
+    local success,result = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet(url))
+    end)
+
+    if success and result and result.data then
+
+        for _,server in pairs(result.data) do
+
+            if server.playing < 8
+            and server.id ~= game.JobId
+            and not JoinedServers[server.id] then
+
+                JoinedServers[server.id] = true
+
+                UpdateStatus("Đang hop server...")
+
+                TeleportService:TeleportToPlaceInstance(
+                    game.PlaceId,
+                    server.id,
+                    LocalPlayer
+                )
+
+                wait(5)
+            end
+        end
+    end
+end
+
+---------------------------------------------------
+-- RESET CHARACTER
+---------------------------------------------------
+
+function ResetCharacter()
+
+    local Character = LocalPlayer.Character
+
+    if Character and Character:FindFirstChild("Humanoid") then
+
+        UpdateStatus("Đảo hết rương | Reset đổi đảo")
+
+        Character.Humanoid.Health = 0
+    end
+end
+
+---------------------------------------------------
+-- MAIN LOOP
+---------------------------------------------------
+
+task.spawn(function()
+
+    while _G.AutoChest do
+        task.wait(0.2)
+
+        ---------------------------------------------
+        -- CHECK SPECIAL ITEMS
+        ---------------------------------------------
+
+        local HasItem,ItemName = CheckSpecialItems()
+
+        if HasItem then
+
+            UpdateStatus("Đã nhặt "..ItemName.." | Auto dừng")
+
+            _G.AutoChest = false
+            break
+        end
+
+        ---------------------------------------------
+        -- CHECK CHESTS
+        ---------------------------------------------
+
+        local Chests = GetAllChests()
+
+        if #Chests > 0 then
+
+            local Chest = GetNearestChest()
+
+            if Chest then
+
+                UpdateStatus("Đang teleport tới "..Chest.Name)
+
+                TeleportToChest(Chest)
+
+                task.wait(0.5)
+            end
+
+        else
+
+            -----------------------------------------
+            -- NO CHEST => RESET
+            -----------------------------------------
+
+            ResetCharacter()
+
+            task.wait(6)
+
+            -----------------------------------------
+            -- CHECK AGAIN
+            -----------------------------------------
+
+            local NewChests = GetAllChests()
+
+            if #NewChests <= 0 then
+
+                -------------------------------------
+                -- STILL NO CHEST => HOP SERVER
+                -------------------------------------
+
+                HopServer()
+            end
+        end
+    end
+end)
+
+UpdateStatus("HIRUZ AUTO CHEST STARTED")
