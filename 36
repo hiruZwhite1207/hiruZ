@@ -1,0 +1,312 @@
+--// HIRUZ HUB V3 - AUTO CHEST FULL
+
+```lua
+--// HIRUZ HUB V3
+--// AUTO CHEST + RESET + SERVER HOP
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+
+local LocalPlayer = Players.LocalPlayer
+
+---------------------------------------------------
+-- SETTINGS
+---------------------------------------------------
+
+_G.AutoChest = true
+
+local SpecialItems = {
+    "God's Chalice",
+    "Fist of Darkness",
+    "Chén Thánh",
+    "Chìa Khóa Râu Đen"
+}
+
+local JoinedServers = {}
+
+---------------------------------------------------
+-- UI
+---------------------------------------------------
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HIRUZ_HUB"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0,370,0,240)
+Main.Position = UDim2.new(0.5,-185,0.4,-120)
+Main.BackgroundColor3 = Color3.fromRGB(10,10,10)
+Main.BackgroundTransparency = 0.15
+Main.Active = true
+Main.Draggable = true
+Main.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0,14)
+Corner.Parent = Main
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(0,170,255)
+Stroke.Thickness = 2
+Stroke.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,0,0,40)
+Title.BackgroundTransparency = 1
+Title.Text = "HIRUZ HUB V3 - AUTO CHEST"
+Title.Font = Enum.Font.Code
+Title.TextSize = 18
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.Parent = Main
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1,-20,0,120)
+Status.Position = UDim2.new(0,10,0,50)
+Status.BackgroundTransparency = 1
+Status.TextWrapped = true
+Status.Font = Enum.Font.Code
+Status.TextColor3 = Color3.fromRGB(0,255,150)
+Status.TextSize = 15
+Status.Text = "Loading..."
+Status.Parent = Main
+
+local CountLabel = Instance.new("TextLabel")
+CountLabel.Size = UDim2.new(1,-20,0,30)
+CountLabel.Position = UDim2.new(0,10,1,-40)
+CountLabel.BackgroundTransparency = 1
+CountLabel.Font = Enum.Font.Code
+CountLabel.TextColor3 = Color3.fromRGB(0,170,255)
+CountLabel.TextSize = 15
+CountLabel.Text = "Chest Count: 0"
+CountLabel.Parent = Main
+
+---------------------------------------------------
+-- STATUS
+---------------------------------------------------
+
+local function UpdateStatus(text)
+    Status.Text = "[STATUS]: "..text
+    print("[HIRUZ]:",text)
+end
+
+---------------------------------------------------
+-- ITEM CHECK
+---------------------------------------------------
+
+local function CheckSpecialItems()
+
+    local Backpack = LocalPlayer:FindFirstChild("Backpack")
+    local Character = LocalPlayer.Character
+
+    for _,item in pairs(SpecialItems) do
+
+        if Backpack and Backpack:FindFirstChild(item) then
+            return true,item
+        end
+
+        if Character and Character:FindFirstChild(item) then
+            return true,item
+        end
+    end
+
+    return false,nil
+end
+
+---------------------------------------------------
+-- GET CHESTS
+---------------------------------------------------
+
+local function GetAllChests()
+
+    local Chests = {}
+
+    for _,obj in pairs(workspace:GetDescendants()) do
+
+        if obj:IsA("BasePart") then
+
+            local name = string.lower(obj.Name)
+
+            if string.find(name,"chest") then
+                table.insert(Chests,obj)
+            end
+        end
+    end
+
+    CountLabel.Text = "Chest Count: "..#Chests
+
+    return Chests
+end
+
+---------------------------------------------------
+-- TELEPORT
+---------------------------------------------------
+
+local function TPChest(chest)
+
+    local Character = LocalPlayer.Character
+    if not Character then return end
+
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    if not Root then return end
+
+    for _,v in pairs(Character:GetDescendants()) do
+        if v:IsA("BasePart") then
+            v.CanCollide = false
+        end
+    end
+
+    Root.CFrame = chest.CFrame + Vector3.new(0,1.5,0)
+
+    task.wait(0.2)
+
+    pcall(function()
+        firetouchinterest(Root,chest,0)
+        firetouchinterest(Root,chest,1)
+    end)
+end
+
+---------------------------------------------------
+-- RESET
+---------------------------------------------------
+
+local function ResetCharacter()
+
+    local Character = LocalPlayer.Character
+
+    if Character and Character:FindFirstChild("Humanoid") then
+
+        UpdateStatus("Hết rương | Reset đổi đảo")
+
+        Character.Humanoid.Health = 0
+    end
+end
+
+---------------------------------------------------
+-- SERVER HOP
+---------------------------------------------------
+
+local function HopServer()
+
+    UpdateStatus("Đang tìm server mới...")
+
+    local url =
+        "https://games.roblox.com/v1/games/"..
+        game.PlaceId..
+        "/servers/Public?sortOrder=Asc&limit=100"
+
+    local success,result = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet(url))
+    end)
+
+    if success and result and result.data then
+
+        for _,server in pairs(result.data) do
+
+            if server.playing < 8
+            and server.id ~= game.JobId
+            and not JoinedServers[server.id] then
+
+                JoinedServers[server.id] = true
+
+                UpdateStatus("Đang hop server...")
+
+                TeleportService:TeleportToPlaceInstance(
+                    game.PlaceId,
+                    server.id,
+                    LocalPlayer
+                )
+
+                task.wait(5)
+            end
+        end
+    end
+end
+
+---------------------------------------------------
+-- MAIN LOOP
+---------------------------------------------------
+
+UpdateStatus("HIRUZ HUB Started")
+
+spawn(function()
+
+    while _G.AutoChest do
+        task.wait(0.15)
+
+        ---------------------------------------------
+        -- ITEM CHECK
+        ---------------------------------------------
+
+        local HasItem,ItemName = CheckSpecialItems()
+
+        if HasItem then
+
+            UpdateStatus("Đã nhặt "..ItemName.." | Auto dừng")
+
+            _G.AutoChest = false
+
+            break
+        end
+
+        ---------------------------------------------
+        -- CHEST CHECK
+        ---------------------------------------------
+
+        local Chests = GetAllChests()
+
+        if #Chests > 0 then
+
+            for _,Chest in pairs(Chests) do
+
+                if Chest and Chest.Parent then
+
+                    UpdateStatus("Đang nhặt: "..Chest.Name)
+
+                    TPChest(Chest)
+
+                    repeat
+                        task.wait(0.1)
+                    until not Chest.Parent
+                    or (LocalPlayer.Character.HumanoidRootPart.Position - Chest.Position).Magnitude > 20
+                end
+            end
+
+        else
+
+            -----------------------------------------
+            -- RESET
+            -----------------------------------------
+
+            ResetCharacter()
+
+            task.wait(6)
+
+            -----------------------------------------
+            -- CHECK AGAIN
+            -----------------------------------------
+
+            if #GetAllChests() <= 0 then
+
+                UpdateStatus("Không còn rương | Hop server")
+
+                HopServer()
+            end
+        end
+    end
+end)
+```
+
+---
+
+# MÃ HÓA NHẸ (MINIFY)
+
+Bạn có thể dùng:
+
+* [https://luaminify.com](https://luaminify.com)
+* [https://glot.io/new/lua](https://glot.io/new/lua)
+
+để minify/obfuscate nhẹ script Lua.
+
+Lưu ý: obfuscate mạnh thường làm script khó debug và dễ lỗi hơn.
