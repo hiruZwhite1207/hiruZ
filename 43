@@ -1,0 +1,324 @@
+--// HIRUZ HUB V0.5 PRO 
+--// Tích hợp Bypass Teleport CFrame siêu mượt cho Delta X
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+local CoreGui = game:GetService("CoreGui")
+
+local LocalPlayer = Players.LocalPlayer
+
+--------------------------------------------------
+-- ANTI AFK (Chống kick 20 phút)
+--------------------------------------------------
+LocalPlayer.Idled:Connect(function()
+    VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    task.wait(1)
+    VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+end)
+
+--------------------------------------------------
+-- SETTINGS & VARIABLES
+--------------------------------------------------
+getgenv().AutoChest = true
+local TELEPORT_HEIGHT = 0.1 -- Sát rương để nhặt chuẩn xác
+local TELEPORT_DELAY = 0.01
+local SEARCH_DELAY = 0.1
+
+local SpecialItems = {
+    "God's Chalice", "Fist of Darkness", "Chén Thánh", "Chìa Khóa Râu Đen"
+}
+
+local CachedChests = {}
+local ChestCountNum = 0 
+
+--------------------------------------------------
+-- LƯU LỊCH SỬ SERVER HOP (Chống vào lại server rác)
+--------------------------------------------------
+local hopFile = "HIRUZ_ServerHop_History.json"
+local JoinedServers = {}
+
+if isfile and isfile(hopFile) then
+    pcall(function()
+        local decoded = HttpService:JSONDecode(readfile(hopFile))
+        if type(decoded) == "table" then JoinedServers = decoded end
+    end)
+end
+
+local function SaveServers()
+    if writefile then
+        pcall(function() writefile(hopFile, HttpService:JSONEncode(JoinedServers)) end)
+    end
+end
+
+JoinedServers[game.JobId] = true
+SaveServers()
+
+--------------------------------------------------
+-- GUI (Giao Diện V0.5)
+--------------------------------------------------
+pcall(function()
+    if CoreGui:FindFirstChild("HIRUZ_UI") then
+        CoreGui.HIRUZ_UI:Destroy()
+    end
+end)
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "HIRUZ_UI"
+Gui.ResetOnSpawn = false
+Gui.Parent = CoreGui
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 350, 0, 180)
+Main.Position = UDim2.new(0.5, -175, 0.2, 0)
+Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Main.BackgroundTransparency = 0.2
+Main.Parent = Gui
+
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+local Stroke = Instance.new("UIStroke", Main)
+Stroke.Color = Color3.fromRGB(0, 170, 255)
+Stroke.Thickness = 2
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Position = UDim2.new(0,0,0,10)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.Code
+Title.TextSize = 18
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Text = "HIRUZ HUB V3 FIXED"
+Title.Parent = Main
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, 0, 0, 30)
+Status.Position = UDim2.new(0, 0, 0.45, 0)
+Status.BackgroundTransparency = 1
+Status.Font = Enum.Font.Code
+Status.TextSize = 15
+Status.TextColor3 = Color3.fromRGB(0, 255, 127)
+Status.Text = "[STATUS]: Loading..."
+Status.Parent = Main
+
+local ChestCount = Instance.new("TextLabel")
+ChestCount.Size = UDim2.new(1, 0, 0, 30)
+ChestCount.Position = UDim2.new(0, 0, 0.75, 0)
+ChestCount.BackgroundTransparency = 1
+ChestCount.Font = Enum.Font.Code
+ChestCount.TextSize = 15
+ChestCount.TextColor3 = Color3.fromRGB(0, 170, 255)
+ChestCount.Text = "Chest Count: 0"
+ChestCount.Parent = Main
+
+local function UpdateStatus(txt)
+    Status.Text = "[STATUS]: " .. txt
+end
+
+local function UpdateCount()
+    ChestCountNum = ChestCountNum + 1
+    ChestCount.Text = "Chest Count: " .. tostring(ChestCountNum)
+end
+
+--------------------------------------------------
+-- CHARACTER & NOCLIP CHUẨN
+--------------------------------------------------
+local function GetCharacter()
+    return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+end
+
+local function GetRoot()
+    local Char = GetCharacter()
+    return Char:WaitForChild("HumanoidRootPart")
+end
+
+local NoclipConnection
+local function ToggleNoclip(state)
+    if state then
+        if not NoclipConnection then
+            NoclipConnection = RunService.Stepped:Connect(function()
+                local Char = LocalPlayer.Character
+                if Char then
+                    for _, v in ipairs(Char:GetDescendants()) do
+                        if v:IsA("BasePart") then v.CanCollide = false end
+                    end
+                end
+            end)
+        end
+    else
+        if NoclipConnection then
+            NoclipConnection:Disconnect()
+            NoclipConnection = nil
+        end
+    end
+end
+
+--------------------------------------------------
+-- ITEM CHECK (Dừng tool nếu nhặt đồ hiếm)
+--------------------------------------------------
+local function CheckItems()
+    local Backpack = LocalPlayer:FindFirstChild("Backpack")
+    local Character = LocalPlayer.Character
+
+    for _, item in ipairs(SpecialItems) do
+        if Backpack and Backpack:FindFirstChild(item) then return true, item end
+        if Character and Character:FindFirstChild(item) then return true, item end
+    end
+    return false, nil
+end
+
+--------------------------------------------------
+-- CHEST SCAN & LỌC TỐI ƯU
+--------------------------------------------------
+local function InitialChestScan()
+    table.clear(CachedChests)
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and string.lower(obj.Name):find("chest") then
+            table.insert(CachedChests, obj)
+        end
+    end
+end
+
+local function GetNearestChest()
+    local Root = GetRoot()
+    if not Root then return nil end
+
+    local nearest = nil
+    local shortest = math.huge
+
+    for i = #CachedChests, 1, -1 do
+        local chest = CachedChests[i]
+        -- Lọc bỏ mấy rương tàng hình/bị mất khỏi game
+        if not chest or not chest.Parent then
+            table.remove(CachedChests, i)
+        else
+            local dist = (Root.Position - chest.Position).Magnitude
+            if dist < shortest then
+                shortest = dist
+                nearest = chest
+            end
+        end
+    end
+    return nearest
+end
+
+--------------------------------------------------
+-- TỐC BIẾN BYPASS (CHIA NHỎ CHỐNG RUBBERBAND)
+--------------------------------------------------
+local function TP(targetPosition)
+    local Root = GetRoot()
+    if not Root then return end
+
+    ToggleNoclip(true)
+
+    local currentPos = Root.Position
+    local distance = (currentPos - targetPosition).Magnitude
+    local maxJump = 590 -- Chia nhỏ 590 studs/nhịp để không bị giật
+
+    if distance > maxJump then
+        local steps = math.ceil(distance / maxJump)
+        for i = 1, steps do
+            local lerpPos = currentPos:Lerp(targetPosition, i / steps)
+            Root.CFrame = CFrame.new(lerpPos + Vector3.new(0, TELEPORT_HEIGHT, 0))
+            Root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+            task.wait(0.01) -- Nghỉ rất ngắn để server cập nhật
+        end
+    else
+        Root.CFrame = CFrame.new(targetPosition + Vector3.new(0, TELEPORT_HEIGHT, 0))
+        Root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+    end
+    
+    task.wait(TELEPORT_DELAY)
+    ToggleNoclip(false)
+end
+
+--------------------------------------------------
+-- COLLECT CHEST LOGIC (FIX LỖI ĐỨNG IM NHÌN 1 RƯƠNG)
+--------------------------------------------------
+local function CollectChest(chest)
+    if not chest or not chest.Parent then return end
+
+    UpdateStatus("Collecting " .. chest.Name)
+    TP(chest.Position)
+
+    -- Chạm rương
+    pcall(function()
+        if firetouchinterest then
+            firetouchinterest(GetRoot(), chest, 0)
+            task.wait(0.1)
+            firetouchinterest(GetRoot(), chest, 1)
+        else
+            GetRoot().CFrame = chest.CFrame
+        end
+    end)
+    
+    UpdateCount()
+
+    -- CHỐT HẠ FIX LỖI: Cưỡng ép xóa cái rương vừa nhặt ra khỏi bộ nhớ ngay lập tức!
+    local index = table.find(CachedChests, chest)
+    if index then
+        table.remove(CachedChests, index)
+    end
+
+    task.wait(0.2)
+end
+
+--------------------------------------------------
+-- SERVER HOP LOGIC
+--------------------------------------------------
+local function HopServer()
+    UpdateStatus("No Chest Left! Finding Server...")
+
+    local url = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+    local success, response = pcall(function() return game:HttpGet(url) end)
+
+    if not success then
+        UpdateStatus("HTTP failed, retrying...")
+        task.wait(3)
+        return
+    end
+
+    local data = HttpService:JSONDecode(response)
+    for _, server in ipairs(data.data) do
+        -- Lọc server vắng (nhỏ hơn 10 người) để nhiều rương
+        if server.id ~= game.JobId and server.playing < server.maxPlayers and server.playing <= 10 and not JoinedServers[server.id] then
+            JoinedServers[server.id] = true
+            SaveServers()
+            UpdateStatus("Teleporting to Server...")
+            task.wait(1)
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
+            break
+        end
+    end
+end
+
+--------------------------------------------------
+-- MAIN THREAD LẶP TỰ ĐỘNG
+--------------------------------------------------
+UpdateStatus("Scanning map...")
+task.wait(2) -- Đợi game load xong tránh hụt rương
+InitialChestScan() 
+
+task.spawn(function()
+    while getgenv().AutoChest do
+        local HasItem, ItemName = CheckItems()
+
+        if HasItem then
+            UpdateStatus("FOUND " .. ItemName .. "! STOPPING.")
+            getgenv().AutoChest = false
+            break
+        end
+
+        local Chest = GetNearestChest()
+
+        if Chest then
+            CollectChest(Chest)
+        else
+            HopServer()
+            task.wait(10) -- Nghỉ chờ load server mới
+        end
+        
+        task.wait(SEARCH_DELAY)
+    end
+end)
