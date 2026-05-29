@@ -1,0 +1,289 @@
+--// HIRUZ HUB V4 TP EDITION (OPTIMIZED FULL)
+--// Fast Teleport + Anti AFK + Safe Noclip + Server Hop Fix
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+local CoreGui = game:GetService("CoreGui")
+
+local LocalPlayer = Players.LocalPlayer
+
+--------------------------------------------------
+-- ANTI AFK (Chống kick 20 phút)
+--------------------------------------------------
+LocalPlayer.Idled:Connect(function()
+    VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    task.wait(1)
+    VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+end)
+
+--------------------------------------------------
+-- SETTINGS
+--------------------------------------------------
+getgenv().AutoChest = true
+
+local TELEPORT_HEIGHT = 4
+local TELEPORT_DELAY = 0.15
+local SEARCH_DELAY = math.random(2,4)
+
+local SpecialItems = {
+    "God's Chalice",
+    "Fist of Darkness",
+    "Chén Thánh",
+    "Chìa Khóa Râu Đen"
+}
+
+local CachedChests = {}
+
+--------------------------------------------------
+-- LƯU LỊCH SỬ SERVER HOP (Chống vào lại server cũ)
+--------------------------------------------------
+local hopFile = "HIRUZ_ServerHop_V4.json"
+local JoinedServers = {}
+
+-- Đọc lịch sử server cũ (nếu có)
+if isfile and isfile(hopFile) then
+    pcall(function()
+        local decoded = HttpService:JSONDecode(readfile(hopFile))
+        if type(decoded) == "table" then
+            JoinedServers = decoded
+        end
+    end)
+end
+
+local function SaveServers()
+    if writefile then
+        pcall(function()
+            writefile(hopFile, HttpService:JSONEncode(JoinedServers))
+        end)
+    end
+end
+
+-- Đánh dấu server hiện tại để không quay lại
+JoinedServers[game.JobId] = true
+SaveServers()
+
+--------------------------------------------------
+-- GUI (Giữ nguyên gốc)
+--------------------------------------------------
+pcall(function()
+    if CoreGui:FindFirstChild("HIRUZ_V4") then
+        CoreGui.HIRUZ_V4:Destroy()
+    end
+end)
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "HIRUZ_V4"
+Gui.ResetOnSpawn = false
+Gui.Parent = CoreGui
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0,320,0,140)
+Main.Position = UDim2.new(0.5,-160,0.15,0)
+Main.BackgroundColor3 = Color3.fromRGB(18,18,18)
+Main.BackgroundTransparency = 0.1
+Main.Parent = Gui
+
+Instance.new("UICorner", Main)
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1,0,1,0)
+Status.BackgroundTransparency = 1
+Status.Font = Enum.Font.Code
+Status.TextSize = 15
+Status.TextColor3 = Color3.new(1,1,1)
+Status.TextWrapped = true
+Status.Text = "Loading..."
+Status.Parent = Main
+
+local function UpdateStatus(txt)
+    Status.Text = "[HIRUZ] "..txt
+    print("[HIRUZ]", txt)
+end
+
+--------------------------------------------------
+-- CHARACTER & NOCLIP CHUẨN
+--------------------------------------------------
+local function GetCharacter()
+    return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+end
+
+local function GetRoot()
+    local Char = GetCharacter()
+    return Char:WaitForChild("HumanoidRootPart")
+end
+
+local NoclipConnection
+local function ToggleNoclip(state)
+    if state then
+        if not NoclipConnection then
+            NoclipConnection = RunService.Stepped:Connect(function()
+                local Char = LocalPlayer.Character
+                if Char then
+                    for _, v in ipairs(Char:GetDescendants()) do
+                        if v:IsA("BasePart") then
+                            v.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        end
+    else
+        if NoclipConnection then
+            NoclipConnection:Disconnect()
+            NoclipConnection = nil
+        end
+    end
+end
+
+--------------------------------------------------
+-- ITEM CHECK
+--------------------------------------------------
+local function CheckItems()
+    local Backpack = LocalPlayer:FindFirstChild("Backpack")
+    local Character = LocalPlayer.Character
+
+    for _, item in ipairs(SpecialItems) do
+        if Backpack and Backpack:FindFirstChild(item) then return true, item end
+        if Character and Character:FindFirstChild(item) then return true, item end
+    end
+    return false, nil
+end
+
+--------------------------------------------------
+-- CHEST LOGIC (TỐI ƯU SIÊU NHẸ)
+--------------------------------------------------
+local function InitialChestScan()
+    table.clear(CachedChests)
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and string.lower(obj.Name):find("chest") then
+            table.insert(CachedChests, obj)
+        end
+    end
+end
+
+local function GetNearestChest()
+    local Root = GetRoot()
+    local nearest = nil
+    local shortest = math.huge
+
+    -- Lọc ngược từ dưới lên để an toàn khi xóa phần tử
+    for i = #CachedChests, 1, -1 do
+        local chest = CachedChests[i]
+        
+        if not chest or not chest.Parent then
+            table.remove(CachedChests, i)
+        else
+            local dist = (Root.Position - chest.Position).Magnitude
+            if dist < shortest then
+                shortest = dist
+                nearest = chest
+            end
+        end
+    end
+    return nearest
+end
+
+--------------------------------------------------
+-- TỐC BIẾN (TELEPORT)
+--------------------------------------------------
+local function TP(targetPosition)
+    local Root = GetRoot()
+    if not Root then return end
+
+    ToggleNoclip(true)
+
+    -- Bay trực tiếp do Executor đã lo Anti-Ban
+    Root.CFrame = CFrame.new(targetPosition + Vector3.new(0, TELEPORT_HEIGHT, 0))
+    
+    task.wait(TELEPORT_DELAY)
+    ToggleNoclip(false)
+end
+
+--------------------------------------------------
+-- COLLECT CHEST
+--------------------------------------------------
+local function CollectChest(chest)
+    if not chest or not chest.Parent then return end
+
+    UpdateStatus("Collecting "..chest.Name)
+    TP(chest.Position)
+
+    pcall(function()
+        if firetouchinterest then
+            firetouchinterest(GetRoot(), chest, 0)
+            task.wait()
+            firetouchinterest(GetRoot(), chest, 1)
+        end
+    end)
+
+    task.wait(math.random(15,30)/100)
+end
+
+--------------------------------------------------
+-- SERVER HOP (CÓ LƯU LẠI SERVER ĐÃ VÀO)
+--------------------------------------------------
+local function HopServer()
+    UpdateStatus("Searching server...")
+
+    local url = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+    local success, response = pcall(function() return game:HttpGet(url) end)
+
+    if not success then
+        UpdateStatus("HTTP failed, retrying...")
+        task.wait(5)
+        return
+    end
+
+    local data = HttpService:JSONDecode(response)
+
+    for _, server in ipairs(data.data) do
+        -- Kiểm tra server chưa vào & vắng người
+        if server.id ~= game.JobId and server.playing < server.maxPlayers and server.playing <= 8 and not JoinedServers[server.id] then
+            
+            JoinedServers[server.id] = true
+            SaveServers()
+
+            UpdateStatus("Joining "..server.playing.."/"..server.maxPlayers)
+            task.wait(1)
+
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
+            break
+        end
+    end
+end
+
+--------------------------------------------------
+-- MAIN LOOP
+--------------------------------------------------
+UpdateStatus("Started")
+
+-- Quét rương 1 lần duy nhất lúc bật script để chống tụt FPS
+InitialChestScan() 
+
+task.spawn(function()
+    while getgenv().AutoChest do
+        local HasItem, ItemName = CheckItems()
+
+        if HasItem then
+            UpdateStatus("FOUND "..ItemName)
+            getgenv().AutoChest = false
+            break
+        end
+
+        local Chest = GetNearestChest()
+
+        if Chest then
+            CollectChest(Chest)
+        else
+            UpdateStatus("No chest found. Hopping...")
+            task.wait(2)
+            HopServer()
+            task.wait(10) -- Nghỉ một chút chờ game dịch chuyển
+        end
+
+        task.wait(math.random(SEARCH_DELAY*10, SEARCH_DELAY*20)/10)
+    end
+end)
