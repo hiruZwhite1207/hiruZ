@@ -1,0 +1,285 @@
+--// HIRUZ HUB V0.7
+--// AUTO CHEST + SMART TELEPORT + RESET + SERVER HOP
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+
+---------------------------------------------------
+-- SETTINGS
+---------------------------------------------------
+getgenv().AutoChest = true
+
+local RESET_AFTER_CHESTS = 9 -- Đã chỉnh xuống 9 theo yêu cầu của pháp sư =)))
+local ChestsCollectedSinceReset = 0
+
+local SpecialItems = {
+    "God's Chalice", "Fist of Darkness", "Chén Thánh", "Chìa Khóa Râu Đen"
+}
+local JoinedServers = {}
+
+---------------------------------------------------
+-- UI (Giữ nguyên giao diện của ông)
+---------------------------------------------------
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HIRUZ_HUB"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0,370,0,240)
+Main.Position = UDim2.new(0.5,-185,0.4,-120)
+Main.BackgroundColor3 = Color3.fromRGB(15,15,15)
+Main.BackgroundTransparency = 0.1
+Main.Active = true
+Main.Draggable = true
+Main.Parent = ScreenGui
+
+Instance.new("UICorner",Main).CornerRadius = UDim.new(0,14)
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(0,170,255)
+Stroke.Thickness = 2
+Stroke.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,0,0,40)
+Title.BackgroundTransparency = 1
+Title.Text = "HIRUZ HUB V3 (9 CHESTS RESET)"
+Title.Font = Enum.Font.Code
+Title.TextSize = 18
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Parent = Main
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1,-20,0,120)
+Status.Position = UDim2.new(0,10,0,50)
+Status.BackgroundTransparency = 1
+Status.TextWrapped = true
+Status.Font = Enum.Font.Code
+Status.TextColor3 = Color3.fromRGB(0,255,150)
+Status.TextSize = 15
+Status.Text = "Loading..."
+Status.Parent = Main
+
+local CountLabel = Instance.new("TextLabel")
+CountLabel.Size = UDim2.new(1,-20,0,30)
+CountLabel.Position = UDim2.new(0,10,1,-40)
+CountLabel.BackgroundTransparency = 1
+CountLabel.Font = Enum.Font.Code
+CountLabel.TextColor3 = Color3.fromRGB(0,170,255)
+CountLabel.TextSize = 15
+CountLabel.Text = "Chest Count: 0"
+CountLabel.Parent = Main
+
+local ChestCountNum = 0 
+
+local function UpdateStatus(txt)
+    Status.Text = "[STATUS]: "..txt
+end
+
+local function UpdateCount()
+    ChestCountNum = ChestCountNum + 1
+    CountLabel.Text = "Chest Count: "..tostring(ChestCountNum)
+end
+
+---------------------------------------------------
+-- CHARACTER & NOCLIP
+---------------------------------------------------
+local function GetCharacter()
+    return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+end
+
+local function GetRoot()
+    local Char = GetCharacter()
+    return Char:WaitForChild("HumanoidRootPart")
+end
+
+local NoclipConnection
+local function ToggleNoclip(state)
+    if state then
+        if not NoclipConnection then
+            NoclipConnection = RunService.Stepped:Connect(function()
+                local Char = LocalPlayer.Character
+                if Char then
+                    for _, v in ipairs(Char:GetDescendants()) do
+                        if v:IsA("BasePart") then v.CanCollide = false end
+                    end
+                end
+            end)
+        end
+    else
+        if NoclipConnection then
+            NoclipConnection:Disconnect()
+            NoclipConnection = nil
+        end
+    end
+end
+
+---------------------------------------------------
+-- ITEM CHECK
+---------------------------------------------------
+local function CheckSpecialItems()
+    local Backpack = LocalPlayer:FindFirstChild("Backpack")
+    local Character = GetCharacter()
+
+    for _,item in ipairs(SpecialItems) do
+        if Backpack and Backpack:FindFirstChild(item) then return true,item end
+        if Character and Character:FindFirstChild(item) then return true,item end
+    end
+    return false,nil
+end
+
+---------------------------------------------------
+-- GET CHESTS
+---------------------------------------------------
+local function GetAllChests()
+    local Chests = {}
+    for _,obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and string.find(string.lower(obj.Name),"chest") then
+            if obj.Parent then
+                table.insert(Chests,obj)
+            end
+        end
+    end
+
+    table.sort(Chests,function(a,b)
+        local Root = GetRoot()
+        if Root then
+            return (Root.Position - a.Position).Magnitude < (Root.Position - b.Position).Magnitude
+        end
+        return false
+    end)
+    return Chests
+end
+
+---------------------------------------------------
+-- TỐC BIẾN BYPASS (CHỐNG KICK) + FIRETOUCHINTEREST
+---------------------------------------------------
+local function TPChest(chest)
+    local Root = GetRoot()
+    if not Root then return end
+
+    ToggleNoclip(true)
+
+    local currentPos = Root.Position
+    local targetPosition = chest.Position
+    local distance = (currentPos - targetPosition).Magnitude
+    
+    local maxJump = 350 -- Hãm phanh 350 chống kick
+    local delayTime = 0.03
+    
+    if distance > maxJump then
+        local steps = math.ceil(distance / maxJump)
+        for i = 1, steps do
+            local lerpPos = currentPos:Lerp(targetPosition, i / steps)
+            Root.CFrame = CFrame.new(lerpPos + Vector3.new(0, 3, 0))
+            Root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+            task.wait(delayTime) 
+        end
+    else
+        Root.CFrame = CFrame.new(targetPosition + Vector3.new(0, 3, 0))
+        Root.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+    end
+    
+    task.wait(0.15)
+    
+    -- HÀM ĂN RƯƠNG ÔNG VỪA TÌM ĐƯỢC ĐÂY
+    pcall(function()
+        if firetouchinterest then
+            firetouchinterest(Root, chest, 0)
+            task.wait(0.05)
+            firetouchinterest(Root, chest, 1)
+        end
+    end)
+    
+    ToggleNoclip(false)
+end
+
+---------------------------------------------------
+-- RESET
+---------------------------------------------------
+local function ResetCharacter()
+    local Char = GetCharacter()
+    local Humanoid = Char:FindFirstChildOfClass("Humanoid")
+    if Humanoid then
+        UpdateStatus("Reset character (Anti-Cheat Bypass)...")
+        Humanoid.Health = 0
+        LocalPlayer.CharacterAdded:Wait()
+        task.wait(3)
+        ChestsCollectedSinceReset = 0 -- Trả nợ server xong, reset bộ đếm
+    end
+end
+
+---------------------------------------------------
+-- SERVER HOP (FIX LỖI 773)
+---------------------------------------------------
+local function HopServer()
+    UpdateStatus("Searching new server...")
+    local URL = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+    
+    local success,response = pcall(function() return game:HttpGet(URL) end)
+    if not success then return end
+
+    local data = HttpService:JSONDecode(response)
+    for _,server in ipairs(data.data) do
+        if server.playing < server.maxPlayers and server.playing <= 7 and server.id ~= game.JobId and not JoinedServers[server.id] then
+            JoinedServers[server.id] = true
+            UpdateStatus("Teleporting...")
+            task.wait(3) -- Nghỉ 3s chống văng 773
+            TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer)
+            break
+        end
+    end
+end
+
+---------------------------------------------------
+-- MAIN
+---------------------------------------------------
+UpdateStatus("HIRUZ STARTED")
+
+task.spawn(function()
+    while getgenv().AutoChest do
+        task.wait(0.2)
+
+        local HasItem,ItemName = CheckSpecialItems()
+        if HasItem then
+            UpdateStatus("Found "..ItemName)
+            getgenv().AutoChest = false
+            break
+        end
+
+        -- KIỂM TRA ĐỦ 9 RƯƠNG THÌ TỰ SÁT
+        if ChestsCollectedSinceReset >= RESET_AFTER_CHESTS then
+            ResetCharacter()
+        end
+
+        local Chests = GetAllChests()
+
+        if #Chests > 0 then
+            -- Chỉ lấy rương gần nhất để ăn
+            local Chest = Chests[1]
+            if Chest and Chest.Parent then
+                UpdateStatus("Collecting "..Chest.Name)
+                TPChest(Chest)
+                
+                UpdateCount()
+                ChestsCollectedSinceReset = ChestsCollectedSinceReset + 1
+                
+                task.wait(0.25)
+            end
+        else
+            UpdateStatus("No chest found")
+            ResetCharacter()
+            task.wait(3)
+            
+            if #GetAllChests() <= 0 then
+                HopServer()
+                task.wait(10)
+            end
+        end
+    end
+end)
