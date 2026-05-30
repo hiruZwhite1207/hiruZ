@@ -1,0 +1,144 @@
+-- Chờ game load hoàn chỉnh để tránh bị lỗi ngang hông
+repeat task.wait() until game:IsLoaded() and game.Players.LocalPlayer
+
+-- Tải thư viện Giao Diện Orion (Đã đổi sang link dự phòng Mobile bao chạy)
+local OrionLib
+local status, err = pcall(function()
+    OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/CustomModules/OrionMobile.lua'))()
+end)
+
+-- Nếu link 1 lỗi thì tự động chuyển sang link 2
+if not status or not OrionLib then
+    OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/jensonhirst/Luau/main/ui/orion.lua'))()
+end
+
+-- Khởi tạo Menu
+local Window = OrionLib:MakeWindow({Name = "Siêu Hub Tổng Hợp - V1.1", HidePremium = false, SaveConfig = true, ConfigFolder = "SieuHub"})
+
+-- Tạo các Tab
+local TabCaiDat = Window:MakeTab({ Name = " Cài Đặt Chung", Icon = "rbxassetid://4483345998", PremiumOnly = false })
+local TabChinh = Window:MakeTab({ Name = " Kho Script", Icon = "rbxassetid://4483345998", PremiumOnly = false })
+
+-- Biến lưu cấu hình
+getgenv().Team = "Pirates"
+local ScriptCanChay = ""
+
+-- Tự động bơm cấu hình Kaitun
+local function SetKaitunConfig()
+    getgenv().Config = {
+        Team = getgenv().Team,
+        FarmConfig = {["Out game when done all"] = true, ["Bypass Teleport"] = true, ["Double Quest(RISK)"] = true},
+        Items = {["Saber"] = true, ["Pole (1st form)"] = true, ["Skull Guitar"] = true, ["Cursed Dual Katana"] = true, ["Godhuman"] = true},
+        Webhook = {["Enabled"] = false, ["Url"] = ""}
+    }
+end
+SetKaitunConfig()
+
+-- KHO SCRIPT TỔNG HỢP CỦA ÔNG
+local KhoScriptBloxFruits = {
+    ["W-Azure v2 (Tự Chọn Phe)"] = "https://rawscripts.net/raw/Blox-Fruits-W-azure-v2-new-12336",
+    ["Omgshit Hub"] = "https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua",
+    ["Simple Hub (Kaitun)"] = "https://raw.githubusercontent.com/simple-hubs/contents/refs/heads/main/bloxfruit-kaitan-main.lua",
+    ["Tay Hub"] = "https://raw.githubusercontent.com/TayHubOfficial/TayHub/main/TayHub.lua",
+    ["Redz V3 (Mới)"] = "https://raw.githubusercontent.com/newredzv3/Scripts/refs/heads/main/main.luau",
+    ["Tumadam Mod (Bản Tiếng Anh)"] = "https://raw.githubusercontent.com/TumadamMod/cwertyur/refs/heads/main/TumadamEng.lua",
+    ["Sigma Hub (Đẳng Cấp)"] = "https://raw.githubusercontent.com/SigmaHubDangCap/BloxFruit/refs/heads/main/MainBloxFruit.lua",
+    ["Tay Hub Kaitun (AnimeHub)"] = "https://raw.githubusercontent.com/VTDROBLOX/Animehub/refs/heads/main/tayhubkaitun.lua",
+    ["Orange Hub"] = "https://raw.githubusercontent.com/HieuDepTrai-Z/Dev_Orange/refs/heads/main/OrangeHub.lua",
+    ["Realkid Hub"] = "https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua",
+    ["Relz Hub"] = "https://relzhub.com/loader",
+    ["Panda Hub"] = "https://raw.githubusercontent.com/nvb201112/the_real_Panda-Hub/refs/heads/main/BloxFruits.luau",
+    ["Script Pastefy (Ẩn Danh)"] = "https://pastefy.app/AjS0TLCt/raw",
+    ["Neji Đẹp Trai Hub"] = "https://raw.githubusercontent.com/Dev-NejiDepzai/Bloxfruits/refs/heads/main/Main.lua",
+    ["Leaf Hub"] = "https://github.com/LeafHubAcademy/LeafHub/raw/refs/heads/main/Leaf.lua",
+    ["Beta Hub"] = "https://raw.githubusercontent.com/Anniecreate86/BloxFruits/refs/heads/main/BetaHub-BF",
+    ["Zee Hub VIP"] = "https://link.trwxz.com/LS-Zee-Hub-VIP",
+    ["Banana Hub (Hàng Longhihi)"] = "https://raw.githubusercontent.com/longhihilonghihi-hub/BananaHub/refs/heads/main/CombackVersion",
+    ["Abacaxi Hub"] = "https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua",
+    ["Moonlight Hub"] = "https://raw.githubusercontent.com/Dev-Moonlight/Moonlight/refs/heads/main/Main",
+    ["Bacon Hub"] = "https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/BaconHub.lua",
+    ["Bear Hub Premium"] = "https://raw.githubusercontent.com/Huylovemy/Bearhud/refs/heads/main/BearHudPremium",
+    ["Vector Hub"] = "https://vectorhub.space",
+    ["Bostur UI (Redz Obfuscated)"] = "https://raw.githubusercontent.com/thihaccff-alt/H-hhhaa/refs/heads/main/MainBosturUiRedzHub-obfuscated.lua",
+    ["Trâu Blue V1"] = "https://raw.githubusercontent.com/trungdao2k4/trauroblox/refs/heads/main/traubluev1",
+    ["TRon Void Hub R6.1"] = "https://raw.githubusercontent.com/TRon-Void-Devs/TRon-Void-Hub-R6.1/refs/heads/main/script.lua",
+    ["Midnight X"] = "https://raw.githubusercontent.com/Ohofo2279/Midnight/refs/heads/main/MidnightX-BloxFruits.lua",
+    ["AloAlo Script (Ẩn Danh)"] = "https://raw.githubusercontent.com/aloaloalo322/sssdas/refs/heads/main/cc",
+    ["Aura Hub"] = "https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Aura",
+    ["Heart Hub"] = "https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/HeartHub",
+    ["Tale Hub"] = "https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Tale",
+    ["Jade Hub"] = "https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Jade",
+    ["Hop Script (Đổi Server)"] = "https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/HopScript.luau",
+    ["Hoàng Trọng Hub"] = "https://raw.githubusercontent.com/trongdeptraihucscript/Main/refs/heads/main/Hoangtrongdepzai.lua",
+    ["Hiru Hub Free"] = "https://luacrack.site/raw.php/HiruHub/raw/Loader/HiruHubFree.lua",
+    ["Asher Project"] = "https://raw.githubusercontent.com/asher-realrise/project/refs/heads/main/loadder.lua",
+    ["RUBU V6"] = "https://raw.githubusercontent.com/Teddyseetink/RUBU/refs/heads/main/RUBUV6.lua",
+    ["Leaf Zeta API"] = "https://leaf-zeta.onrender.com/api/script",
+    ["NaNa TV Hub"] = "https://raw.githubusercontent.com/NaNacuti/nanabeo/refs/heads/main/NaNaTVHub.lua",
+    ["Lag Cat Hub"] = "https://raw.githubusercontent.com/TDDuym500/npmc_/refs/heads/main/LagCatHub.lua",
+    ["Teddy Freemium"] = "https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDY-FREEMIUM",
+    ["Redz Hub (Link Vercel)"] = "https://keyscripthub.vercel.app/redz.lua",
+    ["ZyroX Store Hub"] = "https://raw.githubusercontent.com/vinh129150/ZyroXstore/refs/heads/main/Bloxfruits.lua",
+    ["Zyre Hub"] = "https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/ZyreHub",
+    ["King Rùa Hub"] = "https://raw.githubusercontent.com/shinichi-dz/phucshinyeuem/refs/heads/main/KingRuaHub.lua",
+    ["BT Script (Universal)"] = "https://rawscripts.net/raw/Universal-Script-BT-Script-42346",
+    ["Arceney Hub"] = "https://arceney.cc/cdn/loader.luau",
+    ["Monster Hub"] = "https://raw.githubusercontent.com/giahuy2511-coder/MonsterHub/refs/heads/main/MonsterHub",
+    ["TDT Hub"] = "https://raw.githubusercontent.com/ThinhNek343/tdthub/refs/heads/main/maintdt.lua",
+    ["Rubu Hub V5"] = "https://raw.githubusercontent.com/Bubu2k/Rubutv/refs/heads/main/rubuhubv5.lua",
+    ["Redz Hub (Bản Mod Huy384)"] = "https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua",
+    ["Zis Chuối Hub (Bản Tiếng Anh)"] = "https://raw.githubusercontent.com/LuaCrack/Zis/refs/heads/main/ZisChuoiEng",
+    ["Banana Hub Free (Bản Protect)"] = "https://raw.githubusercontent.com/kimprobloxdz/Banana-Free/refs/heads/main/Protected_5609200582002947.lua.txt"
+}
+
+-- Trích xuất danh sách tên để bỏ vào Dropdown
+local DanhSachTen = {}
+for ten, _ in pairs(KhoScriptBloxFruits) do
+    table.insert(DanhSachTen, ten)
+end
+table.sort(DanhSachTen)
+
+-- ==========================================
+-- GIAO DIỆN CÀI ĐẶT CHUNG
+-- ==========================================
+TabCaiDat:AddToggle({
+    Name = "Chọn Phe Hải Tặc (Tắt = Hải Quân)",
+    Default = true,
+    Callback = function(Value)
+        if Value then
+            getgenv().Team = "Pirates"
+            OrionLib:MakeNotification({Name = "Hệ Thống", Content = "Đã chọn Hải Tặc!", Time = 2})
+        else
+            getgenv().Team = "Marines"
+            OrionLib:MakeNotification({Name = "Hệ Thống", Content = "Đã chọn Hải Quân!", Time = 2})
+        end
+        SetKaitunConfig()
+    end    
+})
+
+-- ==========================================
+-- GIAO DIỆN CHỌN SCRIPT
+-- ==========================================
+TabChinh:AddDropdown({
+    Name = " Chọn Script Trong Kho",
+    Default = "",
+    Options = DanhSachTen,
+    Callback = function(Value)
+        ScriptCanChay = KhoScriptBloxFruits[Value]
+    end    
+})
+
+TabChinh:AddButton({
+    Name = " CHẠY SCRIPT ĐÃ CHỌN ",
+    Callback = function()
+        if ScriptCanChay ~= "" then
+            OrionLib:MakeNotification({Name = "Đang Tải...", Content = "Đang kích hoạt script được chọn!", Time = 3})
+            task.wait(0.3)
+            loadstring(game:HttpGet(ScriptCanChay))()
+        else
+            OrionLib:MakeNotification({Name = "Lỗi", Content = "Ông chưa chọn cái Hub nào từ danh sách cả!", Time = 3})
+        end
+    end    
+})
+
+OrionLib:Init()
