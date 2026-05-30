@@ -1,0 +1,193 @@
+-- ==========================================
+-- GỌI THƯ VIỆN UI (BANANA HUB)
+-- ==========================================
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Window = Library:CreateWindow({
+    Title = "Sieu Hub V3",
+    Subtitle = ": B l o x  F r u i t s (Full)",
+    Image = "rbxassetid://128185233852701"
+})
+
+-- ==========================================
+-- NÚT ẨN/HIỆN MENU DÀNH CHO ĐIỆN THOẠI
+-- ==========================================
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+if CoreGui:FindFirstChild("MobileToggleSieuHub") then
+    CoreGui.MobileToggleSieuHub:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MobileToggleSieuHub"
+ScreenGui.Parent = CoreGui
+
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+ToggleBtn.Text = "MỞ"
+ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 204)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.TextSize = 12
+ToggleBtn.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(1, 0)
+UICorner.Parent = ToggleBtn
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(0, 255, 204)
+UIStroke.Thickness = 2
+UIStroke.Parent = ToggleBtn
+
+local dragging, dragInput, dragStart, startPos
+ToggleBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = ToggleBtn.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+ToggleBtn.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        ToggleBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.RightControl, false, game)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.RightControl, false, game)
+end)
+
+-- ==========================================
+-- KHO DỮ LIỆU SCRIPT (TRẢ LẠI 100% GỐC)
+-- ==========================================
+local Categories = {
+	Kaitun = {
+		{Name = "W-Azure v2", Link = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Blox-Fruits-W-azure-v2-new-12336"))()]]},
+		{Name = "Simple Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/simple-hubs/contents/refs/heads/main/bloxfruit-kaitan-main.lua"))()]]},
+		{Name = "Redz V3", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/newredzv3/Scripts/refs/heads/main/main.luau"))()]]},
+		{Name = "Tay Hub Kaitun", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/VTDROBLOX/Animehub/refs/heads/main/tayhubkaitun.lua"))()]]},
+		{Name = "Tay Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TayHubOfficial/TayHub/main/TayHub.lua"))()]]},
+		{Name = "Omgshit Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))()]]}
+	},
+
+	VietNam = {
+		{Name = "Orange Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/HieuDepTrai-Z/Dev_Orange/refs/heads/main/OrangeHub.lua"))()]]},
+		{Name = "Neji Đẹp Trai", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-NejiDepzai/Bloxfruits/refs/heads/main/Main.lua"))()]]},
+		{Name = "Trâu Blue V1", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/trungdao2k4/trauroblox/refs/heads/main/traubluev1"))()]]},
+		{Name = "Hoàng Trọng Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/trongdeptraihucscript/Main/refs/heads/main/Hoangtrongdepzai.lua"))()]]},
+		{Name = "TDT Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/ThinhNek343/tdthub/refs/heads/main/maintdt.lua"))()]]},
+		{Name = "Hdanh Banana", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/hdanhvip/hdanhhub/refs/heads/main/BananaHub.lua.txt"))()]]},
+		{Name = "King Rùa Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/shinichi-dz/phucshinyeuem/refs/heads/main/KingRuaHub.lua"))()]]}
+	},
+
+	Global = {
+		{Name = "Vector Hub", Link = [[loadstring(game:HttpGet("https://vectorhub.space"))()]]},
+		{Name = "Arceney Hub", Link = [[loadstring(game:HttpGet("https://arceney.cc/cdn/loader.luau"))()]]},
+		{Name = "Relz Hub", Link = [[loadstring(game:HttpGet("https://relzhub.com/loader"))()]]},
+		{Name = "Hiru Hub Free", Link = [[loadstring(game:HttpGet("https://luacrack.site/raw.php/HiruHub/raw/Loader/HiruHubFree.lua"))()]]},
+		{Name = "Leaf Zeta API", Link = [[loadstring(game:HttpGet("https://leaf-zeta.onrender.com/api/script"))()]]},
+		{Name = "Banana Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/BananaHub/refs/heads/main/CombackVersion"))()]]},
+		{Name = "Banana Hub Free", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/kimprobloxdz/Banana-Free/refs/heads/main/Protected_5609200582002947.lua.txt"))()]]},
+		{Name = "Abacaxi Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"))()]]},
+		{Name = "Panda Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/nvb201112/the_real_Panda-Hub/refs/heads/main/BloxFruits.luau"))()]]},
+		{Name = "Bear Hub Premium", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Huylovemy/Bearhud/refs/heads/main/BearHudPremium"))()]]},
+		{Name = "Lag Cat Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TDDuym500/npmc_/refs/heads/main/LagCatHub.lua"))()]]}
+	},
+
+	Utility = {
+		{Name = "Hop Script", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/HopScript.luau"))()]]},
+		{Name = "Tumadam Mod", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TumadamMod/cwertyur/refs/heads/main/TumadamEng.lua"))()]]},
+		{Name = "Bostur UI", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/thihaccff-alt/H-hhhaa/refs/heads/main/MainBosturUiRedzHub-obfuscated.lua"))()]]},
+		{Name = "TRon Void Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TRon-Void-Devs/TRon-Void-Hub-R6.1/refs/heads/main/script.lua"))()]]},
+		{Name = "Zynex Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Hirokai-Script-make/Zynexhubbloxfruit/refs/heads/main/ZynexHub-BloxFruit-redz.lua"))()]]},
+		{Name = "Redz Hub Mod", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"))()]]}
+	},
+
+	Premium = {
+		{Name = "Realkid Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua"))()]]},
+		{Name = "Sigma Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/SigmaHubDangCap/BloxFruit/refs/heads/main/MainBloxFruit.lua"))()]]},
+		{Name = "Leaf Hub Academy", Link = [[loadstring(game:HttpGet("https://github.com/LeafHubAcademy/LeafHub/raw/refs/heads/main/Leaf.lua"))()]]},
+		{Name = "Beta Hub BF", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Anniecreate86/BloxFruits/refs/heads/main/BetaHub-BF"))()]]},
+		{Name = "Zee Hub VIP", Link = [[loadstring(game:HttpGet("https://link.trwxz.com/LS-Zee-Hub-VIP"))()]]},
+		{Name = "Moonlight Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-Moonlight/Moonlight/refs/heads/main/Main"))()]]},
+		{Name = "Bacon Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/BaconHub.lua"))()]]},
+		{Name = "Midnight X", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Ohofo2279/Midnight/refs/heads/main/MidnightX-BloxFruits.lua"))()]]},
+		{Name = "Aura Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Aura"))()]]},
+		{Name = "Heart Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/HeartHub"))()]]},
+		{Name = "Tale Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Tale"))()]]},
+		{Name = "Jade Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Jade"))()]]},
+		{Name = "Asher Project", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/asher-realrise/project/refs/heads/main/loadder.lua"))()]]},
+		{Name = "RUBU V6", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/RUBU/refs/heads/main/RUBUV6.lua"))()]]},
+		{Name = "Rubu Hub V5", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Bubu2k/Rubutv/refs/heads/main/rubuhubv5.lua"))()]]},
+		{Name = "NaNa TV Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/NaNacuti/nanabeo/refs/heads/main/NaNaTVHub.lua"))()]]},
+		{Name = "Teddy Freemium", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDY-FREEMIUM"))()]]},
+		{Name = "Redz Hub Vercel", Link = [[loadstring(game:HttpGet("https://keyscripthub.vercel.app/redz.lua"))()]]},
+		{Name = "ZyroX Store", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/ZyroXstore/refs/heads/main/Bloxfruits.lua"))()]]},
+		{Name = "Zyre Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/ZyreHub"))()]]},
+		{Name = "Monster Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/giahuy2511-coder/MonsterHub/refs/heads/main/MonsterHub"))()]]},
+		{Name = "Zis Chuối Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/Zis/refs/heads/main/ZisChuoiEng"))()]]},
+		{Name = "BT Script", Link = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-BT-Script-42346"))()]]},
+		{Name = "AloAlo Script", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/aloaloalo322/sssdas/refs/heads/main/cc"))()]]},
+		{Name = "Link Pastefy", Link = [[loadstring(game:HttpGet("https://pastefy.app/AjS0TLCt/raw"))()]]}
+	}
+}
+
+-- ==========================================
+-- XÂY DỰNG GIAO DIỆN
+-- ==========================================
+local ScriptTab = Window:AddTab("Blox Fruits")
+
+local KaitunGroup = ScriptTab:AddLeftGroupbox("Kaitun Scripts")
+local VNGroup = ScriptTab:AddLeftGroupbox("Vietnam Scripts")
+local GlobalGroup = ScriptTab:AddRightGroupbox("Global Scripts")
+local UtilsGroup = ScriptTab:AddRightGroupbox("Utility Scripts")
+local PremiumGroup = ScriptTab:AddRightGroupbox("Premium Scripts")
+
+local function SetupCategory(Groupbox, CategoryData)
+    for _, scriptData in ipairs(CategoryData) do
+        Groupbox:AddButton({
+            Text = scriptData.Name,
+            Func = function()
+                Library:Notify({
+                    Title = "Hệ thống",
+                    Description = "Đang chạy: " .. scriptData.Name,
+                    Duration = 3
+                })
+                task.spawn(function()
+                    pcall(function()
+                        local func = loadstring(scriptData.Link)
+                        if func then func() end
+                    end)
+                end)
+            end
+        })
+    end
+end
+
+SetupCategory(KaitunGroup, Categories.Kaitun)
+SetupCategory(VNGroup, Categories.VietNam)
+SetupCategory(GlobalGroup, Categories.Global)
+SetupCategory(UtilsGroup, Categories.Utility)
+SetupCategory(PremiumGroup, Categories.Premium)
+
+Library:Notify({
+    Title = "Thành công!",
+    Description = "Đã load FULL script. Chạm vào MỞ để dùng Menu nhé!",
+    Duration = 5
+})
