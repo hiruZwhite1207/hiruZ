@@ -1,0 +1,390 @@
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
+
+-- Xóa Hub cũ nếu tồn tại để tránh trùng lặp khi chạy lại script
+if CoreGui:FindFirstChild("SieuHubV3") then
+	CoreGui.SieuHubV3:Destroy()
+end
+
+-- ==========================================
+-- KHO DỮ LIỆU SCRIPT (ĐÃ BỌC SẴN LOADSTRING)
+-- ==========================================
+local Categories = {
+	Kaitun = {
+		{Name = "W-Azure v2", Link = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Blox-Fruits-W-azure-v2-new-12336"))()]]},
+		{Name = "Simple Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/simple-hubs/contents/refs/heads/main/bloxfruit-kaitan-main.lua"))()]]},
+		{Name = "Redz V3", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/newredzv3/Scripts/refs/heads/main/main.luau"))()]]},
+		{Name = "Tay Hub Kaitun", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/VTDROBLOX/Animehub/refs/heads/main/tayhubkaitun.lua"))()]]},
+		{Name = "Tay Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TayHubOfficial/TayHub/main/TayHub.lua"))()]]},
+		{Name = "Omgshit Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))()]]}
+	},
+
+	VietNam = {
+		{Name = "Orange Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/HieuDepTrai-Z/Dev_Orange/refs/heads/main/OrangeHub.lua"))()]]},
+		{Name = "Neji Đẹp Trai", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-NejiDepzai/Bloxfruits/refs/heads/main/Main.lua"))()]]},
+		{Name = "Trâu Blue V1", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/trungdao2k4/trauroblox/refs/heads/main/traubluev1"))()]]},
+		{Name = "Hoàng Trọng Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/trongdeptraihucscript/Main/refs/heads/main/Hoangtrongdepzai.lua"))()]]},
+		{Name = "TDT Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/ThinhNek343/tdthub/refs/heads/main/maintdt.lua"))()]]},
+		{Name = "Hdanh Banana", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/hdanhvip/hdanhhub/refs/heads/main/BananaHub.lua.txt"))()]]},
+		{Name = "King Rùa Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/shinichi-dz/phucshinyeuem/refs/heads/main/KingRuaHub.lua"))()]]}
+	},
+
+	Global = {
+		{Name = "Vector Hub", Link = [[loadstring(game:HttpGet("https://vectorhub.space"))()]]},
+		{Name = "Arceney Hub", Link = [[loadstring(game:HttpGet("https://arceney.cc/cdn/loader.luau"))()]]},
+		{Name = "Relz Hub", Link = [[loadstring(game:HttpGet("https://relzhub.com/loader"))()]]},
+		{Name = "Hiru Hub Free", Link = [[loadstring(game:HttpGet("https://luacrack.site/raw.php/HiruHub/raw/Loader/HiruHubFree.lua"))()]]},
+		{Name = "Leaf Zeta API", Link = [[loadstring(game:HttpGet("https://leaf-zeta.onrender.com/api/script"))()]]},
+		{Name = "Banana Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/BananaHub/refs/heads/main/CombackVersion"))()]]},
+		{Name = "Banana Hub Free", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/kimprobloxdz/Banana-Free/refs/heads/main/Protected_5609200582002947.lua.txt"))()]]},
+		{Name = "Abacaxi Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"))()]]},
+		{Name = "Panda Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/nvb201112/the_real_Panda-Hub/refs/heads/main/BloxFruits.luau"))()]]},
+		{Name = "Bear Hub Premium", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Huylovemy/Bearhud/refs/heads/main/BearHudPremium"))()]]},
+		{Name = "Lag Cat Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TDDuym500/npmc_/refs/heads/main/LagCatHub.lua"))()]]}
+	},
+
+	Utility = {
+		{Name = "Hop Script", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/HopScript.luau"))()]]},
+		{Name = "Tumadam Mod", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TumadamMod/cwertyur/refs/heads/main/TumadamEng.lua"))()]]},
+		{Name = "Bostur UI", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/thihaccff-alt/H-hhhaa/refs/heads/main/MainBosturUiRedzHub-obfuscated.lua"))()]]},
+		{Name = "TRon Void Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TRon-Void-Devs/TRon-Void-Hub-R6.1/refs/heads/main/script.lua"))()]]},
+		{Name = "Zynex Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Hirokai-Script-make/Zynexhubbloxfruit/refs/heads/main/ZynexHub-BloxFruit-redz.lua"))()]]},
+		{Name = "Redz Hub Mod", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"))()]]}
+	},
+
+	Premium = {
+		{Name = "Realkid Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua"))()]]},
+		{Name = "Sigma Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/SigmaHubDangCap/BloxFruit/refs/heads/main/MainBloxFruit.lua"))()]]},
+		{Name = "Leaf Hub Academy", Link = [[loadstring(game:HttpGet("https://github.com/LeafHubAcademy/LeafHub/raw/refs/heads/main/Leaf.lua"))()]]},
+		{Name = "Beta Hub BF", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Anniecreate86/BloxFruits/refs/heads/main/BetaHub-BF"))()]]},
+		{Name = "Zee Hub VIP", Link = [[loadstring(game:HttpGet("https://link.trwxz.com/LS-Zee-Hub-VIP"))()]]},
+		{Name = "Moonlight Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-Moonlight/Moonlight/refs/heads/main/Main"))()]]},
+		{Name = "Bacon Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/BaconHub.lua"))()]]},
+		{Name = "Midnight X", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Ohofo2279/Midnight/refs/heads/main/MidnightX-BloxFruits.lua"))()]]},
+		{Name = "Aura Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Aura"))()]]},
+		{Name = "Heart Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/HeartHub"))()]]},
+		{Name = "Tale Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Tale"))()]]},
+		{Name = "Jade Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Jade"))()]]},
+		{Name = "Asher Project", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/asher-realrise/project/refs/heads/main/loadder.lua"))()]]},
+		{Name = "RUBU V6", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/RUBU/refs/heads/main/RUBUV6.lua"))()]]},
+		{Name = "Rubu Hub V5", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Bubu2k/Rubutv/refs/heads/main/rubuhubv5.lua"))()]]},
+		{Name = "NaNa TV Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/NaNacuti/nanabeo/refs/heads/main/NaNaTVHub.lua"))()]]},
+		{Name = "Teddy Freemium", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDY-FREEMIUM"))()]]},
+		{Name = "Redz Hub Vercel", Link = [[loadstring(game:HttpGet("https://keyscripthub.vercel.app/redz.lua"))()]]},
+		{Name = "ZyroX Store", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/ZyroXstore/refs/heads/main/Bloxfruits.lua"))()]]},
+		{Name = "Zyre Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/ZyreHub"))()]]},
+		{Name = "Monster Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/giahuy2511-coder/MonsterHub/refs/heads/main/MonsterHub"))()]]},
+		{Name = "Zis Chuối Hub", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/Zis/refs/heads/main/ZisChuoiEng"))()]]},
+		{Name = "BT Script", Link = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-BT-Script-42346"))()]]},
+		{Name = "AloAlo Script", Link = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/aloaloalo322/sssdas/refs/heads/main/cc"))()]]},
+		{Name = "Link Pastefy", Link = [[loadstring(game:HttpGet("https://pastefy.app/AjS0TLCt/raw"))()]]}
+	}
+}
+
+-- ==========================================
+-- KHỞI TẠO ĐỐI TƯỢNG GIAO DIỆN (UI PARTS)
+-- ==========================================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SieuHubV3"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+-- Khung nền Menu chính
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 700, 0, 420)
+Main.Position = UDim2.new(0.5, -350, 0.5, -210)
+Main.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
+Main.BorderSizePixel = 0
+Main.ClipsDescendants = true
+Main.Parent = ScreenGui
+
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
+
+-- Đường viền đổi màu Neon Cyan
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(0, 255, 204)
+Stroke.Thickness = 1.5
+Stroke.Parent = Main
+
+-- Tiêu đề Panel
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 45)
+Title.BackgroundTransparency = 1
+Title.Text = "SIEU HUB V3"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Title.TextColor3 = Color3.fromRGB(0, 255, 204)
+Title.Parent = Main
+
+-- Nút Thu nhỏ Menu (-)
+local MinBtn = Instance.new("TextButton")
+MinBtn.Size = UDim2.new(0, 30, 0, 30)
+MinBtn.Position = UDim2.new(1, -40, 0, 8)
+MinBtn.Text = "-"
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.TextSize = 18
+MinBtn.TextColor3 = Color3.new(1, 1, 1)
+MinBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+MinBtn.Parent = Main
+Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 6)
+
+-- Nút Mở lại Menu (OPEN)
+local OpenBtn = Instance.new("TextButton")
+OpenBtn.Size = UDim2.new(0, 50, 0, 50)
+OpenBtn.Position = UDim2.new(0.02, 0, 0.4, 0)
+OpenBtn.Text = "OPEN"
+OpenBtn.Visible = false
+OpenBtn.Font = Enum.Font.GothamBold
+OpenBtn.TextSize = 11
+OpenBtn.TextColor3 = Color3.fromRGB(15, 15, 15)
+OpenBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 204)
+OpenBtn.Parent = ScreenGui
+Instance.new("UICorner", OpenBtn).CornerRadius = UDim.new(1, 0)
+
+local OpenStroke = Instance.new("UIStroke")
+OpenStroke.Color = Color3.new(1, 1, 1)
+OpenStroke.Thickness = 1
+OpenStroke.Parent = OpenBtn
+
+-- Sidebar quản lý danh mục (Kaitun, VietNam...)
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 150, 1, -45)
+Sidebar.Position = UDim2.new(0, 0, 0, 45)
+Sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+Sidebar.BorderSizePixel = 0
+Sidebar.Parent = Main
+
+local SidePadding = Instance.new("UIPadding")
+SidePadding.PaddingTop = UDim.new(0, 10)
+SidePadding.PaddingLeft = UDim.new(0, 8)
+SidePadding.Parent = Sidebar
+
+local SideLayout = Instance.new("UIListLayout")
+SideLayout.Padding = UDim.new(0, 6)
+SideLayout.Parent = Sidebar
+
+-- Khu vực chứa danh sách Script bên phải
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, -165, 1, -55)
+Content.Position = UDim2.new(0, 155, 0, 50)
+Content.BackgroundTransparency = 1
+Content.Parent = Main
+
+-- Ô nhập Tìm kiếm (Search)
+local Search = Instance.new("TextBox")
+Search.Size = UDim2.new(1, 0, 0, 35)
+Search.PlaceholderText = "Search scripts..."
+Search.Text = ""
+Search.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
+Search.TextColor3 = Color3.new(1, 1, 1)
+Search.Font = Enum.Font.Gotham
+Search.TextSize = 14
+Search.Parent = Content
+Instance.new("UICorner", Search).CornerRadius = UDim.new(0, 8)
+
+-- Dòng trạng thái (Status Info)
+local Info = Instance.new("TextLabel")
+Info.Size = UDim2.new(1, 0, 0, 25)
+Info.Position = UDim2.new(0, 0, 0, 40)
+Info.BackgroundTransparency = 1
+Info.Text = "Trạng thái: Sẵn sàng"
+Info.TextColor3 = Color3.fromRGB(150, 150, 150)
+Info.TextXAlignment = Enum.TextXAlignment.Left
+Info.Font = Enum.Font.Gotham
+Info.TextSize = 13
+Info.Parent = Content
+
+-- Khung cuộn danh sách (Scrolling Frame)
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.new(1, 0, 1, -70)
+Scroll.Position = UDim2.new(0, 0, 0, 70)
+Scroll.BackgroundTransparency = 1
+Scroll.BorderSizePixel = 0
+Scroll.ScrollBarThickness = 4
+Scroll.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 204)
+Scroll.Parent = Content
+
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0, 6)
+Layout.Parent = Scroll
+
+Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	Scroll.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 10)
+end)
+
+-- ==========================================
+-- LOGIC XỬ LÝ HỆ THỐNG (FUNCTIONS & EVENTS)
+-- ==========================================
+local CurrentButtons = {}
+
+-- Hàm xóa sạch nút cũ để đổi Tab
+local function ClearButtons()
+	for _, v in ipairs(CurrentButtons) do
+		v:Destroy()
+	end
+	table.clear(CurrentButtons)
+end
+
+-- Hàm tạo Nút Script và cấu hình click thực thi
+local function CreateItem(itemData)
+	local Btn = Instance.new("TextButton")
+	Btn.Size = UDim2.new(1, -5, 0, 40)
+	Btn.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
+	Btn.Text = "  " .. itemData.Name
+	Btn.TextColor3 = Color3.new(1, 1, 1)
+	Btn.Font = Enum.Font.Gotham
+	Btn.TextSize = 14
+	Btn.TextXAlignment = Enum.TextXAlignment.Left
+	Btn.Parent = Scroll
+
+	Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
+
+	-- Hiệu ứng phản hồi di chuột (Hover Effect)
+	Btn.MouseEnter:Connect(function()
+		TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 42)}):Play()
+	end)
+	Btn.MouseLeave:Connect(function()
+		TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(22, 22, 30)}):Play()
+	end)
+
+	-- Xử lý luồng tải Script an toàn (pcall + task.spawn)
+	Btn.MouseButton1Click:Connect(function()
+		Info.Text = "Đang kích hoạt: " .. itemData.Name
+		Info.TextColor3 = Color3.fromRGB(0, 255, 204)
+		
+		if itemData.Link and itemData.Link ~= "" then
+			task.spawn(function()
+				local success, err = pcall(function()
+					local func, loadErr = loadstring(itemData.Link)
+					if func then
+						func()
+					else
+						error(loadErr)
+					end
+				end)
+				if not success then
+					Info.Text = "Lỗi script: " .. tostring(err)
+					Info.TextColor3 = Color3.fromRGB(255, 85, 85)
+				end
+			end)
+		else
+			Info.Text = "Script này hiện đang trống Link!"
+			Info.TextColor3 = Color3.fromRGB(255, 170, 0)
+		end
+	end)
+
+	table.insert(CurrentButtons, Btn)
+end
+
+-- Hàm render danh sách theo Tab
+local function LoadCategory(cat)
+	ClearButtons()
+	if Categories[cat] then
+		for _, item in ipairs(Categories[cat]) do
+			CreateItem(item)
+		end
+	end
+end
+
+-- Thứ tự khởi tạo Sidebar thủ công để đảm bảo vị trí đẹp mắt
+local OrderedTabs = {"Kaitun", "VietNam", "Global", "Utility", "Premium"}
+
+for _, cat in ipairs(OrderedTabs) do
+	if Categories[cat] then
+		local Btn = Instance.new("TextButton")
+		Btn.Size = UDim2.new(1, -10, 0, 35)
+		Btn.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+		Btn.Text = cat
+		Btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+		Btn.Font = Enum.Font.GothamBold
+		Btn.TextSize = 13
+		Btn.Parent = Sidebar
+
+		Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+
+		Btn.MouseButton1Click:Connect(function()
+			LoadCategory(cat)
+		end)
+	end
+end
+
+-- Hệ thống tìm kiếm Real-time chuẩn xác
+Search:GetPropertyChangedSignal("Text"):Connect(function()
+	local txt = Search.Text:lower()
+	for _, v in ipairs(CurrentButtons) do
+		local cleanText = string.gsub(v.Text, "^%s+", ""):lower() -- Loại bỏ khoảng trắng đầu dòng
+		if txt == "" or string.find(cleanText, txt, 1, true) then
+			v.Visible = true
+		else
+			v.Visible = false
+		end
+	end
+end)
+
+-- Hiệu ứng Đóng/Mở mượt mà (Tween Animation)
+local isTweening = false
+local originalSize = UDim2.new(0, 700, 0, 420)
+
+MinBtn.MouseButton1Click:Connect(function()
+	if isTweening then return end
+	isTweening = true
+	
+	local tween = TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+		Size = UDim2.new(0, 700, 0, 0)
+	})
+	tween:Play()
+	tween.Completed:Connect(function()
+		Main.Visible = false
+		OpenBtn.Visible = true
+		isTweening = false
+	end)
+end)
+
+OpenBtn.MouseButton1Click:Connect(function()
+	if isTweening then return end
+	isTweening = true
+	
+	Main.Visible = true
+	OpenBtn.Visible = false
+	
+	local tween = TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+		Size = originalSize
+	})
+	tween:Play()
+	tween.Completed:Connect(function()
+		isTweening = false
+	end)
+end)
+
+-- Hệ thống Kéo thả UI chống trôi vị trí (Smooth Drag System)
+local dragging, dragStart, startPos
+
+Main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = Main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		local delta = input.Position - dragStart
+		Main.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- Mặc định load tab Kaitun lên trước khi mở Hub
+LoadCategory("Kaitun")
