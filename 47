@@ -1,0 +1,186 @@
+-- ======================================================
+-- HUB TEMPLATE (MODERN & TỐI ƯU HÓA) - BY GEMINI
+-- ======================================================
+
+local HubLibrary = {}
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+
+-- Tự động tìm nơi an toàn để đặt UI (Tránh bị phát hiện cơ bản)
+local function GetParent()
+    if gethui then return gethui() end
+    if syn and syn.protect_gui then
+        local gui = Instance.new("ScreenGui")
+        syn.protect_gui(gui)
+        gui.Parent = CoreGui
+        return gui
+    end
+    return CoreGui:FindFirstChild("RobloxGui") or Players.LocalPlayer:WaitForChild("PlayerGui")
+end
+
+function HubLibrary:MakeWindow(TitleText)
+    local WindowData = {}
+    
+    local MainGui = Instance.new("ScreenGui")
+    MainGui.Name = "PhapSuHub_" .. tostring(math.random(1000, 9999))
+    MainGui.Parent = GetParent()
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Parent = MainGui
+    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+    MainFrame.Size = UDim2.new(0, 500, 0, 300)
+    MainFrame.Active = true
+    MainFrame.Draggable = true -- Cho phép kéo thả
+    
+    -- Bo góc cho mượt
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 8)
+    UICorner.Parent = MainFrame
+
+    -- Tiêu đề
+    local Title = Instance.new("TextLabel")
+    Title.Parent = MainFrame
+    Title.BackgroundTransparency = 1
+    Title.Position = UDim2.new(0, 15, 0, 0)
+    Title.Size = UDim2.new(1, -15, 0, 40)
+    Title.Font = Enum.Font.GothamBold
+    Title.Text = TitleText or "PHÁP SƯ HUB"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 18
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Khu vực chứa Tab
+    local TabContainer = Instance.new("Frame")
+    TabContainer.Name = "TabContainer"
+    TabContainer.Parent = MainFrame
+    TabContainer.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+    TabContainer.Position = UDim2.new(0, 10, 0, 40)
+    TabContainer.Size = UDim2.new(0, 130, 1, -50)
+    
+    local TabCorner = Instance.new("UICorner")
+    TabCorner.CornerRadius = UDim.new(0, 6)
+    TabCorner.Parent = TabContainer
+
+    local TabLayout = Instance.new("UIListLayout")
+    TabLayout.Parent = TabContainer
+    TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TabLayout.Padding = UDim.new(0, 5)
+
+    -- Khu vực chứa nội dung bên trong Tab
+    local ContentContainer = Instance.new("Frame")
+    ContentContainer.Name = "ContentContainer"
+    ContentContainer.Parent = MainFrame
+    ContentContainer.BackgroundTransparency = 1
+    ContentContainer.Position = UDim2.new(0, 150, 0, 40)
+    ContentContainer.Size = UDim2.new(1, -160, 1, -50)
+
+    WindowData.FirstTab = true
+
+    function WindowData:MakeTab(TabName)
+        local TabData = {}
+        
+        -- Nút bấm chuyển Tab
+        local TabButton = Instance.new("TextButton")
+        TabButton.Parent = TabContainer
+        TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+        TabButton.Size = UDim2.new(1, 0, 0, 30)
+        TabButton.Font = Enum.Font.GothamSemibold
+        TabButton.Text = TabName
+        TabButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+        TabButton.TextSize = 14
+        
+        local BtnCorner = Instance.new("UICorner")
+        BtnCorner.CornerRadius = UDim.new(0, 4)
+        BtnCorner.Parent = TabButton
+
+        -- Vùng hiển thị nội dung của Tab này
+        local TabPage = Instance.new("ScrollingFrame")
+        TabPage.Parent = ContentContainer
+        TabPage.BackgroundTransparency = 1
+        TabPage.Size = UDim2.new(1, 0, 1, 0)
+        TabPage.ScrollBarThickness = 4
+        TabPage.Visible = WindowData.FirstTab -- Tab đầu tiên sẽ hiện mặc định
+        
+        local PageLayout = Instance.new("UIListLayout")
+        PageLayout.Parent = TabPage
+        PageLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        PageLayout.Padding = UDim.new(0, 8)
+
+        if WindowData.FirstTab then
+            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TabButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Sáng lên khi được chọn
+            WindowData.FirstTab = false
+        end
+
+        -- Logic chuyển Tab
+        TabButton.MouseButton1Click:Connect(function()
+            -- Ẩn tất cả TabPage
+            for _, child in ipairs(ContentContainer:GetChildren()) do
+                if child:IsA("ScrollingFrame") then child.Visible = false end
+            end
+            -- Đổi màu tất cả nút về mặc định
+            for _, child in ipairs(TabContainer:GetChildren()) do
+                if child:IsA("TextButton") then 
+                    child.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+                    child.TextColor3 = Color3.fromRGB(200, 200, 200)
+                end
+            end
+            -- Bật Tab hiện tại
+            TabPage.Visible = true
+            TabButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end)
+
+        -- Hàm tạo nút bấm bên trong Tab
+        function TabData:MakeButton(BtnText, Callback)
+            local ActionButton = Instance.new("TextButton")
+            ActionButton.Parent = TabPage
+            ActionButton.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
+            ActionButton.Size = UDim2.new(1, -10, 0, 35)
+            ActionButton.Font = Enum.Font.GothamBold
+            ActionButton.Text = BtnText
+            ActionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            ActionButton.TextSize = 14
+            
+            local ActCorner = Instance.new("UICorner")
+            ActCorner.CornerRadius = UDim.new(0, 4)
+            ActCorner.Parent = ActionButton
+
+            -- Hiệu ứng khi bấm
+            ActionButton.MouseButton1Down:Connect(function()
+                TweenService:Create(ActionButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(60, 60, 65)}):Play()
+            end)
+            ActionButton.MouseButton1Up:Connect(function()
+                TweenService:Create(ActionButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(45, 45, 50)}):Play()
+                pcall(Callback) -- Gọi hàm chạy chức năng
+            end)
+        end
+
+        return TabData
+    end
+
+    return WindowData
+end
+
+-- ======================================================
+-- CÁCH SỬ DỤNG (Lắp "ruột" vào đây)
+-- ======================================================
+
+-- 1. Tạo cái bảng to ngoài cùng
+local MyWindow = HubLibrary:MakeWindow("TÊN HUB CỦA ÔNG")
+
+-- 2. Tạo các Tab
+local TabMain = MyWindow:MakeTab("Chức Năng Chính")
+local TabPlayer = MyWindow:MakeTab("Nhân Vật")
+
+-- 3. Tạo nút bấm và viết chức năng (Callback) vào trong
+TabMain:MakeButton("In ra chữ Hello", function()
+    print("Đã bấm nút! Hello Pháp Sư!")
+end)
+
+TabPlayer:MakeButton("Đổi màu xanh (Test)", function()
+    print("Code chức năng vào đây nè!")
+end)
