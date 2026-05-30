@@ -1,0 +1,308 @@
+-- =================================================================
+-- SIÊU HUB BLOX FRUITS V2.2 - PREMIUM NATIVE (ANTI-LAG & SMOOTH DRAG)
+-- =================================================================
+repeat task.wait() until game:IsLoaded() and game.Players.LocalPlayer
+
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+-- Dọn dẹp UI cũ
+if CoreGui:FindFirstChild("SieuHubPremiumV2") then
+    CoreGui:FindFirstChild("SieuHubPremiumV2"):Destroy()
+end
+
+-- DATA KHO SCRIPT (Đã sắp xếp chuẩn chỉ)
+local KhoScript = {
+    {name = "👑 W-Azure v2 (Kaitun Quốc Dân)", link = "https://rawscripts.net/raw/Blox-Fruits-W-azure-v2-new-12336"},
+    {name = "👑 Simple Hub (Kaitun Tối Ưu)", link = "https://raw.githubusercontent.com/simple-hubs/contents/refs/heads/main/bloxfruit-kaitan-main.lua"},
+    {name = "👑 Redz V3 (Bản Gốc Mới Nhất)", link = "https://raw.githubusercontent.com/newredzv3/Scripts/refs/heads/main/main.luau"},
+    {name = "👑 Tay Hub Kaitun (AnimeHub)", link = "https://raw.githubusercontent.com/VTDROBLOX/Animehub/refs/heads/main/tayhubkaitun.lua"},
+    {name = "👑 Tay Hub (Bản Thường)", link = "https://raw.githubusercontent.com/TayHubOfficial/TayHub/main/TayHub.lua"},
+    {name = "👑 Omgshit Hub (Bản Ám Ảnh)", link = "https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"},
+    {name = "🇻🇳 Orange Hub (Pháp Sư Việt)", link = "https://raw.githubusercontent.com/HieuDepTrai-Z/Dev_Orange/refs/heads/main/OrangeHub.lua"},
+    {name = "🇻🇳 Neji Đẹp Trai Hub", link = "https://raw.githubusercontent.com/Dev-NejiDepzai/Bloxfruits/refs/heads/main/Main.lua"},
+    {name = "🇻🇳 Trâu Blue V1 (Cày Cuốc)", link = "https://raw.githubusercontent.com/trungdao2k4/trauroblox/refs/heads/main/traubluev1"},
+    {name = "🇻🇳 Hoàng Trọng Hub", link = "https://raw.githubusercontent.com/trongdeptraihucscript/Main/refs/heads/main/Hoangtrongdepzai.lua"},
+    {name = "🇻🇳 TDT Hub (ThinhNek)", link = "https://raw.githubusercontent.com/ThinhNek343/tdthub/refs/heads/main/maintdt.lua"},
+    {name = "🇻🇳 Hdanh Banana Hub Mod", link = "https://raw.githubusercontent.com/hdanhvip/hdanhhub/refs/heads/main/BananaHub.lua.txt"},
+    {name = "🇻🇳 King Rùa Hub (Phúc Shin)", link = "https://raw.githubusercontent.com/shinichi-dz/phucshinyeuem/refs/heads/main/KingRuaHub.lua"},
+    {name = "🌐 Vector Hub (Domain VIP)", link = "https://vectorhub.space"},
+    {name = "🌐 Arceney Hub (.CC Domain)", link = "https://arceney.cc/cdn/loader.luau"},
+    {name = "🌐 Relz Hub (loader)", link = "https://relzhub.com/loader"},
+    {name = "🌐 Hiru Hub Free (Luacrack)", link = "https://luacrack.site/raw.php/HiruHub/raw/Loader/HiruHubFree.lua"},
+    {name = "🌐 Leaf Zeta API (Bypass Mạnh)", link = "https://leaf-zeta.onrender.com/api/script"},
+    {name = "🍌 Banana Hub (Hàng Longhihi)", link = "https://raw.githubusercontent.com/longhihilonghihi-hub/BananaHub/refs/heads/main/CombackVersion"},
+    {name = "🍌 Banana Hub Free (Bản Protect)", link = "https://raw.githubusercontent.com/kimprobloxdz/Banana-Free/refs/heads/main/Protected_5609200582002947.lua.txt"},
+    {name = "🍍 Abacaxi Hub (Quả Dứa)", link = "https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"},
+    {name = "🐼 Panda Hub (Mượt)", link = "https://raw.githubusercontent.com/nvb201112/the_real_Panda-Hub/refs/heads/main/BloxFruits.luau"},
+    {name = "🐻 Bear Hub Premium", link = "https://raw.githubusercontent.com/Huylovemy/Bearhud/refs/heads/main/BearHudPremium"},
+    {name = "🐱 Lag Cat Hub (Mèo Lag)", link = "https://raw.githubusercontent.com/TDDuym500/npmc_/refs/heads/main/LagCatHub.lua"},
+    {name = "⚙️ Hop Script (Auto Đổi Server)", link = "https://raw.githubusercontent.com/WhiteX1208/Scripts/refs/heads/main/HopScript.luau"},
+    {name = "⚙️ Tumadam Mod (English)", link = "https://raw.githubusercontent.com/TumadamMod/cwertyur/refs/heads/main/TumadamEng.lua"},
+    {name = "⚙️ Bostur UI (Redz Obfuscated)", link = "https://raw.githubusercontent.com/thihaccff-alt/H-hhhaa/refs/heads/main/MainBosturUiRedzHub-obfuscated.lua"},
+    {name = "⚙️ TRon Void Hub R6.1", link = "https://raw.githubusercontent.com/TRon-Void-Devs/TRon-Void-Hub-R6.1/refs/heads/main/script.lua"},
+    {name = "⚙️ Zynex Hub (Nền Redz)", link = "https://raw.githubusercontent.com/Hirokai-Script-make/Zynexhubbloxfruit/refs/heads/main/ZynexHub-BloxFruit-redz.lua"},
+    {name = "⚙️ Redz Hub (Bản Mod Huy384)", link = "https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"},
+    {name = "🔥 Realkid Hub", link = "https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua"},
+    {name = "🔥 Sigma Hub Đẳng Cấp", link = "https://raw.githubusercontent.com/SigmaHubDangCap/BloxFruit/refs/heads/main/MainBloxFruit.lua"},
+    {name = "🔥 Leaf Hub Academy", link = "https://github.com/LeafHubAcademy/LeafHub/raw/refs/heads/main/Leaf.lua"},
+    {name = "🔥 Beta Hub BF", link = "https://raw.githubusercontent.com/Anniecreate86/BloxFruits/refs/heads/main/BetaHub-BF"},
+    {name = "🔥 Zee Hub VIP", link = "https://link.trwxz.com/LS-Zee-Hub-VIP"},
+    {name = "🔥 Moonlight Hub", link = "https://raw.githubusercontent.com/Dev-Moonlight/Moonlight/refs/heads/main/Main"},
+    {name = "🔥 Bacon Hub", link = "https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/BaconHub.lua"},
+    {name = "🔥 Midnight X (Auto Phe)", link = "https://raw.githubusercontent.com/Ohofo2279/Midnight/refs/heads/main/MidnightX-BloxFruits.lua"},
+    {name = "🔥 Aura Hub (Bản Nhẹ)", link = "https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Aura"},
+    {name = "🔥 Heart Hub", link = "https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/HeartHub"},
+    {name = "🔥 Tale Hub", link = "https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Tale"},
+    {name = "🔥 Jade Hub", link = "https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Jade"},
+    {name = "🔥 Asher Project", link = "https://raw.githubusercontent.com/asher-realrise/project/refs/heads/main/loadder.lua"},
+    {name = "🔥 RUBU V6", link = "https://raw.githubusercontent.com/Teddyseetink/RUBU/refs/heads/main/RUBUV6.lua"},
+    {name = "🔥 Rubu Hub V5", link = "https://raw.githubusercontent.com/Bubu2k/Rubutv/refs/heads/main/rubuhubv5.lua"},
+    {name = "🔥 NaNa TV Hub", link = "https://raw.githubusercontent.com/NaNacuti/nanabeo/refs/heads/main/NaNaTVHub.lua"},
+    {name = "🔥 Teddy Freemium", link = "https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDY-FREEMIUM"},
+    {name = "🔥 Redz Hub (Vercel)", link = "https://keyscripthub.vercel.app/redz.lua"},
+    {name = "🔥 ZyroX Store Hub", link = "https://raw.githubusercontent.com/vinh129150/ZyroXstore/refs/heads/main/Bloxfruits.lua"},
+    {name = "🔥 Zyre Hub", link = "https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/ZyreHub"},
+    {name = "🔥 Monster Hub", link = "https://raw.githubusercontent.com/giahuy2511-coder/MonsterHub/refs/heads/main/MonsterHub"},
+    {name = "🔥 Zis Chuối Hub (Eng)", link = "https://raw.githubusercontent.com/LuaCrack/Zis/refs/heads/main/ZisChuoiEng"},
+    {name = "🔥 BT Script (Multi-Game)", link = "https://rawscripts.net/raw/Universal-Script-BT-Script-42346"},
+    {name = "🔥 AloAlo Script", link = "https://raw.githubusercontent.com/aloaloalo322/sssdas/refs/heads/main/cc"},
+    {name = "🔥 Link Pastefy", link = "https://pastefy.app/AjS0TLCt/raw"}
+}
+
+table.sort(KhoScript, function(a, b) return a.name < b.name end)
+getgenv().Team = "Pirates"
+
+local function UpdateConfig()
+    getgenv().Config = {
+        Team = getgenv().Team,
+        FarmConfig = {["Out game when done all"] = true, ["Bypass Teleport"] = true},
+        Items = {["Saber"] = true, ["Cursed Dual Katana"] = true, ["Godhuman"] = true}
+    }
+end
+UpdateConfig()
+
+-- KHỞI TẠO SCREEN GUI CHUẨN
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SieuHubPremiumV2"
+ScreenGui.ResetOnSpawn = false
+pcall(function() ScreenGui.Parent = CoreGui end)
+if not ScreenGui.Parent then ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui") end
+
+-- Giao diện chính
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 360, 0, 340)
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -170)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
+
+-- Thêm Stroke viền Neon cho sang chảnh
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(0, 255, 204)
+MainStroke.Thickness = 1.5
+MainStroke.Parent = MainFrame
+
+-- HỆ THỐNG CUSTOM DRAG MƯỢT MÀ (ANTI-LAG)
+local dragging, dragInput, dragStart, startPos
+local function update(input)
+    local delta = input.Position - dragStart
+    TweenService:Create(MainFrame, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    }):Play()
+end
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then update(input) end
+end)
+
+-- Tiêu đề
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0, 240, 0, 40)
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Text = "SIÊU HUB TỔNG HỢP V2.2"
+Title.TextColor3 = Color3.fromRGB(0, 255, 204)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.BackgroundTransparency = 1
+Title.Parent = MainFrame
+
+-- Nút Thu Nhỏ
+local MinimizeBtn = Instance.new("TextButton")
+MiniToggleBtn = Instance.new("TextButton") -- Nút nổi bên ngoài
+
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -40, 0, 5)
+MinimizeBtn.Text = "—"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 14
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+MinimizeBtn.Parent = MainFrame
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 6)
+MinCorner.Parent = MinimizeBtn
+
+-- Chọn Phe
+local TeamBtn = Instance.new("TextButton")
+TeamBtn.Size = UDim2.new(0, 130, 0, 30)
+TeamBtn.Position = UDim2.new(0, 15, 0, 45)
+TeamBtn.Text = "🏴‍☠️ PHEL HẢI TẶC"
+TeamBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+TeamBtn.BackgroundColor3 = Color3.fromRGB(150, 35, 35)
+TeamBtn.Font = Enum.Font.GothamBold
+TeamBtn.TextSize = 11
+TeamBtn.Parent = MainFrame
+
+local TeamCorner = Instance.new("UICorner")
+TeamCorner.CornerRadius = UDim.new(0, 6)
+TeamCorner.Parent = TeamBtn
+
+TeamBtn.MouseButton1Click:Connect(function()
+    if getgenv().Team == "Pirates" then
+        getgenv().Team = "Marines"
+        TeamBtn.Text = "⚓ PHE HẢI QUÂN"
+        TeamBtn.BackgroundColor3 = Color3.fromRGB(35, 80, 150)
+    else
+        getgenv().Team = "Pirates"
+        TeamBtn.Text = "🏴‍☠️ PHE HẢI TẶC"
+        TeamBtn.BackgroundColor3 = Color3.fromRGB(150, 35, 35)
+    end
+    UpdateConfig()
+end)
+
+-- Thanh Tìm Kiếm (Đã Fix lỗi ký tự đặc biệt)
+local SearchBox = Instance.new("TextBox")
+SearchBox.Size = UDim2.new(0, 190, 0, 30)
+SearchBox.Position = UDim2.new(0, 155, 0, 45)
+SearchBox.PlaceholderText = "🔍 Nhập tên cần tìm..."
+SearchBox.Text = ""
+SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+SearchBox.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+SearchBox.Font = Enum.Font.Gotham
+SearchBox.TextSize = 11
+SearchBox.Parent = MainFrame
+
+local SearchCorner = Instance.new("UICorner")
+SearchCorner.CornerRadius = UDim.new(0, 6)
+SearchCorner.Parent = SearchBox
+
+-- Khung Cuộn chứa Script danh sách
+local Scroll = Instance.new("ScrollingFrame")
+Scroll.Size = UDim2.new(0, 330, 0, 240)
+Scroll.Position = UDim2.new(0, 15, 0, 85)
+Scroll.BackgroundTransparency = 1
+Scroll.BorderSizePixel = 0
+Scroll.ScrollBarThickness = 3
+Scroll.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 204)
+Scroll.AutomaticCanvasSize = Enum.AutomaticCanvasSize.Y -- Sử dụng tính năng Roblox Modern tự động dãn khay
+Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+Scroll.Parent = MainFrame
+
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0, 6)
+Layout.Parent = Scroll
+
+-- Tạo Nút bấm Script & Tối Ưu padding chuẩn
+local ButtonsMap = {}
+for _, data in ipairs(KhoScript) do
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(1, -6, 0, 35)
+    Btn.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+    Btn.BorderSizePixel = 0
+    Btn.Text = "" -- Không dùng text gốc để chèn khoảng trống thô sơ nữa
+    Btn.Parent = Scroll
+    
+    local BtnCorner = Instance.new("UICorner")
+    BtnCorner.CornerRadius = UDim.new(0, 6)
+    BtnCorner.Parent = Btn
+    
+    local BtnText = Instance.new("TextLabel")
+    BtnText.Size = UDim2.new(1, -20, 1, 0)
+    BtnText.Position = UDim2.new(0, 10, 0, 0) -- Dùng tọa độ chuẩn thay vì "  " dấu cách
+    BtnText.Text = data.name
+    BtnText.TextColor3 = Color3.fromRGB(210, 210, 210)
+    BtnText.Font = Enum.Font.Gotham
+    BtnText.TextSize = 12
+    BtnText.TextXAlignment = Enum.TextXAlignment.Left
+    BtnText.BackgroundTransparency = 1
+    BtnText.Parent = Btn
+
+    Btn.MouseButton1Click:Connect(function()
+        BtnText.Text = "⏳ Đang kích hoạt nguồn..."
+        BtnText.TextColor3 = Color3.fromRGB(255, 200, 50)
+        task.wait(0.1)
+        pcall(function() loadstring(game:HttpGet(data.link))() end)
+        BtnText.Text = "✅ Đã gửi lệnh chạy!"
+        BtnText.TextColor3 = Color3.fromRGB(50, 255, 150)
+        task.delay(2, function()
+            BtnText.Text = data.name
+            BtnText.TextColor3 = Color3.fromRGB(210, 210, 210)
+        end)
+    end)
+    
+    table.insert(ButtonsMap, {btn = Btn, searchName = data.name:lower()})
+end
+
+-- Hệ thống tìm kiếm tối ưu Plain Text (Chống crash)
+SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local text = SearchBox.Text:lower()
+    for _, item in pairs(ButtonsMap) do
+        -- Sử dụng tham số thứ 4 là true để tắt hoàn toàn pattern matching lỗi thời
+        if text == "" or string.find(item.searchName, text, 1, true) then
+            item.btn.Visible = true
+        else
+            item.btn.Visible = false
+        end
+    end
+end)
+
+-- Tạo Nút nổi hình tròn (Floating Button) khi thu nhỏ
+MiniToggleBtn.Size = UDim2.new(0, 45, 0, 45)
+MiniToggleBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
+MiniToggleBtn.Text = "OPEN"
+MiniToggleBtn.TextColor3 = Color3.fromRGB(15, 15, 20)
+MiniToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 204)
+MiniToggleBtn.Font = Enum.Font.GothamBold
+MiniToggleBtn.TextSize = 11
+MiniToggleBtn.Visible = false
+MiniToggleBtn.Active = true
+MiniToggleBtn.Draggable = true -- Nút nổi nhỏ cho phép kéo thoải mái
+MiniToggleBtn.Parent = ScreenGui
+
+local MiniCorner = Instance.new("UICorner")
+MiniCorner.CornerRadius = UDim.new(1, 0)
+MiniCorner.Parent = MiniToggleBtn
+
+-- Hiệu ứng đóng mở mượt bằng Tween
+MinimizeBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    MiniToggleBtn.Visible = true
+end)
+
+MiniToggleBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    MiniToggleBtn.Visible = false
+end)
