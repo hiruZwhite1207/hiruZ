@@ -1,0 +1,241 @@
+-- ==========================================
+-- SIÊU HUB 
+-- ==========================================
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Window = Library:CreateWindow({
+    Title = "Sieu Hub",
+    Subtitle = "siêu hub tổng hợp",
+    Image = "rbxassetid://12652910396"
+})
+
+-- ==========================================
+-- 1. HỆ THỐNG NÚT MOBILE TOGGLE (CHỐNG VĂNG & KÉO THẢ)
+-- ==========================================
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+if CoreGui:FindFirstChild("MobileToggleSieuHubV13") then 
+    CoreGui.MobileToggleSieuHubV13:Destroy() 
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MobileToggleSieuHubV13"
+ScreenGui.Parent = CoreGui
+
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0, 50, 0, 50)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+ToggleBtn.Text = "MENU\nV13"
+ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 255)
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.TextSize = 12
+ToggleBtn.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(1, 0)
+UICorner.Parent = ToggleBtn
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(0, 255, 255)
+UIStroke.Thickness = 2
+UIStroke.Parent = ToggleBtn
+
+local dragging, dragInput, dragStart, startPos
+ToggleBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = ToggleBtn.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+ToggleBtn.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end
+end)
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        ToggleBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+ToggleBtn.MouseButton1Click:Connect(function()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.RightControl, false, game)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.RightControl, false, game)
+end)
+
+-- ==========================================
+-- 2. HÀM CHẠY SCRIPT CHỐNG LAG DELTA X
+-- ==========================================
+local function RunScript(Name, Link)
+    Library:Notify({
+        Title = "Đang Tải: " .. Name,
+        Description = "Delta X đang xử lý mã, vui lòng đợi...",
+        Duration = 3
+    })
+    task.spawn(function()
+        pcall(function()
+            local func = loadstring(game:HttpGet(Link) or Link)
+            if func then func() else loadstring(Link)() end
+        end)
+    end)
+end
+
+local function SetupCategory(Groupbox, CategoryData)
+    for _, scriptData in ipairs(CategoryData) do
+        Groupbox:AddButton({
+            Text = scriptData[1],
+            Func = function() RunScript(scriptData[1], scriptData[2]) end
+        })
+    end
+end
+
+-- ==========================================
+-- 3. DANH SÁCH DỮ LIỆU FULL (KHÔNG THIẾU 1 GAME)
+-- ==========================================
+
+-- [A] BLOX FRUITS QUỐC TẾ
+local BF_QuocTe = {
+    {"Xero Hub (Top 1)", "https://raw.githubusercontent.com/Xero2409/XeroHub/main/main.lua"},
+    {"W-Azure (Siêu Phẩm)", "https://api.luarmor.net/files/v3/loaders/3b2169cf53bc6104dabe8e19562e5cc2.lua"},
+    {"Hoho Hub v3", "https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"},
+    {"Neva Hub", "https://raw.githubusercontent.com/VEZ2/NEVAHUB/main/2"},
+    {"Mukuro Hub (Cổ Đại)", "https://raw.githubusercontent.com/xQuartyx/DonateMe/main/ScriptLoader"},
+    {"Black Trap Hub", "https://raw.githubusercontent.com/BlackTrap-T/BlackTrap-T/main/BlackTrap.lua"},
+    {"Hiraya Hub", "https://raw.githubusercontent.com/S-K-O-R-P-I-O-N/HirayaHub/main/HirayaHub.lua"},
+    {"Min Gaming V4", "https://raw.githubusercontent.com/HatimaBacon/MinGamingV4/main/MinGamingV4.lua"},
+    {"Quantum Hub", "https://raw.githubusercontent.com/Quantum-Core/QuantumHub/main/QuantumHub.lua"},
+    {"Thunder Z", "https://raw.githubusercontent.com/ThunderZ-NEXUS/ThudnerZ-Hub/main/ThudnerZ-Hub.lua"},
+    {"Relz Hub", "https://raw.githubusercontent.com/RelzHub/RelzHub/main/Main.lua"}
+}
+
+-- [B] BLOX FRUITS VIỆT NAM
+local BF_VietNam = {
+    {"Huy Hub (Tiếng Việt)", "https://raw.githubusercontent.com/HuyHubTDT/HuyHub/main/HuyHub.lua"},
+    {"Maru Hub", "https://raw.githubusercontent.com/ThinhNek343/tdthub/refs/heads/main/MaruHub.lua"},
+    {"Tris Hub", "https://raw.githubusercontent.com/Trissss1/TrisHub/main/BloxFruits"},
+    {"Redz Hub (New)", [[local Settings={JoinTeam="Pirates",Translator=true}; loadstring(game:HttpGet("https://raw.githubusercontent.com/PlockScripts/newredz/refs/heads/main/Remake-version.luau"))(Settings)]]},
+    {"Bắp Red Hub", "https://raw.githubusercontent.com/BapRed/BapRedHub/main/BapRedHub.lua"},
+    {"AnDepZai Hub", "https://raw.githubusercontent.com/AnDepZaiHub/AnDepZaiHub/main/AnDepZaiHub.lua"},
+    {"KynVex Hub", [[getgenv().Key="60cd41fb59d3ab790e45081a"; loadstring(game:HttpGet("https://raw.githubusercontent.com/NguyenKhangxHUB/KynVexHubMain/refs/heads/main/BananaHubReMakebyNguyenKhang.txt"))()]]},
+    {"Cokka Hub", "https://raw.githubusercontent.com/UserDev-1/CokkaHub/main/CokkaHub.lua"},
+    {"Mango Hub", "https://raw.githubusercontent.com/MangoHub/Mango/main/BloxFruits.lua"},
+    {"Makima Hub", "https://raw.githubusercontent.com/MakimaaHub/MakimaaHub/main/MakimaaHub.lua"},
+    {"Zen Hub", "https://raw.githubusercontent.com/Zenhubtop/zen_hub_pr/main/zennewwwui.lua"},
+    {"Madox Hub", "https://raw.githubusercontent.com/MadoxHub/Madox/main/Main.lua"},
+    {"Ripper Hub V3", "https://raw.githubusercontent.com/hajibeza/RIPPER-HUB/main/RIPPERHUBV3.lua"}
+}
+
+-- [C] BLOX FRUITS CÀY THUÊ / KAITUN
+local KT_Scripts = {
+    {"Auto Bounty - Rax", "https://raw.githubusercontent.com/Rax-Hub/Auto-Bounty/main/Rax.lua"},
+    {"Auto Bounty - Hỏa Tốc", "https://raw.githubusercontent.com/TheOne1st/Auto-Bounty/main/BloxFruit.lua"},
+    {"Auto Race V4", "https://raw.githubusercontent.com/ahmadsgamer2/Script--Game/main/Script%20Game"},
+    {"Auto Raid Dough/Mochi", "https://raw.githubusercontent.com/Minhtriu/script/main/Raid.lua"},
+    {"Blue X (Kaitun Max)", "https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/main/Kaitun.lua"},
+    {"Night Hub (Kaitun)", "https://raw.githubusercontent.com/NigthHubTeam/Nigth-hub/main/NightHub.lua"},
+    {"TFT Hub (Kaitun)", "https://raw.githubusercontent.com/TFT-Hub/TFT/main/Kaitun.lua"},
+    {"Lonely Hub (Kaitun)", "https://raw.githubusercontent.com/LonelyHub/Lonely/main/Kaitun.lua"},
+    {"Speed Hub (Siêu Nhẹ)", "https://raw.githubusercontent.com/SpeedHub/BloxFruits/main/Script.lua"}
+}
+
+-- [D] DOORS FULL 4 BẢN
+local Doors_Scripts = {
+    {"Msdoors (Huyền Thoại)", "https://raw.githubusercontent.com/mstudio45/MSDOORS/main/MSDOORS.lua"},
+    {"Vynixius Doors", "https://raw.githubusercontent.com/RegularVynixu/Vynixius/main/Doors/Script.lua"},
+    {"King Hub", "https://raw.githubusercontent.com/KingPandaTheFirst/KingHub/main/Doors.lua"},
+    {"Bob Hub (Auto Room)", "https://raw.githubusercontent.com/KSane-3/BobHub/main/doors.lua"}
+}
+
+-- [E] ANIME & RPG
+local Anime_Scripts = {
+    {"Anime Fighters - Maru", "https://raw.githubusercontent.com/ThinhNek343/tdthub/refs/heads/main/MaruHub.lua"},
+    {"King Legacy - Hoho", "https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"},
+    {"Meme Sea - Redz", "https://raw.githubusercontent.com/REDzHUB/MemeSea/main/Source.lua"},
+    {"Anime Defenders - Bacon", "https://raw.githubusercontent.com/BaconLord/BaconHub/main/AnimeDefenders.lua"},
+    {"Anime Vanguards - Tora", "https://raw.githubusercontent.com/ToraIsMe/ToraIsMe/main/0Vanguards"},
+    {"Strongest Battlegrounds", "https://raw.githubusercontent.com/ToraIsMe/ToraIsMe/main/0strongest"}
+}
+
+-- [F] PVP, FPS, BẮN SÚNG
+local PvP_Scripts = {
+    {"Arsenal - DarkHub", "https://raw.githubusercontent.com/RandomPlayz-Roblox/DarkHub/main/Arsenal.lua"},
+    {"Rivals - Tora", "https://raw.githubusercontent.com/ToraIsMe/ToraIsMe/main/0Rivals"},
+    {"Da Hood - RayX", "https://raw.githubusercontent.com/SpaceX-e/RayX-Hub/main/RayX-Hub-Loader.lua"},
+    {"Da Hood - Fates", "https://raw.githubusercontent.com/fatesc/fates-admin/main/main.lua"},
+    {"Evade - DarkHub", "https://raw.githubusercontent.com/RandomPlayz-Roblox/DarkHub/main/Evade.lua"},
+    {"BedWars - Voidware", "https://raw.githubusercontent.com/VapeVoidware/vapevoidware/main/NewMainScript.lua"},
+    {"Blade Ball - FFJ Hub", "https://raw.githubusercontent.com/FFJHub/BladeBall/main/FFJHub.lua"},
+    {"Slap Battles - Tora", "https://raw.githubusercontent.com/ToraIsMe/ToraIsMe/main/0SlapBattles"}
+}
+
+-- [G] SIMULATOR, ROLEPLAY & MINIGAME
+local Sim_Scripts = {
+    {"Pet Sim 99 - Zap Hub", "https://raw.githubusercontent.com/ZapHub/ZapHub/main/PetSimulator99.lua"},
+    {"Bee Swarm - BSS Hub", "https://raw.githubusercontent.com/BSS-Hub/BSS/main/Main.lua"},
+    {"Fisch - Cokka Hub", "https://raw.githubusercontent.com/UserDev-1/CokkaHub/main/CokkaHub.lua"},
+    {"Brookhaven - Redz", "https://raw.githubusercontent.com/REDzHUB/Brookhaven/main/brookhaven"},
+    {"Lumber Tycoon 2 - Blood", "https://raw.githubusercontent.com/Blood-TL/BloodHub/main/LumberTycoon2.lua"},
+    {"Build A Boat - Auto", "https://raw.githubusercontent.com/BoaHub/BuildABoatForTreasure/main/Script.lua"},
+    {"Natural Disaster - Auto", "https://raw.githubusercontent.com/BaconLord/BaconHub/main/NaturalDisaster.lua"},
+    {"MM2 - Eclipse Hub", "https://raw.githubusercontent.com/EclipseTeam/EclipseHub/main/MM2.lua"},
+    {"MM2 - Vynixius", "https://raw.githubusercontent.com/RegularVynixu/Vynixius/main/Murder%20Mystery%202/Script.lua"}
+}
+
+-- [H] ADMIN TOOLS & UNIVERSAL
+local Admin_Scripts = {
+    {"Infinite Yield (Lệnh)", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
+    {"CMD-X (Bảng Admin)", "https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source"},
+    {"Nameless Admin", "https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source"},
+    {"Unnamed ESP (Nhìn Xuyên)", "https://raw.githubusercontent.com/ic3w0lf22/Unnamed-ESP/master/UnnamedESP.lua"},
+    {"Universal Aimbot (Bắn)", "https://raw.githubusercontent.com/Exunys/Aimbot-V2/main/Resources/Scripts/Main.lua"},
+    {"Orca Hub (Đa Dụng)", "https://raw.githubusercontent.com/richie0866/orca/master/public/latest.lua"},
+    {"Dex Explorer (Soi Code)", "https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"},
+    {"Btools (Đập Phá)", "https://raw.githubusercontent.com/BtoolsForRoblox/Btools/main/Btools.lua"}
+}
+
+-- ==========================================
+-- 4. GẮN DỮ LIỆU VÀO GIAO DIỆN (TẠO TABS)
+-- ==========================================
+
+-- Tab 1 & 2: Blox Fruits (Hơn 30 Script)
+local Tab_BF = Window:AddTab("Blox Fruits Xịn")
+SetupCategory(Tab_BF:AddLeftGroupbox("Quốc Tế (Top Tier)"), BF_QuocTe)
+SetupCategory(Tab_BF:AddRightGroupbox("Việt Nam (Dễ Dùng)"), BF_VietNam)
+
+local Tab_KT = Window:AddTab("BF: Cày Thuê")
+SetupCategory(Tab_KT:AddLeftGroupbox("Auto Bounty, Raid, V4, Kaitun"), KT_Scripts)
+
+-- Tab 3: Doors & Kinh Dị
+local Tab_Doors = Window:AddTab("Doors")
+SetupCategory(Tab_Doors:AddLeftGroupbox("Full Script Doors"), Doors_Scripts)
+
+-- Tab 4: Anime & RPG
+local Tab_Anime = Window:AddTab("Anime / RPG")
+SetupCategory(Tab_Anime:AddLeftGroupbox("Meme Sea, King Legacy..."), Anime_Scripts)
+
+-- Tab 5: PvP, Đấu Trường
+local Tab_PvP = Window:AddTab("PvP / Bắn Súng")
+SetupCategory(Tab_PvP:AddLeftGroupbox("Arsenal, Rivals, Da Hood..."), PvP_Scripts)
+
+-- Tab 6: Simulator & Khác
+local Tab_Sim = Window:AddTab("Simulator / Khác")
+SetupCategory(Tab_Sim:AddLeftGroupbox("Pet, Bee, MM2, Brookhaven..."), Sim_Scripts)
+
+-- Tab 7: Admin & Mọi Game
+local Tab_Admin = Window:AddTab("Mọi Game / Admin")
+SetupCategory(Tab_Admin:AddLeftGroupbox("ESP, Aimbot, IY, CMD-X..."), Admin_Scripts)
+
+-- ==========================================
+-- THÔNG BÁO HOÀN TẤT
+-- ==========================================
+Library:Notify({
+    Title = "V13 - Full Tính Năng!",
+    Description = "Đã bật Mobile Toggle và thêm toàn bộ 60+ Hub. Chúc anh em quẩy banh nóc!",
+    Duration = 8
+})
