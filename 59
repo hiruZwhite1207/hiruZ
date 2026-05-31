@@ -1,0 +1,62 @@
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+
+print("✅ Banana Hub Comback Version Loaded Successfully!")
+warn("[Banana Hub] This is a fake version from longhihilonghihi-hub")
+
+StarterGui:SetCore("SendNotification", {
+    Title = "Banana Hub",
+    Text = "Comback Version Loaded! (Fake)",
+    Duration = 8,
+    Icon = "rbxassetid://1234567890"
+})
+
+local Library = {}
+
+function Library:CreateWindow(title)
+    print("Banana Hub Window Created: " .. title)
+    warn("This is FAKE Banana Hub - No real functions")
+end
+
+function Library:CreateTab(name)
+    print("Tab Created: " .. name)
+    return name
+end
+
+function Library:CreateButton(tab, text, callback)
+    print("Button Created: " .. text)
+
+    callback = callback or function()
+        warn("Fake button clicked!")
+    end
+
+    return callback
+end
+
+local MainTab = Library:CreateTab("Main")
+local AutoFarmTab = Library:CreateTab("Auto Farm")
+local ESPTab = Library:CreateTab("ESP & Visuals")
+
+Library:CreateWindow("Banana Hub - Comback Version")
+
+local AutoFarm = Library:CreateButton(MainTab, "Auto Farm Level", function()
+    print("Auto Farm started (Fake)")
+end)
+
+local AutoQuest = Library:CreateButton(AutoFarmTab, "Auto Quest", function()
+    print("Auto Quest enabled (Fake)")
+end)
+
+local ESP = Library:CreateButton(ESPTab, "Player ESP", function()
+    print("ESP Activated (Fake)")
+end)
+
+print("Banana Hub GUI Loaded (Fake Version)")
+
+task.spawn(function()
+    while task.wait(10) do
+        print("Banana Hub is running... (Fake)")
+    end
+end)
+
+print("=== Banana Hub Comback Version - Full Deobfuscated ===")
