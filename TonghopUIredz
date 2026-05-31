@@ -1,0 +1,119 @@
+-- Load Redz Hub UI Library
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
+
+-- Create the main window
+local Window = redzlib:MakeWindow({
+    Title = "HiruZ Hub",
+    SubTitle = "Tổng hợp Script",
+    SaveFolder = "HiruZHubConfig"
+})
+
+-- Add a minimize button with original Redz asset
+Window:AddMinimizeButton({
+    Button = {
+        Image = "rbxassetid://71014873973869",
+        BackgroundTransparency = 0
+    },
+    Corner = {
+        CornerRadius = UDim.new(0, 8)
+    }
+})
+
+-- Tabs
+local BF1Tab = Window:MakeTab({"Blox Fruit (P1)", "swords"})
+local BF2Tab = Window:MakeTab({"Blox Fruit (P2)", "swords"})
+local BladeTab = Window:MakeTab({"Blade Ball", "crosshair"})
+local TsbTab = Window:MakeTab({"TSB / JJK", "fist"})
+local DoorsTab = Window:MakeTab({"Doors / 99 Nights", "ghost"})
+local MiscTab = Window:MakeTab({"Misc / Khác", "box"})
+
+Window:SelectTab(BF1Tab)
+
+-- BLOX FRUIT P1
+BF1Tab:AddSection({"Blox Fruit Scripts - Part 1"})
+BF1Tab:AddButton({"Ego Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/SuperIkka/Main/main/EgoLoaderMain", true))() end})
+BF1Tab:AddButton({"Andepzai", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Blox-Fruits-Andepzai-17362"))() end})
+BF1Tab:AddButton({"Sol Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/SolHub", true))() end})
+BF1Tab:AddButton({"TDT Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/ThinhNek343/tdthub/refs/heads/main/maintdt.lua"))() end})
+BF1Tab:AddButton({"Rubu V5", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Bubu2k/Rubutv/refs/heads/main/rubuhubv5.lua"))() end})
+BF1Tab:AddButton({"Redz Fake", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"))() end})
+BF1Tab:AddButton({"ZisChuoiEng", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/Zis/refs/heads/main/ZisChuoiEng"))() end})
+BF1Tab:AddButton({"Banana Kimpro", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/kimprobloxdz/Banana-Free/refs/heads/main/Protected_5609200582002947.lua.txt"))() end})
+BF1Tab:AddButton({"King Rùa Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/shinichi-dz/phucshinyeuem/refs/heads/main/KingRuaHub.lua"))() end})
+BF1Tab:AddButton({"BT Script", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-BT-Script-42346"))() end})
+BF1Tab:AddButton({"Arceney Hub", function() loadstring(game:HttpGet("https://arceney.cc/cdn/loader.luau"))() end})
+BF1Tab:AddButton({"Monster Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/giahuy2511-coder/MonsterHub/refs/heads/main/MonsterHub"))() end})
+BF1Tab:AddButton({"CatLag Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/TDDuym500/npmc_/refs/heads/main/LagCatHub.lua"))() end})
+BF1Tab:AddButton({"Teddy Freemium", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDY-FREEMIUM"))() end})
+BF1Tab:AddButton({"NaNa TV Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/NaNacuti/nanabeo/refs/heads/main/NaNaTVHub.lua"))() end})
+BF1Tab:AddButton({"NHT Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/trongdeptraihucscript/Main/refs/heads/main/Hoangtrongdepzai.lua"))() end})
+BF1Tab:AddButton({"Hiru Hub", function() loadstring(game:HttpGet("https://luacrack.site/raw.php/HiruHub/raw/Loader/HiruHubFree.lua"))() end})
+BF1Tab:AddButton({"Rise Hub", function() loadstring(game:HttpGet('https://raw.githubusercontent.com/asher-realrise/project/refs/heads/main/loadder.lua'))() end})
+BF1Tab:AddButton({"Tale Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Tale", true))() end})
+BF1Tab:AddButton({"Zynex Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Hirokai-Script-make/Zynexhubbloxfruit/refs/heads/main/ZynexHub-BloxFruit-redz.lua"))() end})
+BF1Tab:AddButton({"Zyn Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/jaiasof/Zyn-Hub/refs/heads/main/Zyn%20Loader", true))() end})
+BF1Tab:AddButton({"Jade Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Jade", true))() end})
+BF1Tab:AddButton({"Aura Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Aura", true))() end})
+BF1Tab:AddButton({"Teddy Hub (Key)", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/e86ed284a22672d29e906214e7bbf8b9.lua"))() end})
+BF1Tab:AddButton({"HoHo Hub (Key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"))() end})
+
+-- BLOX FRUIT P2
+BF2Tab:AddSection({"Blox Fruit Scripts - Part 2"})
+BF2Tab:AddButton({"Heart Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/HeartHub", true))() end})
+BF2Tab:AddButton({"Darksoul Hub", function() loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/30a80695384ce9f2c29abb8cbea83e883dd4210a3921ad7afaa91d20c339799e/download"))() end})
+BF2Tab:AddButton({"Omg Hub (Key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))() end})
+BF2Tab:AddButton({"Hdanh Hub (Key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/hdanhvip/hdanhhub/refs/heads/main/BananaHub.lua.txt"))() end})
+BF2Tab:AddButton({"Speed Hub X (Key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))() end})
+BF2Tab:AddButton({"Bostur UI", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/thihaccff-alt/H-hhhaa/refs/heads/main/MainBosturUiRedzHub-obfuscated.lua"))() end})
+BF2Tab:AddButton({"Tron Void Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/TRon-Void-Devs/TRon-Void-Hub-R6.1/refs/heads/main/script.lua"))() end})
+BF2Tab:AddButton({"Midnight X", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Ohofo2279/Midnight/refs/heads/main/MidnightX-BloxFruits.lua"))() end})
+BF2Tab:AddButton({"Banana Fake", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/aloaloalo322/sssdas/refs/heads/main/cc"))() end})
+BF2Tab:AddButton({"Abacaxi Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"))() end})
+BF2Tab:AddButton({"Moonlight Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-Moonlight/Moonlight/refs/heads/main/Main"))() end})
+BF2Tab:AddButton({"Bacon Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/BaconHub.lua"))() end})
+BF2Tab:AddButton({"Bear Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Huylovemy/Bearhud/refs/heads/main/BearHudPremium"))() end})
+BF2Tab:AddButton({"Quantum Onyx", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))() end})
+BF2Tab:AddButton({"Vector Hub", function() loadstring(game:HttpGet("https://vectorhub.space"))() end})
+BF2Tab:AddButton({"Neji Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-NejiDepzai/BloxFruits/refs/heads/main/Main.lua"))() end})
+BF2Tab:AddButton({"Leaf Hub (Key)", function() loadstring(game:HttpGet("https://github.com/LeafHubAcademy/LeafHub/raw/refs/heads/main/Leaf.lua"))() end})
+BF2Tab:AddButton({"Eclipse Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Eclipse2408/Scripts/refs/heads/main/PhahattiScripts.lua"))() end})
+BF2Tab:AddButton({"Gravity Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua"))() end})
+BF2Tab:AddButton({"Anime Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Anniecreate86/BloxFruits/refs/heads/main/BetaHub-BF"))() end})
+BF2Tab:AddButton({"Zee Hub", function() loadstring(game:HttpGet("https://link.trwxz.com/LS-Zee-Hub-VIP"))() end})
+BF2Tab:AddButton({"Redz Official", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/newredzv3/Scripts/refs/heads/main/main.luau"))() end})
+BF2Tab:AddButton({"Rubu V6", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/RUBU/refs/heads/main/RUBUV6.lua"))() end})
+BF2Tab:AddButton({"Blue X (Key)", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"))() end})
+
+-- BLADE BALL
+BladeTab:AddSection({"Blade Ball Scripts"})
+BladeTab:AddButton({"Sangra Hub", function() loadstring(game:HttpGet("https://sangra-opus.vercel.app/scripts/loader.lua"))() end})
+BladeTab:AddButton({"Levi Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/MriseHubX/main/refs/heads/main/BladeBall"))() end})
+BladeTab:AddButton({"Cyraa Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LynX99-9/komtolmmek2script/refs/heads/main/CyraaHub.lua", true))() end})
+BladeTab:AddButton({"Argon Hub X", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AgentX771/ArgonHubX/main/Loader.lua"))() end})
+
+-- TSB / JJK
+TsbTab:AddSection({"The Strongest Battlegrounds"})
+TsbTab:AddButton({"Vexon Hub", function() loadstring(game:HttpGet("https://rawscripts.net/raw/The-Strongest-Battlegrounds-TSB-SCRIPT-VexonHub-146385"))() end})
+TsbTab:AddButton({"Tổng Hợp TSB Tech", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/kaimm2/TSB/refs/heads/main/Tthanh%20Tong%20Hop%20Tech.txt"))() end})
+TsbTab:AddButton({"Fix Lag TSB", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/rachs14/Best-Antilag/refs/heads/main/Tsb"))() end})
+TsbTab:AddButton({"Protect Hub", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_3334988263341522.lua.txt"))() end})
+TsbTab:AddSection({"Jujutsu Shenanigans"})
+TsbTab:AddButton({"Lock On JJK", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Loader-DesconhecidoJ/AkaYsn/refs/heads/main/LockOn.lua"))() end})
+
+-- DOORS / 99 NIGHTS
+DoorsTab:AddSection({"Doors"})
+DoorsTab:AddButton({"Ze Script", function() loadstring(game:HttpGet("https://rawscripts.net/raw/DOORS-ZeScript-67246"))() end})
+DoorsTab:AddButton({"Bob Doors", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/notzanocoddz4/bobdoors/main/main.lua"))() end})
+DoorsTab:AddButton({"MSPaint V4 (Key)", function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/002c19202c9946e6047b0c6e0ad51f84.lua"))() end})
+DoorsTab:AddSection({"99 Nights in the Forest"})
+DoorsTab:AddButton({"99 Nights (Key)", function() loadstring(game:HttpGet("https://api.rblxscripthub.com/99NightsInTheForest"))() end})
+DoorsTab:AddButton({"VW Script", function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-99-Noches-Script-VW-212366"))() end})
+DoorsTab:AddButton({"H4x (Key)", function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-CLASSES-H4x-99-nights-in-the-forest-43911"))() end})
+DoorsTab:AddButton({"Ringta", function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-99-NIGHTS-HUB-BY-RINGTA-211844"))() end})
+DoorsTab:AddButton({"Foxname", function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-GOD-MODE-BRING-ITEMS-Foxname-HUB-GODLY-SCRIPT-100694"))() end})
+
+-- MISC
+MiscTab:AddSection({"Công cụ khác"})
+MiscTab:AddButton({"Touch Fling", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"))() end})
+MiscTab:AddButton({"Troll GUI", function() loadstring(game:HttpGet("https://rawscripts.net/raw/Troll-is-a-pinning-tower-2-Troll-Gui-36868"))() end})
+MiscTab:AddButton({"Fly Gui V3", function() loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))() end})
