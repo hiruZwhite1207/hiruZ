@@ -1,0 +1,112 @@
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Window = Library:CreateWindow({
+    Title = "HiruZ Hub",
+    Subtitle = "Tổng Hợp Script",
+    Image = "rbxassetid://128185233852701"
+})
+
+Library:ToggleKeybind("RightShift")
+
+-- TABS
+local MainTab = Window:AddTab("Blox Fruit")
+local BladeBallTab = Window:AddTab("Blade Ball")
+local TsbTab = Window:AddTab("TSB")
+local JjkTab = Window:AddTab("JJK")
+local DoorsTab = Window:AddTab("Doors")
+local NightsTab = Window:AddTab("99 Nights")
+local MiscTab = Window:AddTab("Misc / Khác")
+
+-- GROUPS
+local MainGroup = MainTab:AddLeftGroupbox("Blox Fruit A-Z")
+local BladeBallGroup = BladeBallTab:AddLeftGroupbox("Blade Ball")
+local TsbGroup = TsbTab:AddLeftGroupbox("TSB")
+local JjkGroup = JjkTab:AddLeftGroupbox("JJK")
+local DoorsGroup = DoorsTab:AddLeftGroupbox("Doors Scripts")
+local NightsGroup = NightsTab:AddLeftGroupbox("99 Nights In The Forest")
+local MiscGroup = MiscTab:AddLeftGroupbox("Công cụ khác")
+
+-- BLOX FRUIT FULL LIST
+MainGroup:AddButton({ Text = "Ego Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/SuperIkka/Main/main/EgoLoaderMain", true))() end })
+MainGroup:AddButton({ Text = "Andepzai", Func = function() loadstring(game:HttpGet("https://rawscripts.net/raw/Blox-Fruits-Andepzai-17362"))() end })
+MainGroup:AddButton({ Text = "Sol Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/GoblinKun009/Script/refs/heads/main/SolHub", true))() end })
+MainGroup:AddButton({ Text = "TDT Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/ThinhNek343/tdthub/refs/heads/main/maintdt.lua"))() end })
+MainGroup:AddButton({ Text = "Rubu V5", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Bubu2k/Rubutv/refs/heads/main/rubuhubv5.lua"))() end })
+MainGroup:AddButton({ Text = "Redz Fake", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/huy384/redzHub/refs/heads/main/redzHub.lua"))() end })
+MainGroup:AddButton({ Text = "ZisChuoiEng", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/Zis/refs/heads/main/ZisChuoiEng"))() end })
+MainGroup:AddButton({ Text = "Banana Kimpro", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/kimprobloxdz/Banana-Free/refs/heads/main/Protected_5609200582002947.lua.txt"))() end })
+MainGroup:AddButton({ Text = "King Rùa Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/shinichi-dz/phucshinyeuem/refs/heads/main/KingRuaHub.lua"))() end })
+MainGroup:AddButton({ Text = "BT Script", Func = function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-BT-Script-42346"))() end })
+MainGroup:AddButton({ Text = "Arceney Hub", Func = function() loadstring(game:HttpGet("https://arceney.cc/cdn/loader.luau"))() end })
+MainGroup:AddButton({ Text = "Monster Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/giahuy2511-coder/MonsterHub/refs/heads/main/MonsterHub"))() end })
+MainGroup:AddButton({ Text = "CatLag Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/TDDuym500/npmc_/refs/heads/main/LagCatHub.lua"))() end })
+MainGroup:AddButton({ Text = "Teddy Freemium", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/Haidepzai/refs/heads/main/TEDDY-FREEMIUM"))() end })
+MainGroup:AddButton({ Text = "NaNa TV Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/NaNacuti/nanabeo/refs/heads/main/NaNaTVHub.lua"))() end })
+MainGroup:AddButton({ Text = "NHT Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/trongdeptraihucscript/Main/refs/heads/main/Hoangtrongdepzai.lua"))() end })
+MainGroup:AddButton({ Text = "Hiru Hub", Func = function() loadstring(game:HttpGet("https://luacrack.site/raw.php/HiruHub/raw/Loader/HiruHubFree.lua"))() end })
+MainGroup:AddButton({ Text = "Rise Hub", Func = function() loadstring(game:HttpGet('https://raw.githubusercontent.com/asher-realrise/project/refs/heads/main/loadder.lua'))() end })
+MainGroup:AddButton({ Text = "Tale Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Tale", true))() end })
+MainGroup:AddButton({ Text = "Zynex Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Hirokai-Script-make/Zynexhubbloxfruit/refs/heads/main/ZynexHub-BloxFruit-redz.lua"))() end })
+MainGroup:AddButton({ Text = "Zyn Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/jaiasof/Zyn-Hub/refs/heads/main/Zyn%20Loader", true))() end })
+MainGroup:AddButton({ Text = "Jade Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Jade", true))() end })
+MainGroup:AddButton({ Text = "Aura Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/Aura", true))() end })
+MainGroup:AddButton({ Text = "Teddy Hub (Key)", Func = function() loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/e86ed284a22672d29e906214e7bbf8b9.lua"))() end })
+MainGroup:AddButton({ Text = "HoHo Hub (Key)", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"))() end })
+MainGroup:AddButton({ Text = "Heart Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Jadelly/bloxfruit/refs/heads/main/HeartHub", true))() end })
+MainGroup:AddButton({ Text = "Darksoul Hub", Func = function() loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/30a80695384ce9f2c29abb8cbea83e883dd4210a3921ad7afaa91d20c339799e/download"))() end })
+MainGroup:AddButton({ Text = "Omg Hub (Key)", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua"))() end })
+MainGroup:AddButton({ Text = "Hdanh Hub (Key)", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/hdanhvip/hdanhhub/refs/heads/main/BananaHub.lua.txt"))() end })
+MainGroup:AddButton({ Text = "Speed Hub X (Key)", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))() end })
+MainGroup:AddButton({ Text = "Bostur UI", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/thihaccff-alt/H-hhhaa/refs/heads/main/MainBosturUiRedzHub-obfuscated.lua"))() end })
+MainGroup:AddButton({ Text = "Tron Void Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/TRon-Void-Devs/TRon-Void-Hub-R6.1/refs/heads/main/script.lua"))() end })
+MainGroup:AddButton({ Text = "Midnight X", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Ohofo2279/Midnight/refs/heads/main/MidnightX-BloxFruits.lua"))() end })
+MainGroup:AddButton({ Text = "Banana Fake", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/aloaloalo322/sssdas/refs/heads/main/cc"))() end })
+MainGroup:AddButton({ Text = "Abacaxi Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/real33ms/BloxFruits/refs/heads/main/AbacaxiHubOfc.lua"))() end })
+MainGroup:AddButton({ Text = "Moonlight Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-Moonlight/Moonlight/refs/heads/main/Main"))() end })
+MainGroup:AddButton({ Text = "Bacon Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/vinh129150/hack/refs/heads/main/BaconHub.lua"))() end })
+MainGroup:AddButton({ Text = "Bear Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Huylovemy/Bearhud/refs/heads/main/BearHudPremium"))() end })
+MainGroup:AddButton({ Text = "Quantum Onyx", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))() end })
+MainGroup:AddButton({ Text = "Vector Hub", Func = function() loadstring(game:HttpGet("https://vectorhub.space"))() end })
+MainGroup:AddButton({ Text = "Neji Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-NejiDepzai/BloxFruits/refs/heads/main/Main.lua"))() end })
+MainGroup:AddButton({ Text = "Leaf Hub (Key)", Func = function() loadstring(game:HttpGet("https://github.com/LeafHubAcademy/LeafHub/raw/refs/heads/main/Leaf.lua"))() end })
+MainGroup:AddButton({ Text = "Eclipse Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Eclipse2408/Scripts/refs/heads/main/PhahattiScripts.lua"))() end })
+MainGroup:AddButton({ Text = "Gravity Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-GravityHub/BloxFruit/refs/heads/main/Main.lua"))() end })
+MainGroup:AddButton({ Text = "Anime Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Anniecreate86/BloxFruits/refs/heads/main/BetaHub-BF"))() end })
+MainGroup:AddButton({ Text = "Zee Hub", Func = function() loadstring(game:HttpGet("https://link.trwxz.com/LS-Zee-Hub-VIP"))() end })
+MainGroup:AddButton({ Text = "Redz Official", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/newredzv3/Scripts/refs/heads/main/main.luau"))() end })
+MainGroup:AddButton({ Text = "Rubu V6", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Teddyseetink/RUBU/refs/heads/main/RUBUV6.lua"))() end })
+MainGroup:AddButton({ Text = "Blue X (Key)", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"))() end })
+
+-- BLADE BALL
+BladeBallGroup:AddButton({ Text = "Sangra Hub", Func = function() loadstring(game:HttpGet("https://sangra-opus.vercel.app/scripts/loader.lua"))() end })
+BladeBallGroup:AddButton({ Text = "Levi Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/MriseHubX/main/refs/heads/main/BladeBall"))() end })
+BladeBallGroup:AddButton({ Text = "Cyraa Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/LynX99-9/komtolmmek2script/refs/heads/main/CyraaHub.lua", true))() end })
+BladeBallGroup:AddButton({ Text = "Argon Hub X", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/AgentX771/ArgonHubX/main/Loader.lua"))() end })
+
+-- TSB
+TsbGroup:AddButton({ Text = "Vexon Hub", Func = function() loadstring(game:HttpGet("https://rawscripts.net/raw/The-Strongest-Battlegrounds-TSB-SCRIPT-VexonHub-146385"))() end })
+TsbGroup:AddButton({ Text = "Tổng Hợp TSB Tech", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/kaimm2/TSB/refs/heads/main/Tthanh%20Tong%20Hop%20Tech.txt"))() end })
+TsbGroup:AddButton({ Text = "Fix Lag TSB", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/rachs14/Best-Antilag/refs/heads/main/Tsb"))() end })
+TsbGroup:AddButton({ Text = "Protect Hub", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_3334988263341522.lua.txt"))() end })
+
+-- JJK
+JjkGroup:AddButton({ Text = "Lock On JJK", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/Loader-DesconhecidoJ/AkaYsn/refs/heads/main/LockOn.lua"))() end })
+
+-- DOORS
+DoorsGroup:AddButton({ Text = "Ze Script", Func = function() loadstring(game:HttpGet("https://rawscripts.net/raw/DOORS-ZeScript-67246"))() end })
+DoorsGroup:AddButton({ Text = "Bob Doors", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/notzanocoddz4/bobdoors/main/main.lua"))() end })
+DoorsGroup:AddButton({ Text = "MSPaint V4 (Key)", Func = function() loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/002c19202c9946e6047b0c6e0ad51f84.lua"))() end })
+
+-- 99 NIGHTS
+NightsGroup:AddButton({ Text = "99 Nights (Key)", Func = function() loadstring(game:HttpGet("https://api.rblxscripthub.com/99NightsInTheForest"))() end })
+NightsGroup:AddButton({ Text = "VW Script", Func = function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-99-Noches-Script-VW-212366"))() end })
+NightsGroup:AddButton({ Text = "H4x (Key)", Func = function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-CLASSES-H4x-99-nights-in-the-forest-43911"))() end })
+NightsGroup:AddButton({ Text = "Ringta", Func = function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-99-NIGHTS-HUB-BY-RINGTA-211844"))() end })
+NightsGroup:AddButton({ Text = "Foxname", Func = function() loadstring(game:HttpGet("https://rawscripts.net/raw/99-Nights-in-the-Forest-GOD-MODE-BRING-ITEMS-Foxname-HUB-GODLY-SCRIPT-100694"))() end })
+
+-- MISC
+MiscGroup:AddButton({ Text = "Touch Fling", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"))() end })
+MiscGroup:AddButton({ Text = "Troll GUI", Func = function() loadstring(game:HttpGet("https://rawscripts.net/raw/Troll-is-a-pinning-tower-2-Troll-Gui-36868"))() end })
+MiscGroup:AddButton({ Text = "Fly Gui V3", Func = function() loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))() end })
+
+Library:Notify({ Title = "HiruZ Hub", Description = "Loaded Banana UI Version!", Duration = 5 })
