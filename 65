@@ -1,0 +1,42 @@
+-- [[ KAVO UI LIBRARY - NHẸ NHÀNG, ĐƠN GIẢN, LINK BẤT TỬ ]]
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+
+-- Tạo Cửa sổ (Có thể đổi Theme: DarkTheme, LightTheme, BloodTheme, GrapeTheme, OceanTheme)
+local Window = Library.CreateLib("hiruz Hub | by name_script", "BloodTheme")
+
+-- ================= TAB 1: FIRST TAB =================
+local Tab1 = Window:NewTab("First Tab")
+local Section1 = Tab1:NewSection("Các chức năng cơ bản")
+
+Section1:NewButton("Example Button", "In ra chữ Hello World", function()
+    print("Hello World!")
+end)
+
+Section1:NewToggle("Toggle Example", "Bật/Tắt trạng thái", function(state)
+    if state then
+        print("The toggle is On")
+    else
+        print("The toggle is Off")
+    end
+end)
+
+Section1:NewSlider("Slider Example", "Kéo để chọn tốc độ", 300, 1, function(s) -- 300 là Max, 1 là Min
+    print("Slider value is:", s)
+end)
+
+-- ================= TAB 2: SECOND TAB =================
+local Tab2 = Window:NewTab("Second Tab")
+local Section2 = Tab2:NewSection("Menu mở rộng")
+
+Section2:NewDropdown("Example Drop-down", "Chọn một số trong danh sách", {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}, function(currentOption)
+    print("Selected value:", currentOption)
+end)
+
+Section2:NewTextBox("Textbox Example", "Nhập text vào đây", function(txt)
+    print(txt)
+end)
+
+-- Nút ẩn/hiện UI (Mặc định Kavo dùng phím RightShift, có thể tự custom thêm)
+Section2:NewKeybind("Nút ẩn/hiện Menu", "Nhấn nút này để bật/tắt giao diện", Enum.KeyCode.RightControl, function()
+    Library:ToggleUI()
+end)
