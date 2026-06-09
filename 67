@@ -1,0 +1,73 @@
+-- [[ HIRUZ HUB - BLOX FRUIT TOTAL SCRIPT COMPILATION ]]
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+-- Cấu hình màu sắc hệ thống sang Đen - Trắng
+Library.Theme = {
+    MainColor = Color3.fromRGB(10, 10, 10),       -- Nền UI đen đậm
+    BackgroundColor = Color3.fromRGB(20, 20, 20), -- Nền các khối bên trong
+    AccentColor = Color3.fromRGB(255, 255, 255),  -- Điểm nhấn trắng
+    OutlineColor = Color3.fromRGB(255, 255, 255), -- Viền trắng sắc nét
+    FontColor = Color3.fromRGB(255, 255, 255)     -- Chữ trắng rõ ràng
+}
+
+local Window = Library:CreateWindow({
+    Title = "HiruZ Hub",
+    Subtitle = ": tổng hợp premium",
+    Image = "rbxassetid://10747361845" -- ID chữ H Cyberpunk phối đen trắng
+})
+
+--==================================================
+-- TAB DUY NHẤT: BLOX FRUIT
+--==================================================
+local BloxFruitTab = Window:AddTab("Blox Fruit")
+
+--==================================================
+-- PHÂN CHIA GROUPBOXES ĐỐI XỨNG TRÁI - PHẢI
+--==================================================
+local LeftGroup  = BloxFruitTab:AddLeftGroupbox("Scripts No Key")
+local RightGroup = BloxFruitTab:AddRightGroupbox("Scripts Need Key")
+
+--==================================================
+-- CHỨC NĂNG BÊN TRÁI: NHÓM KHÔNG CẦN KEY
+--==================================================
+
+LeftGroup:AddButton({
+    Text = "Anime Hub",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/tanloc01/tloc/refs/heads/main/annie.lua"))()
+    end
+})
+
+LeftGroup:AddButton({
+    Text = "Night Mystic",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-NightMystic/Bloxfruits/refs/heads/main/Script.lua"))()
+    end
+})
+
+LeftGroup:AddButton({
+    Text = "Banana Longhihi",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/longhihilonghihi-hub/BananaHub/refs/heads/main/CombackVersion"))()
+    end
+})
+
+--==================================================
+-- CHỨC NĂNG BÊN PHẢI: NHÓM CẦN KEY
+--==================================================
+
+RightGroup:AddButton({
+    Text = "Real Kid",
+    Func = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua"))()
+    end
+})
+
+--==================================================
+-- THÔNG BÁO KHỞI CHẠY
+--==================================================
+Library:Notify({
+    Title = "HiruZ Loaded",
+    Description = "Compilation Completed Successfully!",
+    Duration = 5
+})
