@@ -1,0 +1,26 @@
+-- [[ HIRUZ HUB - KHUNG SẠCH TỔNG HỢP (1 TAB BLOX FRUIT TRỐNG) ]]
+local Library = loadstring(game:HttpGet("https://pastefy.app/21Kp3vvz/raw"))()
+
+local Window = Library:CreateWindow({
+    Title = "HiruZ Hub",
+    Subtitle = ": tổng hợp premium",
+    Image = "rbxassetid://10747361845" -- ID chữ H Cyberpunk của ông
+})
+
+--==================================================
+-- TAB DUY NHẤT: BLOX FRUIT (ĐÃ XÓA SẠCH CHỨC NĂNG CŨ)
+--==================================================
+local BloxFruitTab = Window:AddTab("Blox Fruit")
+
+-- Ông bắt đầu tự tạo Groupbox và thêm chức năng tổng hợp của ông ở dưới này nhé:
+-- Ví dụ: local MyGroup = BloxFruitTab:AddLeftGroupbox("Tên Nhóm")
+
+
+--==================================================
+-- THÔNG BÁO KHỞI CHẠY
+--==================================================
+Library:Notify({
+    Title = "HiruZ Loaded",
+    Description = "Khung tổng hợp Blox Fruit đã sẵn sàng!",
+    Duration = 5
+})
