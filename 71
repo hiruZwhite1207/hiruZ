@@ -1,0 +1,133 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Tạo GUI Bo Góc (Giữ nguyên độ sang chảnh)
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+ScreenGui.Name = "HiruzHubPremium"
+
+local function createRoundedFrame(parent, size, pos)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = size
+    frame.Position = pos
+    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) -- Nền đen nhám
+    frame.BorderSizePixel = 0
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+    local stroke = Instance.new("UIStroke", frame)
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.Thickness = 2
+    return frame
+end
+
+-- Nút Bật/Tắt Menu
+local ToggleBtn = Instance.new("TextButton", ScreenGui)
+ToggleBtn.Size = UDim2.new(0, 80, 0, 40)
+ToggleBtn.Position = UDim2.new(0, 20, 0.5, 0)
+ToggleBtn.Text = "MENU"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Font = Enum.Font.GothamBold
+Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 10)
+Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Draggable = true
+
+-- Bảng Main
+local MainFrame = createRoundedFrame(ScreenGui, UDim2.new(0, 220, 0, 200), UDim2.new(0, 120, 0.5, -100))
+MainFrame.Visible = false
+MainFrame.Draggable = true
+
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "HIRUZ HUB (PREMIUM)"
+Title.TextColor3 = Color3.fromRGB(255, 215, 0) -- Đổi chữ thành màu Vàng Gold VIP
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+
+local TextBox = Instance.new("TextBox", MainFrame)
+TextBox.Size = UDim2.new(0.8, 0, 0, 30)
+TextBox.Position = UDim2.new(0.1, 0, 0.25, 0)
+TextBox.PlaceholderText = "Tên người chơi..."
+TextBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", TextBox)
+
+local TpButton = Instance.new("TextButton", MainFrame)
+TpButton.Size = UDim2.new(0.8, 0, 0, 35)
+TpButton.Position = UDim2.new(0.1, 0, 0.45, 0)
+TpButton.Text = "TELEPORT"
+TpButton.BackgroundColor3 = Color3.fromRGB(0, 85, 255)
+TpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TpButton.Font = Enum.Font.GothamBold
+Instance.new("UICorner", TpButton)
+
+local FarmButton = Instance.new("TextButton", MainFrame)
+FarmButton.Size = UDim2.new(0.8, 0, 0, 35)
+FarmButton.Position = UDim2.new(0.1, 0, 0.7, 0)
+FarmButton.Text = "AUTO FARM: OFF"
+FarmButton.BackgroundColor3 = Color3.fromRGB(150, 40, 40)
+FarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+FarmButton.Font = Enum.Font.GothamBold
+Instance.new("UICorner", FarmButton)
+
+-----------------------------------------
+-- LOGIC XỬ LÝ (VIP CORE)
+-----------------------------------------
+ToggleBtn.MouseButton1Click:Connect(function() 
+    MainFrame.Visible = not MainFrame.Visible 
+end)
+
+-- Teleport Thông Minh
+TpButton.MouseButton1Click:Connect(function()
+    local name = string.lower(TextBox.Text)
+    if name == "" then return end
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.sub(string.lower(p.Name), 1, #name) == name or string.sub(string.lower(p.DisplayName), 1, #name) == name then
+            if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame
+                break
+            end
+        end
+    end
+end)
+
+-- Auto Farm Siêu Cấp
+local auto = false
+FarmButton.MouseButton1Click:Connect(function()
+    auto = not auto
+    FarmButton.Text = auto and "AUTO FARM: ON" or "AUTO FARM: OFF"
+    FarmButton.BackgroundColor3 = auto and Color3.fromRGB(35, 150, 40) or Color3.fromRGB(150, 40, 40)
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.2) -- Tốc độ quét (có thể chỉnh nhỏ hơn nếu muốn lẹ)
+        if auto then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    -- Quét toàn bộ map để tìm vật phẩm có thể tương tác
+                    for _, obj in pairs(workspace:GetDescendants()) do
+                        -- Nếu game dùng phím E (ProximityPrompt)
+                        if obj:IsA("ProximityPrompt") then
+                            local distance = (obj.Parent.Position - char.HumanoidRootPart.Position).Magnitude
+                            if distance <= obj.MaxActivationDistance then
+                                fireproximityprompt(obj, 1)
+                                fireproximityprompt(obj, 0)
+                            end
+                        -- Nếu game dùng Click chuột (ClickDetector)
+                        elseif obj:IsA("ClickDetector") then
+                            local distance = (obj.Parent.Position - char.HumanoidRootPart.Position).Magnitude
+                            if distance <= obj.MaxActivationDistance then
+                                fireclickdetector(obj)
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- Chống AFK tuyệt đối
+for _, v in pairs(getconnections(LocalPlayer.Idled)) do
+    v:Disable()
+end
