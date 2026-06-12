@@ -1,0 +1,114 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Xóa GUI cũ nếu có
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local oldGui = PlayerGui:FindFirstChild("HackGardenGUI")
+if oldGui then
+    oldGui:Destroy()
+end
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HackGardenGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- Nút mở menu
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Parent = ScreenGui
+ToggleBtn.Name = "ToggleBtn"
+ToggleBtn.Size = UDim2.new(0,50,0,50)
+ToggleBtn.Position = UDim2.new(0,10,0.5,0)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(0,0,0)
+ToggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+ToggleBtn.Text = "MENU"
+
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0,180,0,120)
+MainFrame.Position = UDim2.new(0,70,0.5,-60)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+MainFrame.Visible = false
+
+-- TextBox
+local TextBox = Instance.new("TextBox")
+TextBox.Parent = MainFrame
+TextBox.Size = UDim2.new(0.9,0,0,30)
+TextBox.Position = UDim2.new(0.05,0,0.1,0)
+TextBox.PlaceholderText = "Tên người chơi..."
+
+-- TP Button
+local TpButton = Instance.new("TextButton")
+TpButton.Parent = MainFrame
+TpButton.Size = UDim2.new(0.9,0,0,30)
+TpButton.Position = UDim2.new(0.05,0,0.45,0)
+TpButton.Text = "TELEPORT"
+
+-- Money Button
+local InfButton = Instance.new("TextButton")
+InfButton.Parent = MainFrame
+InfButton.Size = UDim2.new(0.9,0,0,30)
+InfButton.Position = UDim2.new(0.05,0,0.75,0)
+InfButton.Text = "INF"
+
+-- Mở/Tắt Menu
+ToggleBtn.MouseButton1Click:Connect(function()
+	MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- Teleport
+TpButton.MouseButton1Click:Connect(function()
+
+	local targetName = TextBox.Text:lower()
+
+	if targetName == "" then
+		warn("Chưa nhập tên người chơi")
+		return
+	end
+
+	for _, player in ipairs(Players:GetPlayers()) do
+
+		if player ~= LocalPlayer and
+		   player.Name:lower():sub(1,#targetName) == targetName then
+
+			local myChar = LocalPlayer.Character
+			local targetChar = player.Character
+
+			if myChar and targetChar then
+
+				local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+				local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+
+				if myRoot and targetRoot then
+					myRoot.CFrame = targetRoot.CFrame + Vector3.new(0,3,0)
+				end
+			end
+
+			break
+		end
+	end
+end)
+
+-- Tiền INF (chỉ client-side)
+InfButton.MouseButton1Click:Connect(function()
+
+	local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
+
+	if not leaderstats then
+		warn("Không tìm thấy leaderstats")
+		return
+	end
+
+	for _, stat in ipairs(leaderstats:GetChildren()) do
+
+		if stat:IsA("IntValue") then
+			stat.Value = 2000000000
+
+		elseif stat:IsA("NumberValue") then
+			stat.Value = 1e30
+		end
+	end
+end)
