@@ -1,0 +1,110 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local VirtualInput = game:GetService("VirtualInputManager")
+
+-- Tạo UI Sang Chảnh
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+ScreenGui.Name = "HiruzHub"
+
+local function createRoundedFrame(parent, size, pos)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = size; frame.Position = pos
+    frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    local corner = Instance.new("UICorner", frame); corner.CornerRadius = UDim.new(0, 15)
+    local stroke = Instance.new("UIStroke", frame); stroke.Color = Color3.fromRGB(255, 255, 255); stroke.Thickness = 2
+    return frame
+end
+
+local Main = createRoundedFrame(ScreenGui, UDim2.new(0, 250, 0, 350), UDim2.new(0, 50, 0.5, -175))
+Main.Draggable = true
+
+-- Title
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1, 0, 0, 50); Title.Text = "HIRUZ HUB [PREMIUM]"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255); Title.BackgroundTransparency = 1; Title.Font = Enum.Font.GothamBold
+
+-- Buttons
+local function createBtn(text, pos, color)
+    local btn = Instance.new("TextButton", Main)
+    btn.Size = UDim2.new(0.8, 0, 0, 40); btn.Position = pos
+    btn.Text = text; btn.BackgroundColor3 = color; btn.TextColor3 = Color3.fromRGB(255,255,255)
+    Instance.new("UICorner", btn)
+    return btn
+end
+
+local Input = Instance.new("TextBox", Main)
+Input.Size = UDim2.new(0.8, 0, 0, 40); Input.Position = UDim2.new(0.1, 0, 0.15, 0)
+Input.PlaceholderText = "Tên người chơi..."; Input.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Instance.new("UICorner", Input)
+
+local TpBtn = createBtn("TELEPORT", UDim2.new(0.1, 0, 0.3, 0), Color3.fromRGB(0, 100, 255))
+local FarmBtn = createBtn("AUTO FARM: OFF", UDim2.new(0.1, 0, 0.45, 0), Color3.fromRGB(200, 0, 0))
+local ShopBtn = createBtn("AUTO SHOP: OFF", UDim2.new(0.1, 0, 0.6, 0), Color3.fromRGB(200, 0, 0))
+local InfBtn = createBtn("VISUAL INF MONEY", UDim2.new(0.1, 0, 0.75, 0), Color3.fromRGB(150, 0, 200))
+
+-----------------------------------------
+-- LOGIC
+-----------------------------------------
+-- 1. INF MONEY (Visual Only)
+InfBtn.MouseButton1Click:Connect(function()
+    local ls = LocalPlayer:FindFirstChild("leaderstats")
+    if ls then
+        for _, stat in pairs(ls:GetChildren()) do
+            if stat:IsA("IntValue") or stat:IsA("NumberValue") then
+                stat.Value = 9999999999999999999999999999999999999999999 -- Chỉnh số dư hiển thị
+            end
+        end
+        InfBtn.Text = "MONEY UPDATED!"
+        task.wait(1)
+        InfBtn.Text = "VISUAL INF MONEY"
+    end
+end)
+
+-- 2. Teleport
+TpBtn.MouseButton1Click:Connect(function()
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.find(string.lower(p.Name), string.lower(Input.Text)) then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame
+        end
+    end
+end)
+
+-- 3. click
+local farming = false
+FarmBtn.MouseButton1Click:Connect(function()
+    farming = not farming
+    FarmBtn.Text = farming and "quay tay: "bật" or "quay tay: tắt"
+    FarmBtn.BackgroundColor3 = farming and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)
+end)
+
+task.spawn(function()
+    while task.wait(0.1) do
+        if farming then
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj:IsA("ProximityPrompt") then fireproximityprompt(obj) end
+            end
+        end
+    end
+end)
+
+-- 4.  Shop (Cần thay tên nút như đã dặn)
+local shopping = false
+ShopBtn.MouseButton1Click:Connect(function()
+    shopping = not shopping
+    ShopBtn.Text = shopping and "chợ đen: mở" or "chợ đen: đóng"
+    ShopBtn.BackgroundColor3 = shopping and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)
+end)
+
+task.spawn(function()
+    while task.wait(2) do
+        if shopping then
+            local pg = LocalPlayer:WaitForChild("PlayerGui")
+            -- Thay "Shop" và "Tool" bằng tên nút trong game của ông
+            local btn1 = pg:FindFirstChild("Shop", true)
+            local btn2 = pg:FindFirstChild("Tool", true)
+            if btn1 and btn1:IsA("GuiButton") then VirtualInput:SendMouseButtonEvent(btn1.AbsolutePosition.X, btn1.AbsolutePosition.Y, 0, true, game, 1) end
+            task.wait(0.5)
+            if btn2 and btn2:IsA("GuiButton") then VirtualInput:SendMouseButtonEvent(btn2.AbsolutePosition.X, btn2.AbsolutePosition.Y, 0, true, game, 1) end
+        end
+    end
+end)
