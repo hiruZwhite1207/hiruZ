@@ -1,0 +1,98 @@
+local UIS = game:GetService("UserInputService")
+
+local gui = Instance.new("ScreenGui")
+gui.Parent = game.CoreGui
+gui.ResetOnSpawn = false
+
+local main = Instance.new("Frame")
+main.Parent = gui
+main.Size = UDim2.fromOffset(700, 450)
+main.Position = UDim2.fromScale(0.5, 0.5)
+main.AnchorPoint = Vector2.new(0.5,0.5)
+main.BackgroundColor3 = Color3.fromRGB(20,20,30)
+main.BorderSizePixel = 0
+
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,12)
+
+-- Drag
+local dragging = false
+local dragStart
+local startPos
+
+main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		main.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- Sidebar
+local sidebar = Instance.new("Frame")
+sidebar.Parent = main
+sidebar.Size = UDim2.new(0,160,1,0)
+sidebar.BackgroundColor3 = Color3.fromRGB(30,30,45)
+sidebar.BorderSizePixel = 0
+
+local title = Instance.new("TextLabel")
+title.Parent = sidebar
+title.Size = UDim2.new(1,0,0,50)
+title.Text = "PREMIUM HUB"
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.BackgroundTransparency = 1
+
+-- Content
+local content = Instance.new("Frame")
+content.Parent = main
+content.Position = UDim2.new(0,170,0,10)
+content.Size = UDim2.new(1,-180,1,-20)
+content.BackgroundColor3 = Color3.fromRGB(25,25,35)
+content.BorderSizePixel = 0
+
+Instance.new("UICorner", content).CornerRadius = UDim.new(0,10)
+
+local layout = Instance.new("UIListLayout")
+layout.Parent = sidebar
+layout.Padding = UDim.new(0,8)
+
+local function Tab(name)
+	local b = Instance.new("TextButton")
+	b.Parent = sidebar
+	b.Size = UDim2.new(1,-10,0,40)
+	b.Text = name
+	b.TextColor3 = Color3.new(1,1,1)
+	b.Font = Enum.Font.Gotham
+	b.TextSize = 15
+	b.BackgroundColor3 = Color3.fromRGB(90,60,180)
+	b.BorderSizePixel = 0
+
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0,8)
+
+	return b
+end
+
+Tab("Main")
+Tab("Farm")
+Tab("Teleport")
+Tab("Player")
+Tab("Settings")
