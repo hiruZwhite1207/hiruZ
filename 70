@@ -1,0 +1,101 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local VirtualUser = game:GetService("VirtualUser")
+
+-- Tạo GUI
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+ScreenGui.Name = "HiruzHubGui"
+
+-- Hàm tạo UI bo góc với viền trắng
+local function createRoundedFrame(parent, size, pos)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = size
+    frame.Position = pos
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BorderSizePixel = 0
+    
+    local corner = Instance.new("UICorner", frame)
+    corner.CornerRadius = UDim.new(0, 12)
+    
+    local stroke = Instance.new("UIStroke", frame)
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.Thickness = 2
+    
+    return frame
+end
+
+-- Nút Toggle
+local ToggleBtn = Instance.new("TextButton", ScreenGui)
+ToggleBtn.Size = UDim2.new(0, 80, 0, 40)
+ToggleBtn.Position = UDim2.new(0, 20, 0.5, 0)
+ToggleBtn.Text = "MENU"
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Font = Enum.Font.GothamBold
+Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 10)
+Instance.new("UIStroke", ToggleBtn).Color = Color3.fromRGB(255, 255, 255)
+
+-- Menu chính
+local MainFrame = createRoundedFrame(ScreenGui, UDim2.new(0, 220, 0, 200), UDim2.new(0, 120, 0.5, -100))
+MainFrame.Visible = false
+MainFrame.Draggable = true
+
+-- Title
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "HIRUZ HUB (PREMIUM)"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+
+-- Các ô nhập và nút
+local TextBox = Instance.new("TextBox", MainFrame)
+TextBox.Size = UDim2.new(0.8, 0, 0, 30)
+TextBox.Position = UDim2.new(0.1, 0, 0.25, 0)
+TextBox.PlaceholderText = "Tên người chơi..."
+TextBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", TextBox)
+
+local TpButton = Instance.new("TextButton", MainFrame)
+TpButton.Size = UDim2.new(0.8, 0, 0, 35)
+TpButton.Position = UDim2.new(0.1, 0, 0.45, 0)
+TpButton.Text = "TELEPORT"
+TpButton.BackgroundColor3 = Color3.fromRGB(0, 85, 255)
+TpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", TpButton)
+
+local FarmButton = Instance.new("TextButton", MainFrame)
+FarmButton.Size = UDim2.new(0.8, 0, 0, 35)
+FarmButton.Position = UDim2.new(0.1, 0, 0.7, 0)
+FarmButton.Text = "AUTO FARM: OFF"
+FarmButton.BackgroundColor3 = Color3.fromRGB(35, 150, 40)
+FarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", FarmButton)
+
+-- Logic
+ToggleBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
+
+TpButton.MouseButton1Click:Connect(function()
+    local name = string.lower(TextBox.Text)
+    for _, p in pairs(Players:GetPlayers()) do
+        if string.sub(string.lower(p.Name), 1, #name) == name then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = p.Character.HumanoidRootPart.CFrame
+        end
+    end
+end)
+
+local auto = false
+FarmButton.MouseButton1Click:Connect(function()
+    auto = not auto
+    FarmButton.Text = auto and "AUTO FARM: ON" or "AUTO FARM: OFF"
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        if auto then
+            game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.E, false, game)
+        end
+    end
+end)
