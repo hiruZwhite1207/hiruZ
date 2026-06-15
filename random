@@ -1,0 +1,92 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- 1. KHỞI TẠO GUI NỀN ĐEN VIỀN TRẮNG
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+ScreenGui.Name = "HiruzHubLucky"
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 240, 0, 130)
+MainFrame.Position = UDim2.new(0, 40, 0.5, -65)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 0
+MainFrame.Draggable = true
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 12)
+
+local Stroke = Instance.new("UIStroke", MainFrame)
+Stroke.Color = Color3.fromRGB(255, 255, 255)
+Stroke.Thickness = 2
+
+-- Tiêu đề
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 45)
+Title.Text = "HIRUZ GACHA (BUG LUCKY)"
+Title.TextColor3 = Color3.fromRGB(255, 215, 0) -- Vàng VIP
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+
+-- 2. THIẾT KẾ NÚT KÉO HÌNH TRÒN (TOGGLE SWITCH)
+local SwitchTrack = Instance.new("TextButton", MainFrame) -- Thanh trượt nền
+SwitchTrack.Size = UDim2.new(0, 60, 0, 30)
+SwitchTrack.Position = UDim2.new(0.5, -30, 0.5, 0)
+SwitchTrack.BackgroundColor3 = Color3.fromRGB(40, 40, 40) -- Mặc định màu tối (OFF)
+SwitchTrack.Text = ""
+Instance.new("UICorner", SwitchTrack).CornerRadius = UDim.new(1, 0) -- Bo tròn thành thanh oval
+
+local SwitchCircle = Instance.new("Frame", SwitchTrack) -- Nút tròn kéo
+SwitchCircle.Size = UDim2.new(0, 26, 0, 26)
+SwitchCircle.Position = UDim2.new(0, 2, 0.5, -13) -- Nằm bên trái khi OFF
+SwitchCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", SwitchCircle).CornerRadius = UDim.new(1, 0) -- Tròn trịa
+
+-- Trạng thái
+local isLuckyAuto = false
+local TweenService = game:GetService("TweenService")
+
+-- 3. LOGIC DI CHUYỂN NÚT KÉO & BẬT/TẮT
+SwitchTrack.MouseButton1Click:Connect(function()
+    isLuckyAuto = not isLuckyAuto
+    
+    local targetPos = isLuckyAuto and UDim2.new(1, -28, 0.5, -13) or UDim2.new(0, 2, 0.5, -13)
+    local targetColor = isLuckyAuto and Color3.fromRGB(35, 150, 40) or Color3.fromRGB(40, 40, 40)
+    
+    -- Hiệu ứng mượt mà khi gạt công tắc
+    TweenService:Create(SwitchCircle, TweenInfo.new(0.2), {Position = targetPos}):Play()
+    TweenService:Create(SwitchTrack, TweenInfo.new(0.2), {BackgroundColor3 = targetColor}):Play()
+end)
+
+-- 4. CORE BUG LUCKY GACHA (AUTO RANDOM + STORE)
+task.spawn(function()
+    while true do
+        task.wait(2) -- Quét liên tục mỗi 2 giây
+        if isLuckyAuto then
+            pcall(function()
+                local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommF_")
+                if remote then
+                    -- Lệnh thực hiện Gacha
+                    local result = remote:InvokeServer("Cousin", "Buy")
+                    
+                    -- Nếu Gacha thành công và trả về Trái ác quỷ, tự động thực hiện chuỗi tối ưu:
+                    if result then
+                        task.wait(0.5)
+                        -- Tìm trái ác quỷ trong người và tự động cất vào kho (Tránh bị cướp/out game mất)
+                        for _, tool in pairs(LocalPlayer.Backpack:GetChildren()) do
+                            if tool:IsA("Tool") and string.find(tool.Name, "Fruit") then
+                                remote:InvokeServer("StoreFruit", tool.Name, tool)
+                            end
+                        end
+                        for _, tool in pairs(LocalPlayer.Character:GetChildren()) do
+                            if tool:IsA("Tool") and string.find(tool.Name, "Fruit") then
+                                remote:InvokeServer("StoreFruit", tool.Name, tool)
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- Chống AFK kích văng khỏi server khi treo máy chờ roll
+for _, v in pairs(getconnections(LocalPlayer.Idled)) do v:Disable() end
