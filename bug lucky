@@ -1,0 +1,76 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+
+-- 1. KHỞI TẠO TÙY CHỈNH GUI (Siêu Nhỏ Gọn & Di Chuyển Được)
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+ScreenGui.Name = "HiruzMiniLucky"
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 160, 0, 90) -- Thu nhỏ kích thước tối đa
+MainFrame.Position = UDim2.new(0, 40, 0.5, -45)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true -- Cho phép giữ chuột/tay để kéo di chuyển trên màn hình
+
+-- Viền trắng mỏng sang chảnh
+local Stroke = Instance.new("UIStroke", MainFrame)
+Stroke.Color = Color3.fromRGB(255, 255, 255)
+Stroke.Thickness = 1.5
+
+-- Tiêu đề mini
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "HIRUZ GACHA VIP"
+Title.TextColor3 = Color3.fromRGB(255, 215, 0) -- Vàng Gold
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 11
+
+-- 2. NÚT KÉO HÌNH TRÒN (TOGGLE SWITCH CHỈNH KÍCH THƯỚC MINI)
+local SwitchTrack = Instance.new("TextButton", MainFrame)
+SwitchTrack.Size = UDim2.new(0, 50, 0, 24) -- Thanh trượt nhỏ gọn
+SwitchTrack.Position = UDim2.new(0.5, -25, 0.5, -2)
+SwitchTrack.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SwitchTrack.Text = ""
+Instance.new("UICorner", SwitchTrack).CornerRadius = UDim.new(1, 0)
+
+local SwitchCircle = Instance.new("Frame", SwitchTrack)
+SwitchCircle.Size = UDim2.new(0, 20, 0, 20) -- Nút tròn mini
+SwitchCircle.Position = UDim2.new(0, 2, 0.5, -10)
+SwitchCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Instance.new("UICorner", SwitchCircle).CornerRadius = UDim.new(1, 0)
+
+-- Trạng thái điều khiển độc lập
+local isLuckyAuto = false
+
+-- 3. HIỆU ỨNG GẠT NÚT MƯỢT MÀ
+SwitchTrack.MouseButton1Click:Connect(function()
+    isLuckyAuto = not isLuckyAuto
+    
+    local targetPos = isLuckyAuto and UDim2.new(1, -22, 0.5, -10) or UDim2.new(0, 2, 0.5, -10)
+    local targetColor = isLuckyAuto and Color3.fromRGB(35, 150, 40) or Color3.fromRGB(40, 40, 40)
+    
+    TweenService:Create(SwitchCircle, TweenInfo.new(0.15), {Position = targetPos}):Play()
+    TweenService:Create(SwitchTrack, TweenInfo.new(0.15), {BackgroundColor3 = targetColor}):Play()
+end)
+
+-- 4. LOGIC AUTO RANDOM ĐỘC LẬP (KHÔNG CHỨA CHỨC NĂNG CŨ)
+task.spawn(function()
+    while true do
+        task.wait(2) -- Tần suất quét lệnh
+        if isLuckyAuto then
+            pcall(function()
+                local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommF_")
+                if remote then
+                    -- Lệnh gọi Server thực hiện Gacha gốc của game
+                    remote:InvokeServer("Cousin", "Buy")
+                end
+            end)
+        end
+    end
+end)
+
+-- Chống ngắt kết nối AFK khi treo máy
+for _, v in pairs(getconnections(LocalPlayer.Idled)) do v:Disable() end
