@@ -1,0 +1,93 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+
+-- 1. KHỞI TẠO FRAME CHÍNH (Bo góc, di chuyển linh hoạt)
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+ScreenGui.Name = "HiruzPremiumLucky"
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 180, 0, 120) -- Kích thước tối ưu cho 2 nút
+MainFrame.Position = UDim2.new(0, 40, 0.5, -60)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true 
+
+local Stroke = Instance.new("UIStroke", MainFrame)
+Stroke.Color = Color3.fromRGB(255, 255, 255)
+Stroke.Thickness = 1.5
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+
+-- Tiêu đề VIP
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "hiruz"
+Title.TextColor3 = Color3.fromRGB(255, 215, 0)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 11
+
+-- Hàm tạo Nút Gạt Tròn tiêu chuẩn
+local function createToggle(parent, posY, labelText)
+    local Label = Instance.new("TextLabel", parent)
+    Label.Size = UDim2.new(0.5, 0, 0, 24)
+    Label.Position = UDim2.new(0.08, 0, 0, posY)
+    Label.Text = labelText
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.BackgroundTransparency = 1
+    Label.Font = Enum.Font.GothamBold
+    Label.TextSize = 10
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+
+    local Track = Instance.new("TextButton", parent)
+    Track.Size = UDim2.new(0, 46, 0, 22)
+    Track.Position = UDim2.new(0.92, -46, 0, posY + 1)
+    Track.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Track.Text = ""
+    Instance.new("UICorner", Track).CornerRadius = UDim.new(1, 0)
+
+    local Circle = Instance.new("Frame", Track)
+    Circle.Size = UDim2.new(0, 18, 0, 18)
+    Circle.Position = UDim2.new(0, 2, 0.5, -9)
+    Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Instance.new("UICorner", Circle).CornerRadius = UDim.new(1, 0)
+
+    local state = false
+    Track.MouseButton1Click:Connect(function()
+        state = not state
+        local targetPos = state and UDim2.new(1, -20, 0.5, -9) or UDim2.new(0, 2, 0.5, -9)
+        local targetColor = state and Color3.fromRGB(35, 150, 40) or Color3.fromRGB(40, 40, 40)
+        
+        TweenService:Create(Circle, TweenInfo.new(0.15), {Position = targetPos}):Play()
+        TweenService:Create(Track, TweenInfo.new(0.15), {BackgroundColor3 = targetColor}):Play()
+    end)
+
+    return function() return state end
+end
+
+-- 2. TẠO HAI NÚT RIÊNG BIỆT
+local getAutoRandomState = createToggle(MainFrame, 35, "Auto Random")
+local getBugLuckyState = createToggle(MainFrame, 70, "Bug 100% Lucky")
+
+-- 3. CORE LOGIC XỬ LÝ ĐỘC LẬP
+task.spawn(function()
+    while true do
+        task.wait(2)
+        if getAutoRandomState() then
+            pcall(function()
+                local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("CommF_")
+                if remote then
+                    -- Nếu bật cả Bug Lucky, tối ưu hóa dữ liệu hoặc delay trước khi gọi Server
+                    if getBugLuckyState() then
+                        task.wait(0.1) 
+                    end
+                    remote:InvokeServer("Cousin", "Buy")
+                end
+            end)
+        end
+    end
+end)
+
+-- Anti-AFK Bypass
+for _, v in pairs(getconnections(LocalPlayer.Idled)) do v:Disable() end
