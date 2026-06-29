@@ -1,0 +1,117 @@
+-- [[ KAI HUB - FLUENT UI ]] --
+
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local CoreGui = game:GetService("CoreGui")
+
+-- 1. LOAD THƯ VIỆN FLUENT UI
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+
+-- 2. KHỞI TẠO CỬA SỔ HUB
+local Window = Fluent:CreateWindow({
+    Title = "kAI hub",
+    SubTitle = "ID: 125357138591690",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Theme = "Dark", -- Giao diện tối hiện đại
+    MinimizeKey = Enum.KeyCode.RightControl -- Nút cứng trên PC để bật/tắt
+})
+
+-- 3. TẠO CÁC TAB CHỨC NĂNG
+local Tabs = {
+    Main = Window:AddTab({ Title = "Tính Năng", Icon = "home" }),
+    Visual = Window:AddTab({ Title = "Xuyên Tường (ESP)", Icon = "eye" }),
+    Settings = Window:AddTab({ Title = "Cài Đặt", Icon = "settings" })
+}
+
+-- 4. THÊM TÍNH NĂNG VÀO TAB MAIN
+Tabs.Main:AddParagraph({
+    Title = "Chào mừng pháp sư!",
+    Content = "Tận hưởng kai hub với giao diện Fluent UI siêu mượt."
+})
+
+local SpeedToggle = Tabs.Main:AddToggle("SpeedToggle", {
+    Title = "Tốc Độ Chạy (Speedhack)",
+    Default = false,
+    Callback = function(state)
+        print("Trạng thái Speed:", state)
+        -- Chèn code speed vào đây sau
+    end 
+})
+
+-- 5. THÊM TÍNH NĂNG VÀO TAB VISUAL
+local EspToggle = Tabs.Visual:AddToggle("EspToggle", {
+    Title = "Bật ESP",
+    Default = false,
+    Callback = function(state)
+        print("Trạng thái ESP:", state)
+        -- Chèn code ESP vào đây sau
+    end 
+})
+
+-- 6. TẠO NÚT BẬT/TẮT MENU TRÊN MÀN HÌNH (CHO MOBILE & PC)
+local ToggleGui = Instance.new("ScreenGui")
+ToggleGui.Name = "KaiHubToggleGui"
+ToggleGui.Parent = CoreGui
+
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Name = "ToggleButton"
+ToggleBtn.Size = UDim2.new(0, 45, 0, 45)
+ToggleBtn.Position = UDim2.new(0, 15, 0, 15)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+ToggleBtn.Text = "KAI"
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.Font = Enum.Font.SourceSansBold
+ToggleBtn.TextSize = 16
+ToggleBtn.Parent = ToggleGui
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(1, 0) -- Làm tròn nút thành hình tròn
+BtnCorner.Parent = ToggleBtn
+
+-- Hiệu ứng viền phát sáng nhẹ cho nút Toggle
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(100, 100, 100)
+UIStroke.Thickness = 1
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke.Parent = ToggleBtn
+
+-- Code cho phép kéo thả nút Toggle trên màn hình
+local dragging, dragInput, dragStart, startPos
+ToggleBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = ToggleBtn.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+ToggleBtn.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        ToggleBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Code xử lý khi bấm nút (giả lập phím RightControl để mở/tắt Hub)
+ToggleBtn.MouseButton1Click:Connect(function()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.RightControl, false, game)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.RightControl, false, game)
+end)
+
+-- Bật thông báo hệ thống của thư viện
+Fluent:Notify({
+    Title = "Kai Hub",
+    Content = "Đã tải xong UI! Bấm nút KAI để ẩn/hiện.",
+    Duration = 5
+})
