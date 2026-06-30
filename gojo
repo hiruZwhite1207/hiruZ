@@ -1,0 +1,207 @@
+--========================================================
+-- GOJO SATORU ULTIMATE VFX SCRIPT (CLIENT-SIDE)
+-- BAO GỒM HƯ THỨC TỬ 200% VÀ HIỆU ỨNG ÁNH SÁNG
+--========================================================
+local Player = game:GetService("Players").LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+
+-- Hàm tạo rung màn hình (Camera Shake) cho chiêu có lực
+local function cameraShake(duration, intensity)
+    local startTime = os.clock()
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        if os.clock() - startTime < duration then
+            local offsetX = (math.random() - 0.5) * intensity
+            local offsetY = (math.random() - 0.5) * intensity
+            Camera.CFrame = Camera.CFrame * CFrame.Angles(math.rad(offsetX), math.rad(offsetY), 0)
+        else
+            connection:Disconnect()
+        end
+    end)
+end
+
+-- Hàm tạo quả cầu năng lượng siêu đẹp (Có lõi sáng + Hạt Particle)
+local function createFancyBall(color, size, position)
+    local ball = Instance.new("Part")
+    ball.Shape = Enum.PartType.Ball
+    ball.Size = Vector3.new(size, size, size)
+    ball.Color = color
+    ball.Material = Enum.Material.Neon
+    ball.Anchored = true
+    ball.CanCollide = false
+    ball.Position = position
+    ball.Parent = workspace
+    
+    -- Ánh sáng tỏa ra
+    local light = Instance.new("PointLight", ball)
+    light.Color = color
+    light.Range = size * 4
+    light.Brightness = 8
+    
+    -- Hạt năng lượng bao quanh
+    local attachment = Instance.new("Attachment", ball)
+    local particles = Instance.new("ParticleEmitter", attachment)
+    particles.Color = ColorSequence.new(color)
+    particles.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, size/3), NumberSequenceKeypoint.new(1, 0)})
+    particles.Texture = "rbxassetid://281983280" -- Texture hạt sáng cơ bản của Roblox
+    particles.LockedToPart = true
+    particles.Rate = 100
+    particles.Speed = NumberRange.new(0.5, 2)
+    particles.Lifetime = NumberRange.new(0.5, 1)
+    
+    return ball
+end
+
+-- 1. PHÍM Q: THƯƠNG (XANH - BLUE)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Q then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local blueBall = createFancyBall(Color3.fromRGB(0, 150, 255), 2, hrp.Position + hrp.CFrame.LookVector * 6)
+        
+        local tween = TweenService:Create(blueBall, TweenInfo.new(0.6, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {
+            Size = Vector3.new(8, 8, 8),
+            Transparency = 1
+        })
+        tween:Play()
+        tween.Completed:Connect(function() blueBall:Destroy() end)
+    end
+end)
+
+-- 2. PHÍM E: HÁCH (ĐỎ - RED)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.E then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local redBall = createFancyBall(Color3.fromRGB(255, 20, 50), 3, hrp.Position + hrp.CFrame.LookVector * 5)
+        local targetPos = redBall.Position + hrp.CFrame.LookVector * 60
+        
+        local tweenMove = TweenService:Create(redBall, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+            Position = targetPos,
+            Size = Vector3.new(0.5, 0.5, 0.5)
+        })
+        tweenMove:Play()
+        tweenMove.Completed:Connect(function() redBall:Destroy() end)
+    end
+end)
+
+-- 3. PHÍM R: HƯ THỨC TỬ 100% (HOLLOW PURPLE)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.R then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local leftBall = createFancyBall(Color3.fromRGB(0, 150, 255), 2.5, hrp.Position + (hrp.CFrame.RightVector * -4) + (hrp.CFrame.LookVector * 5))
+        local rightBall = createFancyBall(Color3.fromRGB(255, 20, 50), 2.5, hrp.Position + (hrp.CFrame.RightVector * 4) + (hrp.CFrame.LookVector * 5))
+        
+        task.wait(0.5)
+        local midPos = hrp.Position + hrp.CFrame.LookVector * 6
+        TweenService:Create(leftBall, TweenInfo.new(0.2), {Position = midPos, Size = Vector3.new(1,1,1)}):Play()
+        TweenService:Create(rightBall, TweenInfo.new(0.2), {Position = midPos, Size = Vector3.new(1,1,1)}):Play()
+        
+        task.wait(0.2)
+        leftBall:Destroy()
+        rightBall:Destroy()
+        cameraShake(0.2, 1)
+        
+        local purpleBall = createFancyBall(Color3.fromRGB(180, 0, 255), 10, midPos)
+        local targetPos = purpleBall.Position + hrp.CFrame.LookVector * 150
+        
+        local tweenPurple = TweenService:Create(purpleBall, TweenInfo.new(1.2, Enum.EasingStyle.Linear), {
+            Position = targetPos,
+            Size = Vector3.new(20, 20, 20)
+        })
+        tweenPurple:Play()
+        tweenPurple.Completed:Connect(function() purpleBall:Destroy() end)
+    end
+end)
+
+-- 4. PHÍM Y: HƯ THỨC TỬ 200% (MÀN TỤ LỰC KHỔNG LỒ)
+local isCasting200 = false
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Y and not isCasting200 then
+        isCasting200 = true
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then isCasting200 = false return end
+        
+        -- Tạo 2 quả cầu Đỏ và Xanh siêu to khổng lồ
+        local leftBlue = createFancyBall(Color3.fromRGB(0, 150, 255), 8, hrp.Position + (hrp.CFrame.RightVector * -15) + (hrp.CFrame.LookVector * 10))
+        local rightRed = createFancyBall(Color3.fromRGB(255, 20, 50), 8, hrp.Position + (hrp.CFrame.RightVector * 15) + (hrp.CFrame.LookVector * 10))
+        
+        -- Rung màn hình nhẹ khi đang tụ lực
+        cameraShake(2, 0.5)
+        task.wait(1.5)
+        
+        -- Ép 2 quả cầu lại cực mạnh
+        local midPos = hrp.Position + hrp.CFrame.LookVector * 15
+        TweenService:Create(leftBlue, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.In), {Position = midPos}):Play()
+        TweenService:Create(rightRed, TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.In), {Position = midPos}):Play()
+        
+        task.wait(0.5)
+        leftBlue:Destroy()
+        rightRed:Destroy()
+        
+        -- VỤ NỔ 200% KÈM RUNG MÀN HÌNH MẠNH
+        cameraShake(1.5, 3)
+        local megaPurple = createFancyBall(Color3.fromRGB(200, 0, 255), 25, midPos)
+        local targetPos = megaPurple.Position + hrp.CFrame.LookVector * 400 -- Bay siêu xa
+        
+        -- Hiệu ứng bay đi càn quét
+        local tweenMega = TweenService:Create(megaPurple, TweenInfo.new(2, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {
+            Position = targetPos,
+            Size = Vector3.new(60, 60, 60) -- Kích thước khổng lồ
+        })
+        tweenMega:Play()
+        
+        tweenMega.Completed:Connect(function() 
+            megaPurple:Destroy() 
+            isCasting200 = false
+        end)
+    end
+end)
+
+-- 5. PHÍM T: LÃNH ĐỊA NHÃN TẠNG
+local domainActive = false
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.T and not domainActive then
+        domainActive = true
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local domain = Instance.new("Part")
+        domain.Shape = Enum.PartType.Ball
+        domain.Size = Vector3.new(1, 1, 1)
+        domain.Color = Color3.fromRGB(15, 15, 30)
+        domain.Material = Enum.Material.ForceField -- Đổi sang ForceField cho giống Lãnh Địa lưới
+        domain.Anchored = true
+        domain.CanCollide = false
+        domain.Position = hrp.Position
+        domain.Parent = workspace
+        
+        TweenService:Create(domain, TweenInfo.new(1.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {
+            Size = Vector3.new(120, 120, 120)
+        }):Play()
+        
+        task.wait(8)
+        local shrink = TweenService:Create(domain, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Size = Vector3.new(0, 0, 0),
+            Transparency = 1
+        })
+        shrink:Play()
+        shrink.Completed:Connect(function() 
+            domain:Destroy() 
+            domainActive = false
+        end)
+    end
+end)
