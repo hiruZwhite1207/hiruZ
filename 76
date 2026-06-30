@@ -1,0 +1,179 @@
+--========================================================
+-- GOJO SATORU - MANGA ORBIT PATH 200% (V6)
+-- Quỹ đạo Xanh Đỏ bay vòng cung bo cua trước khi hợp thể Tử 200%
+--========================================================
+local Player = game:GetService("Players").LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+
+-- HÀM: Rung màn hình
+local function cameraShake(duration, intensity)
+    local startTime = os.clock()
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        if os.clock() - startTime < duration then
+            local offsetX = (math.random() - 0.5) * intensity
+            local offsetY = (math.random() - 0.5) * intensity
+            Camera.CFrame = Camera.CFrame * CFrame.Angles(math.rad(offsetX), math.rad(offsetY), 0)
+        else
+            connection:Disconnect()
+        end
+    end)
+end
+
+-- HÀM: Tạo Quả Cầu Năng Lượng Anime ForceField
+local function createAnimeAuraBall(color, size, position)
+    local core = Instance.new("Part")
+    core.Shape = Enum.PartType.Ball
+    core.Size = Vector3.new(size * 0.5, size * 0.5, size * 0.5)
+    core.Color = Color3.new(1, 1, 1)
+    core.Material = Enum.Material.Neon
+    core.Anchored = true
+    core.CanCollide = false
+    core.Position = position
+    core.Parent = workspace
+    
+    local aura = Instance.new("Part")
+    aura.Shape = Enum.PartType.Ball
+    aura.Size = Vector3.new(size, size, size)
+    aura.Color = color
+    aura.Material = Enum.Material.ForceField
+    aura.Anchored = true
+    aura.CanCollide = false
+    aura.CFrame = core.CFrame
+    aura.Parent = core
+    
+    local light = Instance.new("PointLight", core)
+    light.Color = color
+    light.Range = size * 3
+    light.Brightness = 2
+    
+    RunService.RenderStepped:Connect(function()
+        if core.Parent then
+            aura.CFrame = core.CFrame * CFrame.Angles(math.rad(math.random(-10,10)), math.rad(math.random(-10,10)), 0)
+        end
+    end)
+    
+    return core
+end
+
+local function applyRecoil(distance)
+    local hrp = Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    local targetCFrame = hrp.CFrame * CFrame.new(0, 0, distance)
+    TweenService:Create(hrp, TweenInfo.new(0.15, Enum.EasingStyle.QuadOut), {CFrame = targetCFrame}):Play()
+end
+
+-- CHIÊU THƯỜNG Q, E, R (GIỮ NGUYÊN TỐC ĐỘ BAY VÈO CHỚP NHOÁNG)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    local hrp = Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    if input.KeyCode == Enum.KeyCode.Q then
+        local blueBall = createAnimeAuraBall(Color3.fromRGB(0, 120, 255), 3, hrp.Position + hrp.CFrame.LookVector * 7)
+        cameraShake(0.15, 0.6)
+        applyRecoil(3)
+        local tween = TweenService:Create(blueBall, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = blueBall.Position + hrp.CFrame.LookVector * 200})
+        tween:Play()
+        tween.Completed:Connect(function() blueBall:Destroy() end)
+        
+    elseif input.KeyCode == Enum.KeyCode.E then
+        local redBall = createAnimeAuraBall(Color3.fromRGB(255, 30, 60), 4, hrp.Position + hrp.CFrame.LookVector * 7)
+        cameraShake(0.15, 0.8)
+        applyRecoil(5)
+        local tween = TweenService:Create(redBall, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = redBall.Position + hrp.CFrame.LookVector * 200})
+        tween:Play()
+        tween.Completed:Connect(function() redBall:Destroy() end)
+        
+    elseif input.KeyCode == Enum.KeyCode.R then
+        local leftBlue = createAnimeAuraBall(Color3.fromRGB(0, 120, 255), 3.5, hrp.Position + (hrp.CFrame.RightVector * -4) + (hrp.CFrame.LookVector * 6))
+        local rightRed = createAnimeAuraBall(Color3.fromRGB(255, 30, 60), 3.5, hrp.Position + (hrp.CFrame.RightVector * 4) + (hrp.CFrame.LookVector * 6))
+        local midPos = hrp.Position + hrp.CFrame.LookVector * 7
+        TweenService:Create(leftBlue, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = midPos}):Play()
+        TweenService:Create(rightRed, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = midPos}):Play()
+        task.wait(0.2)
+        leftBlue:Destroy()
+        rightRed:Destroy()
+        local purpleBall = createAnimeAuraBall(Color3.fromRGB(160, 0, 255), 15, midPos)
+        cameraShake(0.3, 2)
+        applyRecoil(7)
+        local tween = TweenService:Create(purpleBall, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = purpleBall.Position + hrp.CFrame.LookVector * 300})
+        tween:Play()
+        tween.Completed:Connect(function() purpleBall:Destroy() end)
+    end
+end)
+
+-- 4. PHÍM Y: HƯ THỨC TỬ 200% - QUỸ ĐẠO BAY VÒNG CUNG CHUẨN SHINJUKU MANGA
+local isCasting200 = false
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Y and not isCasting200 then
+        isCasting200 = true
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then isCasting200 = false return end
+        
+        -- 1. Gojo lơ lửng bay lên (Mượt mà bằng vật lý)
+        local bp = Instance.new("BodyPosition")
+        bp.MaxForce = Vector3.new(0, math.huge, 0)
+        bp.Position = hrp.Position + Vector3.new(0, 45, 0)
+        bp.Parent = hrp
+        
+        local bg = Instance.new("BodyGyro")
+        bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        bg.CFrame = hrp.CFrame
+        bg.Parent = hrp
+        
+        task.wait(2)
+        
+        local startPos = hrp.Position + hrp.CFrame.LookVector * 10
+        local midPos = hrp.Position + hrp.CFrame.LookVector * 45 -- Điểm đích hợp thể ở xa phía trước
+        
+        -- Tạo Xanh Đỏ ngay trước mặt Gojo trước khi bắn vòng vèo
+        local blueBall = createAnimeAuraBall(Color3.fromRGB(0, 120, 255), 20, startPos)
+        local redBall = createAnimeAuraBall(Color3.fromRGB(255, 30, 60), 20, startPos)
+        
+        -- TỌA ĐỘ ĐIỂM BẺ CONG (Tạo hình chữ V dạt ra ngoài theo sơ đồ `/ \`)
+        local leftCurve = startPos + (hrp.CFrame.RightVector * -35) + (hrp.CFrame.LookVector * 20)
+        local rightCurve = startPos + (hrp.CFrame.RightVector * 35) + (hrp.CFrame.LookVector * 20)
+        
+        -- 2. GIAI ĐOẠN 1: Bắn dạt rộng ra hai bên cánh (Mất 2 giây)
+        cameraShake(2, 0.8)
+        TweenService:Create(blueBall, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = leftCurve}):Play()
+        TweenService:Create(redBall, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = rightCurve}):Play()
+        task.wait(2)
+        
+        -- 3. GIAI ĐOẠN 2: Từ hai bên cánh bẻ lái bo cua ôm ngược vào điểm giữa (Mất 2.5 giây)
+        cameraShake(2.5, 1.5)
+        TweenService:Create(blueBall, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Position = midPos}):Play()
+        TweenService:Create(redBall, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Position = midPos}):Play()
+        task.wait(2.5)
+        
+        blueBall:Destroy()
+        redBall:Destroy()
+        
+        -- 4. KHAI TRIỂN TỬ 200% KHỔNG LỒ + RECOIL TRÊN KHÔNG
+        cameraShake(2.5, 5)
+        local megaPurple = createAnimeAuraBall(Color3.fromRGB(180, 0, 255), 55, midPos)
+        local targetPos = megaPurple.Position + hrp.CFrame.LookVector * 1000
+        
+        -- Giật lùi Gojo về sau cực mạnh khi bung chiêu
+        TweenService:Create(hrp, TweenInfo.new(0.3, Enum.EasingStyle.QuadOut), {CFrame = hrp.CFrame * CFrame.new(0, 0, 15)}):Play()
+        
+        -- Bắn vèo cái mất hút
+        local tweenMega = TweenService:Create(megaPurple, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Position = targetPos,
+            Size = Vector3.new(100, 100, 100)
+        })
+        tweenMega:Play()
+        tweenMega.Completed:Connect(function() megaPurple:Destroy() end)
+        
+        task.wait(0.5)
+        bp:Destroy()
+        bg:Destroy()
+        isCasting200 = false
+    end
+end)
