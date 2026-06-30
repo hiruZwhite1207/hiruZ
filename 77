@@ -1,0 +1,172 @@
+--========================================================
+-- GOJO SATORU - MANGA ACCURATE NO LAG FIX (V7)
+-- BỎ RUNG - KHÔNG CHÓI MÙ MẮT - CHIÊU THƯỜNG BAY CHẬM - TỬ 200% TRÊN ĐẦU
+--========================================================
+local Player = game:GetService("Players").LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- HÀM: Tạo quả cầu năng lượng mượt, không dùng PointLight để chống lóa như Screenshot_20260630-211815.jpg
+local function createCleanBall(color, size, position)
+    local core = Instance.new("Part")
+    core.Shape = Enum.PartType.Ball
+    core.Size = Vector3.new(size * 0.4, size * 0.4, size * 0.4)
+    core.Color = color
+    core.Material = Enum.Material.Neon -- Lõi neon nhỏ vừa phải để lấy màu sắc
+    core.Anchored = true
+    core.CanCollide = false
+    core.Position = position
+    core.Parent = workspace
+    
+    local aura = Instance.new("Part")
+    aura.Shape = Enum.PartType.Ball
+    aura.Size = Vector3.new(size, size, size)
+    aura.Color = color
+    aura.Material = Enum.Material.ForceField -- Vỏ cuộn năng lượng anime không phát sáng lóa
+    aura.Anchored = true
+    aura.CanCollide = false
+    aura.CFrame = core.CFrame
+    aura.Parent = core
+    
+    -- Xoay nhẹ vỏ năng lượng cho sinh động
+    RunService.RenderStepped:Connect(function()
+        if core.Parent then
+            aura.CFrame = core.CFrame * CFrame.Angles(math.rad(math.random(-5,5)), math.rad(math.random(-5,5)), 0)
+        end
+    end)
+    
+    return core
+end
+
+-- 1. PHÍM Q: THƯƠNG (XANH) - Bay từ từ (1 giây)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Q then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local blueBall = createCleanBall(Color3.fromRGB(0, 100, 255), 3, hrp.Position + hrp.CFrame.LookVector * 6)
+        local targetPos = blueBall.Position + hrp.CFrame.LookVector * 120
+        
+        local tween = TweenService:Create(blueBall, TweenInfo.new(1.0, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Position = targetPos
+        })
+        tween:Play()
+        tween.Completed:Connect(function() blueBall:Destroy() end)
+    end
+end)
+
+-- 2. PHÍM E: HÁCH (ĐỎ) - Bay từ từ (1 giây)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.E then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local redBall = createCleanBall(Color3.fromRGB(255, 0, 50), 3.5, hrp.Position + hrp.CFrame.LookVector * 6)
+        local targetPos = redBall.Position + hrp.CFrame.LookVector * 120
+        
+        local tween = TweenService:Create(redBall, TweenInfo.new(1.0, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Position = targetPos
+        })
+        tween:Play()
+        tween.Completed:Connect(function() redBall:Destroy() end)
+    end
+end)
+
+-- 3. PHÍM R: HƯ THỨC TỬ 100% - Ép từ từ rồi bắn chậm rãi
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.R then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local leftBlue = createCleanBall(Color3.fromRGB(0, 100, 255), 3, hrp.Position + (hrp.CFrame.RightVector * -5) + (hrp.CFrame.LookVector * 6))
+        local rightRed = createCleanBall(Color3.fromRGB(255, 0, 50), 3, hrp.Position + (hrp.CFrame.RightVector * 5) + (hrp.CFrame.LookVector * 6))
+        
+        local midPos = hrp.Position + hrp.CFrame.LookVector * 7
+        TweenService:Create(leftBlue, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = midPos}):Play()
+        TweenService:Create(rightRed, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = midPos}):Play()
+        
+        task.wait(0.6)
+        leftBlue:Destroy()
+        rightRed:Destroy()
+        
+        local purpleBall = createCleanBall(Color3.fromRGB(140, 0, 255), 12, midPos)
+        local targetPos = purpleBall.Position + hrp.CFrame.LookVector * 180
+        
+        local tween = TweenService:Create(purpleBall, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Position = targetPos
+        })
+        tween:Play()
+        tween.Completed:Connect(function() purpleBall:Destroy() end)
+    end
+end)
+
+-- 4. PHÍM Y: HƯ THỨC TỬ 200% - CHUẨN MANGA (TỤ TRÊN ĐẦU SIÊU CHẬM)
+local isCasting200 = false
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Y and not isCasting200 then
+        isCasting200 = true
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then isCasting200 = false return end
+        
+        -- 1. Dùng lực vật lý đưa Gojo bay lơ lửng lên trời mượt mà
+        local bp = Instance.new("BodyPosition")
+        bp.MaxForce = Vector3.new(0, math.huge, 0)
+        bp.Position = hrp.Position + Vector3.new(0, 40, 0)
+        bp.Parent = hrp
+        
+        local bg = Instance.new("BodyGyro")
+        bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        bg.CFrame = hrp.CFrame
+        bg.Parent = hrp
+        
+        task.wait(2)
+        
+        -- Vị trí TRÊN ĐẦU nhân vật (Cộng thêm 15 studs theo trục Y hướng lên trên)
+        local topHeadPos = hrp.Position + Vector3.new(0, 15, 0)
+        local midTargetPos = topHeadPos + hrp.CFrame.LookVector * 30 -- Điểm giao nhau ở phía trước trên cao
+        
+        -- 2. Tạo 2 quả cầu Xanh Đỏ TRÊN ĐẦU, dạt rộng sang hai bên cánh theo hình chữ V (/ \)
+        local blueBall = createCleanBall(Color3.fromRGB(0, 100, 255), 18, topHeadPos)
+        local redBall = createCleanBall(Color3.fromRGB(255, 0, 50), 18, topHeadPos)
+        
+        local leftCurve = topHeadPos + (hrp.CFrame.RightVector * -30) + (hrp.CFrame.LookVector * 15)
+        local rightCurve = topHeadPos + (hrp.CFrame.RightVector * 30) + (hrp.CFrame.LookVector * 15)
+        
+        -- Giai đoạn 1: Bắn dạt ra hai góc (2 giây)
+        TweenService:Create(blueBall, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = leftCurve}):Play()
+        TweenService:Create(redBall, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = rightCurve}):Play()
+        task.wait(2)
+        
+        -- Giai đoạn 2: Ép lượn vòng cung ngược vào điểm giữa TRÊN CAO (3 giây - Tổng cộng 5s tụ lực siêu chậm)
+        TweenService:Create(blueBall, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Position = midTargetPos}):Play()
+        TweenService:Create(redBall, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Position = midTargetPos}):Play()
+        task.wait(3)
+        
+        blueBall:Destroy()
+        redBall:Destroy()
+        
+        -- 3. GIẢI PHÓNG TỬ 200% KHỔNG LỒ TỪ TRÊN CAO BẮN XUỐNG
+        local megaPurple = createCleanBall(Color3.fromRGB(140, 0, 255), 45, midTargetPos)
+        local targetPos = megaPurple.Position + hrp.CFrame.LookVector * 600
+        
+        -- Bay đi càn quét với tốc độ vừa phải, nhìn cực hoành tráng (1.5 giây)
+        local tweenMega = TweenService:Create(megaPurple, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Position = targetPos,
+            Size = Vector3.new(80, 80, 80)
+        })
+        tweenMega:Play()
+        tweenMega.Completed:Connect(function() megaPurple:Destroy() end)
+        
+        -- Hạ cánh rơi tự do xuống đất
+        task.wait(0.5)
+        bp:Destroy()
+        bg:Destroy()
+        isCasting200 = false
+    end
+end)
