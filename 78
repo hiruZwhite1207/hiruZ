@@ -1,0 +1,171 @@
+--========================================================
+-- GOJO SATORU - EXPLOSIVE ANIME EDITION (V9)
+-- THÊM HIỆU ỨNG NỔ XUNG KÍCH LÚC HỢP THỂ & LÚC CHẠM ĐÍCH
+--========================================================
+local Player = game:GetService("Players").LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- *** CÀI ĐẶT ANIMATION ID (ĐIỀN ID CỦA ÔNG VÀO ĐÂY NHÉ) ***
+local ANIM_IDS = {
+	["Bay"] = "rbxassetid://13110271569",     
+	["Hách"] = "rbxassetid://0000000000",    
+	["Ép_Tử_100"] = "rbxassetid://0000000000", 
+	["Tụ_Tử_200"] = "rbxassetid://0000000000" 
+}
+local CurrentAnimations = {}
+
+local function playAnim(name)
+	local id = ANIM_IDS[name]
+	if not id or id == "rbxassetid://0000000000" then return end
+	if CurrentAnimations[name] and CurrentAnimations[name].IsPlaying then CurrentAnimations[name]:Stop() end
+	local anim = Instance.new("Animation")
+	anim.AnimationId = id
+	local track = Humanoid:LoadAnimation(anim)
+	CurrentAnimations[name] = track
+	track:Play()
+	track.Looped = (name == "Bay")
+	return track
+end
+
+local function stopAnim(name)
+	if CurrentAnimations[name] then CurrentAnimations[name]:Stop() end
+end
+
+-- HÀM: TẠO VỤ NỔ XUNG KÍCH (Không chói mắt)
+local function createExplosion(position, maxSize, color, duration)
+	local blast = Instance.new("Part")
+	blast.Shape = Enum.PartType.Ball
+	blast.Material = Enum.Material.ForceField -- Dùng ForceField để nổ cuộn sóng ngầu mà không chói
+	blast.Color = color
+	blast.Size = Vector3.new(1, 1, 1)
+	blast.Position = position
+	blast.Anchored = true
+	blast.CanCollide = false
+	blast.Parent = workspace
+	
+	-- Tween phình to vụ nổ và làm mờ dần
+	local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out)
+	local tween = TweenService:Create(blast, tweenInfo, {
+		Size = Vector3.new(maxSize, maxSize, maxSize),
+		Transparency = 1 -- Mờ dần đi đến vô hình
+	})
+	tween:Play()
+	tween.Completed:Connect(function() blast:Destroy() end)
+end
+
+-- HÀM: QUẢ CẦU NĂNG LƯỢNG ANIME CỐT LÕI
+local function createAnimeEnergyBall(color, size, position)
+	local corePart = Instance.new("Part")
+	corePart.Shape = Enum.PartType.Ball
+	corePart.Size = Vector3.new(size * 0.4, size * 0.4, size * 0.4)
+	corePart.Color = color
+	corePart.Material = Enum.Material.Neon
+	corePart.Anchored = true
+	corePart.CanCollide = false
+	corePart.Position = position
+	corePart.Parent = workspace
+	
+	local attach0 = Instance.new("Attachment", corePart)
+	
+	local emitter_Core = Instance.new("ParticleEmitter", attach0)
+	emitter_Core.Color = ColorSequence.new(color)
+	emitter_Core.Size = NumberSequence.new({NumberSequenceKeypoint.new(0, size*0.5), NumberSequenceKeypoint.new(1, 0)})
+	emitter_Core.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0, 0.2), NumberSequenceKeypoint.new(1, 1)})
+	emitter_Core.Lifetime = NumberRange.new(0.2, 0.4)
+	emitter_Core.Rate = 200
+	emitter_Core.Speed = NumberRange.new(0, 2)
+	emitter_Core.EmissionDirection = Enum.NormalId.Back
+	emitter_Core.Texture = "rbxassetid://1360000000" 
+	emitter_Core.LightEmission = 1
+	emitter_Core.Orientation = Enum.ParticleOrientation.VelocityPerpendicular
+	emitter_Core.LockedToPart = true
+	
+	return corePart
+end
+
+local function applyRecoil(distance)
+	local hrp = Character:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+	local targetCFrame = hrp.CFrame * CFrame.new(0, 0, distance)
+	TweenService:Create(hrp, TweenInfo.new(0.15, Enum.EasingStyle.QuadOut), {CFrame = targetCFrame}):Play()
+end
+
+-- PHÍM Y: HƯ THỨC TỬ 200% (CÓ NỔ BÙM BÙM)
+local isCasting200 = false
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.Y and not isCasting200 then
+		isCasting200 = true
+		local hrp = Character:FindFirstChild("HumanoidRootPart")
+		if not hrp then isCasting200 = false return end
+		
+		-- Bay lên
+		local bp = Instance.new("BodyPosition")
+		bp.MaxForce = Vector3.new(0, math.huge, 0)
+		bp.Position = hrp.Position + Vector3.new(0, 45, 0)
+		bp.Parent = hrp
+		
+		local bg = Instance.new("BodyGyro")
+		bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+		bg.CFrame = hrp.CFrame
+		bg.Parent = hrp
+		
+		playAnim("Bay")
+		task.wait(2)
+		stopAnim("Bay")
+		
+		-- TỌA ĐỘ TRÊN ĐẦU
+		local topHeadPos = hrp.Position + Vector3.new(0, 18, 0)
+		local midTargetPos = topHeadPos + hrp.CFrame.LookVector * 35
+		
+		local blueBall = createAnimeEnergyBall(Color3.fromRGB(0, 191, 255), 22, topHeadPos)
+		local redBall = createAnimeEnergyBall(Color3.fromRGB(255, 0, 77), 22, topHeadPos)
+		
+		local leftCurve = topHeadPos + (hrp.CFrame.RightVector * -35) + (hrp.CFrame.LookVector * 20)
+		local rightCurve = topHeadPos + (hrp.CFrame.RightVector * 35) + (hrp.CFrame.LookVector * 20)
+		
+		local castTrack = playAnim("Tụ_Tử_200")
+		
+		-- Ép vòng cung
+		TweenService:Create(blueBall, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = leftCurve}):Play()
+		TweenService:Create(redBall, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = rightCurve}):Play()
+		task.wait(2)
+		
+		TweenService:Create(blueBall, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Position = midTargetPos}):Play()
+		TweenService:Create(redBall, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Position = midTargetPos}):Play()
+		task.wait(3)
+		
+		blueBall:Destroy()
+		redBall:Destroy()
+		
+		-- NỔ LÚC HỢP THỂ (Xung kích sóng Tím trên không)
+		createExplosion(midTargetPos, 120, Color3.fromRGB(148, 0, 211), 1.0)
+		
+		-- TẠO TỬ 200% VÀ BẮN
+		local megaPurple = createAnimeEnergyBall(Color3.fromRGB(148, 0, 211), 55, midTargetPos)
+		local targetPos = megaPurple.Position + hrp.CFrame.LookVector * 1000
+		
+		applyRecoil(15) -- Giật lùi mạnh
+		
+		local tweenMega = TweenService:Create(megaPurple, TweenInfo.new(1.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			Position = targetPos, Size = Vector3.new(100, 100, 100)
+		})
+		tweenMega:Play()
+		
+		tweenMega.Completed:Connect(function() 
+			-- NỔ TUNG LÚC KẾT THÚC ĐƯỜNG ĐẠN
+			createExplosion(megaPurple.Position, 250, Color3.fromRGB(148, 0, 211), 1.5)
+			megaPurple:Destroy() 
+			if castTrack then castTrack:Stop() end 
+		end)
+		
+		task.wait(0.5)
+		bp:Destroy()
+		bg:Destroy()
+		isCasting200 = false
+	end
+end)
