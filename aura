@@ -1,0 +1,49 @@
+--========================================================
+-- FE GHOST MODE (TÀNG HÌNH VẪN TƯƠNG TÁC ĐƯỢC) - SLAP TOWERS 2
+--========================================================
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+
+local function BecomeGhost()
+    -- 1. Xóa toàn bộ phụ kiện, quần áo để không bị lộ
+    for _, v in pairs(Character:GetChildren()) do
+        if v:IsA("Accessory") or v:IsA("Shirt") or v:IsA("Pants") or v:IsA("CharacterMesh") or v:IsA("ShirtGraphic") then
+            v:Destroy()
+        end
+    end
+
+    -- 2. Tàng hình các bộ phận cơ thể và xóa lưới đồ họa (Mesh)
+    for _, part in pairs(Character:GetDescendants()) do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+            -- Tắt bóng và làm trong suốt
+            part.CastShadow = false
+            part.Transparency = 1
+            
+            -- Xóa luôn khung 3D (nếu có) để người khác không nhìn thấy hình thù
+            local mesh = part:FindFirstChildWhichIsA("SpecialMesh") or part:FindFirstChildWhichIsA("Mesh")
+            if mesh then mesh:Destroy() end
+            
+        elseif part:IsA("Decal") or part:IsA("Texture") then
+            -- Xóa biểu cảm khuôn mặt
+            part:Destroy()
+        end
+    end
+    
+    -- 3. Ẩn luôn thanh tên trên đầu (Nametag)
+    local head = Character:FindFirstChild("Head")
+    if head and head:FindFirstChildWhichIsA("BillboardGui") then
+        head:FindFirstChildWhichIsA("BillboardGui"):Destroy()
+    end
+end
+
+BecomeGhost()
+
+-- Giữ cho nhân vật luôn tàng hình kể cả khi game cố load lại
+Character.DescendantAdded:Connect(function(descendant)
+    task.wait(0.1)
+    if descendant:IsA("Accessory") or descendant:IsA("Decal") then
+        descendant:Destroy()
+    elseif descendant:IsA("BasePart") and descendant.Name ~= "HumanoidRootPart" then
+        descendant.Transparency = 1
+    end
+end)
