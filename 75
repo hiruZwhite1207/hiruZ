@@ -1,0 +1,191 @@
+--========================================================
+-- GOJO SATORU - ANIME & MANGA ACCURATE VFX (V3)
+-- Hiệu ứng Hào quang cuộn, Bay chậm, Tụ lực 200% siêu chậm
+--========================================================
+local Player = game:GetService("Players").LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+
+-- HÀM: Rung màn hình
+local function cameraShake(duration, intensity)
+    local startTime = os.clock()
+    local connection
+    connection = RunService.RenderStepped:Connect(function()
+        if os.clock() - startTime < duration then
+            local offsetX = (math.random() - 0.5) * intensity
+            local offsetY = (math.random() - 0.5) * intensity
+            Camera.CFrame = Camera.CFrame * CFrame.Angles(math.rad(offsetX), math.rad(offsetY), 0)
+        else
+            connection:Disconnect()
+        end
+    end)
+end
+
+-- HÀM: Tạo Quả Cầu Cấu Trúc Anime (Lõi chói + Vỏ Hào quang cuộn)
+local function createAnimeAuraBall(color, size, position)
+    -- Lõi đặc sáng chói
+    local core = Instance.new("Part")
+    core.Shape = Enum.PartType.Ball
+    core.Size = Vector3.new(size * 0.7, size * 0.7, size * 0.7)
+    core.Color = Color3.new(1, 1, 1) -- Lõi luôn trắng sáng
+    core.Material = Enum.Material.Neon
+    core.Anchored = true
+    core.CanCollide = false
+    core.Position = position
+    core.Parent = workspace
+    
+    -- Vỏ năng lượng cuộn bên ngoài (Dùng ForceField siêu ảo)
+    local aura = Instance.new("Part")
+    aura.Shape = Enum.PartType.Ball
+    aura.Size = Vector3.new(size, size, size)
+    aura.Color = color
+    aura.Material = Enum.Material.ForceField
+    aura.Anchored = true
+    aura.CanCollide = false
+    aura.CFrame = core.CFrame
+    aura.Parent = core
+    
+    -- Ánh sáng hắt ra
+    local light = Instance.new("PointLight", core)
+    light.Color = color
+    light.Range = size * 4
+    light.Brightness = 5
+    
+    -- Cập nhật vỏ chạy theo lõi
+    RunService.RenderStepped:Connect(function()
+        if core.Parent then
+            aura.CFrame = core.CFrame * CFrame.Angles(math.rad(math.random(-5,5)), math.rad(math.random(-5,5)), 0)
+        end
+    end)
+    
+    return core
+end
+
+-- 1. PHÍM Q: THƯƠNG (XANH) - Bay chậm lại, có lực hơn
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Q then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local blueBall = createAnimeAuraBall(Color3.fromRGB(0, 100, 255), 3, hrp.Position + hrp.CFrame.LookVector * 5)
+        local targetPos = blueBall.Position + hrp.CFrame.LookVector * 100
+        
+        -- Bay mất 0.8 giây (chậm hơn bản trước để thấy rõ)
+        local tween = TweenService:Create(blueBall, TweenInfo.new(0.8, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out), {
+            Position = targetPos, Size = Vector3.new(5,5,5)
+        })
+        tween:Play()
+        tween.Completed:Connect(function() blueBall:Destroy() end)
+    end
+end)
+
+-- 2. PHÍM E: HÁCH (ĐỎ) - Lực đẩy mạnh, bay từ từ
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.E then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local redBall = createAnimeAuraBall(Color3.fromRGB(255, 0, 50), 4, hrp.Position + hrp.CFrame.LookVector * 5)
+        local targetPos = redBall.Position + hrp.CFrame.LookVector * 120
+        
+        local tweenMove = TweenService:Create(redBall, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Position = targetPos
+        })
+        cameraShake(0.3, 0.5)
+        tweenMove:Play()
+        tweenMove.Completed:Connect(function() redBall:Destroy() end)
+    end
+end)
+
+-- 3. PHÍM R: HƯ THỨC TỬ 100% - Hợp nhất nhìn rõ ràng
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.R then
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        local leftBlue = createAnimeAuraBall(Color3.fromRGB(0, 100, 255), 3, hrp.Position + (hrp.CFrame.RightVector * -4) + (hrp.CFrame.LookVector * 5))
+        local rightRed = createAnimeAuraBall(Color3.fromRGB(255, 0, 50), 3, hrp.Position + (hrp.CFrame.RightVector * 4) + (hrp.CFrame.LookVector * 5))
+        
+        -- Mất 0.6s để ép vào nhau (chậm hơn)
+        local midPos = hrp.Position + hrp.CFrame.LookVector * 6
+        TweenService:Create(leftBlue, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = midPos}):Play()
+        TweenService:Create(rightRed, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Position = midPos}):Play()
+        
+        task.wait(0.6)
+        leftBlue:Destroy()
+        rightRed:Destroy()
+        
+        local purpleBall = createAnimeAuraBall(Color3.fromRGB(150, 0, 255), 14, midPos)
+        local targetPos = purpleBall.Position + hrp.CFrame.LookVector * 200
+        
+        cameraShake(0.6, 2)
+        -- Bay mất 1.2s càn quét
+        local tweenPurple = TweenService:Create(purpleBall, TweenInfo.new(1.2, Enum.EasingStyle.Linear), {
+            Position = targetPos, Size = Vector3.new(20, 20, 20)
+        })
+        tweenPurple:Play()
+        tweenPurple.Completed:Connect(function() purpleBall:Destroy() end)
+    end
+end)
+
+-- 4. PHÍM Y: HƯ THỨC TỬ 200% - ĐÚNG CHUẨN TRẬN SHINJUKU
+local isCasting200 = false
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.Y and not isCasting200 then
+        isCasting200 = true
+        local hrp = Character:FindFirstChild("HumanoidRootPart")
+        if not hrp then isCasting200 = false return end
+        
+        -- 1. Từ từ lơ lửng bay lên cao
+        hrp.Anchored = true
+        local floatCFrame = hrp.CFrame + Vector3.new(0, 40, 0)
+        TweenService:Create(hrp, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = floatCFrame}):Play()
+        task.wait(2)
+        
+        -- 2. Ra 2 quả cầu siêu to ở xa
+        local leftBlue = createAnimeAuraBall(Color3.fromRGB(0, 100, 255), 20, floatCFrame.Position + (floatCFrame.RightVector * -30) + (floatCFrame.LookVector * 20))
+        local rightRed = createAnimeAuraBall(Color3.fromRGB(255, 0, 50), 20, floatCFrame.Position + (floatCFrame.RightVector * 30) + (floatCFrame.LookVector * 20))
+        
+        -- 3. TỤ LỰC SIÊU CHẬM (5 GIÂY) NHƯ ĐANG ĐỌC CHÚ TỪ
+        local midPos = floatCFrame.Position + floatCFrame.LookVector * 30
+        -- Dùng Tween 5 giây để mô phỏng 2 quả cầu nhích lại gần nhau cực kỳ khó khăn
+        TweenService:Create(leftBlue, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Position = midPos}):Play()
+        TweenService:Create(rightRed, TweenInfo.new(5, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Position = midPos}):Play()
+        
+        -- Rung màn hình từ nhẹ đến mạnh dần
+        for i = 1, 5 do
+            cameraShake(1, i * 0.5)
+            task.wait(1)
+        end
+        
+        leftBlue:Destroy()
+        rightRed:Destroy()
+        
+        -- 4. BÙM! VỤ NỔ HƯ THỨC TỬ 200% KHỔNG LỒ
+        cameraShake(3, 5) -- Rung cực bạo
+        local megaPurple = createAnimeAuraBall(Color3.fromRGB(180, 0, 255), 50, midPos)
+        local targetPos = megaPurple.Position + floatCFrame.LookVector * 800
+        
+        -- Bắn ra càn quét chậm rãi nhưng hủy diệt (mất 2.5 giây bay)
+        local tweenMega = TweenService:Create(megaPurple, TweenInfo.new(2.5, Enum.EasingStyle.Cubic, Enum.EasingDirection.In), {
+            Position = targetPos,
+            Size = Vector3.new(120, 120, 120) -- Lớn kinh dị
+        })
+        tweenMega:Play()
+        
+        tweenMega.Completed:Connect(function() 
+            megaPurple:Destroy() 
+        end)
+        
+        task.wait(1)
+        hrp.Anchored = false -- Thả rơi tự do
+        isCasting200 = false
+    end
+end)
