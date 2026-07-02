@@ -1,0 +1,356 @@
+-- ===== PHẦN KHỞI TẠO (BẮT BUỘC) =====
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "HTD.roblox",
+    SubTitle = "Blox Fruit",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(500, 450),
+    Acrylic = true,
+    Theme = "Dark",
+    Image = "rbxassetid://128185233852",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+-- Khai báo các tab (chỉ tên, chưa có nội dung)
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "home" }),
+    Farming = Window:AddTab({ Title = "Farming", Icon = "sword" }),
+    Fishing = Window:AddTab({ Title = "Fishing", Icon = "fish" }),
+    Item = Window:AddTab({ Title = "Item", Icon = "gift" }),
+    SeaEvent = Window:AddTab({ Title = "Sea Event", Icon = "ship" }),
+    Volcano = Window:AddTab({ Title = "Volcano", Icon = "fire" }),
+    DragonDojo = Window:AddTab({ Title = "Dragon Dojo", Icon = "dragon" }),
+    FruitRaid = Window:AddTab({ Title = "Fruit Raid/Dungeon", Icon = "cube" }),
+    ESP = Window:AddTab({ Title = "ESP", Icon = "eye" }),
+    PvP = Window:AddTab({ Title = "PvP", Icon = "crosshair" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "sliders" })
+}
+
+local Options = Fluent.Options
+-- ===== TAB FARMING =====
+local FarmTab = Tabs.Farming
+
+FarmTab:AddDropdown("WeaponSelect", {
+    Title = "Select Weapon",
+    Values = {"Melee", "Sword", "Fruit", "Gun"},
+    Default = "Melee"
+})
+
+FarmTab:AddToggle("FarmLever", { Title = "Farm Lever", Default = false })
+FarmTab:AddToggle("FarmKatakuri", { Title = "Farm Katakuri", Default = false })
+FarmTab:AddToggle("FarmBone", { Title = "Farm Bone", Default = false })
+FarmTab:AddToggle("AutoFarmChests", { Title = "Auto Farm Chests", Default = false })
+FarmTab:AddToggle("FlyFarmChests", { Title = "Fly Farm Chests", Default = false })
+
+FarmTab:AddInput("TeleportInput", {
+    Title = "Teleport to (Position or Name)",
+    Default = "Island",
+    Placeholder = "Nhập tọa độ hoặc tên đảo..."
+})
+FarmTab:AddButton({
+    Title = "Teleport",
+    Callback = function()
+        local target = Options.TeleportInput.Value
+        print("Teleport to: " .. target)
+    end
+})
+
+FarmTab:AddToggle("AutoCollectFruit", { Title = "Auto Collect Fruit", Default = false })
+FarmTab:AddToggle("AutoCollectFruitHop", { Title = "Auto Collect Fruit (Hop Server)", Default = false })
+
+FarmTab:AddParagraph({ Title = "── Boss Farm ──", Content = "" })
+FarmTab:AddDropdown("BossSea1", {
+    Title = "Sea 1 - Select Boss",
+    Values = {"Boss A", "Boss B", "Boss C"},
+    Default = "Boss A"
+})
+FarmTab:AddToggle("AutoFarmBossSea1", { Title = "Auto Farm Boss (Sea 1)", Default = false })
+
+FarmTab:AddDropdown("BossSea2", {
+    Title = "Sea 2 - Select Boss",
+    Values = {"Boss X", "Boss Y", "Boss Z"},
+    Default = "Boss X"
+})
+FarmTab:AddToggle("AutoFarmBossSea2", { Title = "Auto Farm Boss (Sea 2)", Default = false })
+
+FarmTab:AddDropdown("BossSea3", {
+    Title = "Sea 3 - Select Boss",
+    Values = {"Boss P", "Boss Q", "Boss R"},
+    Default = "Boss P"
+})
+FarmTab:AddToggle("AutoFarmBossSea3", { Title = "Auto Farm Boss (Sea 3)", Default = false })
+
+FarmTab:AddParagraph({ Title = "── Materials ──", Content = "" })
+FarmTab:AddDropdown("MaterialSelect", {
+    Title = "Select Material",
+    Values = {"Scrap Metal", "Wood", "Leather", "Mystic Droplet"},
+    Default = "Scrap Metal"
+})
+FarmTab:AddToggle("AutoFarmMaterial", { Title = "Auto Farm Material", Default = false })
+-- ===== TAB FISHING =====
+local FishingTab = Tabs.Fishing
+
+FishingTab:AddDropdown("SelectRod", {
+    Title = "Select Rod",
+    Values = {"Wooden Rod", "Fishing Rod", "Magnetic Rod", "Mythical Rod"},
+    Default = "Fishing Rod"
+})
+
+FishingTab:AddDropdown("SelectBait", {
+    Title = "Select Bait",
+    Values = {"Worm", "Shrimp", "Lobster", "Mythical Bait"},
+    Default = "Worm"
+})
+
+FishingTab:AddToggle("AutoFishing", { Title = "Auto Fishing", Default = false })
+FishingTab:AddToggle("AutoAcceptQuest", { Title = "Auto Accept Quest", Default = false })
+
+FishingTab:AddButton({
+    Title = "Teleport Fishing NPC",
+    Callback = function()
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            char.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(1000,10,2000)) -- thay tọa độ thực
+        end
+    end
+})
+
+-- (Tùy chọn) Thêm xử lý cho Auto Fishing và Auto Accept Quest
+Options.AutoFishing:OnChanged(function()
+    print("Auto Fishing: " .. tostring(Options.AutoFishing.Value))
+end)
+Options.AutoAcceptQuest:OnChanged(function()
+    print("Auto Accept Quest: " .. tostring(Options.AutoAcceptQuest.Value))
+end)
+-- ===== TAB ITEM =====
+local ItemTab = Tabs.Item
+
+-- Helper function để teleport giữa các sea
+local function teleportToSea(n)
+    local positions = {
+        [2] = Vector3.new(1000, 0, 2000),
+        [3] = Vector3.new(-500, 0, -500)
+    }
+    local pos = positions[n]
+    if pos then
+        local char = game.Players.LocalPlayer.Character
+        if char then char.HumanoidRootPart.CFrame = CFrame.new(pos) end
+    end
+end
+
+ItemTab:AddParagraph({ Title = "── Sea 1 ──", Content = "" })
+ItemTab:AddButton({ Title = "Go To Sea 2", Callback = function() teleportToSea(2) end })
+ItemTab:AddButton({ Title = "Complete Bartilo Quest", Callback = function() print("Bartilo Quest") end })
+ItemTab:AddButton({ Title = "Get Saber", Callback = function() print("Get Saber") end })
+ItemTab:AddButton({ Title = "Get Pole", Callback = function() print("Get Pole") end })
+ItemTab:AddButton({ Title = "Get Trident", Callback = function() print("Get Trident") end })
+
+ItemTab:AddParagraph({ Title = "── Sea 2 ──", Content = "" })
+ItemTab:AddButton({ Title = "Go To Sea 3", Callback = function() teleportToSea(3) end })
+ItemTab:AddToggle("AutoFactoryRaid", { Title = "Auto Factory Raid", Default = false })
+ItemTab:AddToggle("AutoDarkbeard", { Title = "Auto Darkbeard", Default = false })
+ItemTab:AddToggle("AutoCursedCaptain", { Title = "Auto Cursed Captain", Default = false })
+ItemTab:AddButton({ Title = "Get Longsword", Callback = function() print("Get Longsword") end })
+ItemTab:AddButton({ Title = "Get Dragon Trident", Callback = function() print("Get Dragon Trident") end })
+ItemTab:AddButton({ Title = "Get Rengoku", Callback = function() print("Get Rengoku") end })
+ItemTab:AddButton({ Title = "Get Gravity Cane", Callback = function() print("Get Gravity Cane") end })
+
+ItemTab:AddParagraph({ Title = "── Sea 3 ──", Content = "" })
+ItemTab:AddToggle("AutoPirateRaid", { Title = "Auto Pirate Raid", Default = false })
+ItemTab:AddButton({ Title = "Get Buddy Sword", Callback = function() print("Get Buddy Sword") end })
+ItemTab:AddButton({ Title = "Get Yama", Callback = function() print("Get Yama") end })
+ItemTab:AddButton({ Title = "Get Tushita", Callback = function() print("Get Tushita") end })
+ItemTab:AddButton({ Title = "Get Canvander", Callback = function() print("Get Canvander") end })
+-- ===== TAB SEA EVENT =====
+local SeaEventTab = Tabs.SeaEvent
+
+SeaEventTab:AddDropdown("SelectBoat", {
+    Title = "Boat",
+    Values = {"Rowboat", "Sailboat", "Motorboat", "Flying Boat", "Mythical Boat"},
+    Default = "Rowboat"
+})
+
+SeaEventTab:AddDropdown("SelectSea", {
+    Title = "Select Sea",
+    Values = {"Sea 1", "Sea 2", "Sea 3", "Sea 4", "Sea 5", "Sea 6", "Infinite"},
+    Default = "Sea 1"
+})
+
+SeaEventTab:AddToggle("AutoFish", { Title = "Auto Fish", Default = false })
+SeaEventTab:AddToggle("AutoShark", { Title = "Auto Shark", Default = false })
+SeaEventTab:AddToggle("AutoElectricShark", { Title = "Auto Electric Shark", Default = false })
+SeaEventTab:AddToggle("AutoTerrorShark", { Title = "Auto Terror Shark", Default = false })
+SeaEventTab:AddToggle("AutoSeaBeast", { Title = "Auto Sea Beast", Default = false })
+SeaEventTab:AddToggle("AutoLeviathan", { Title = "Auto Leviathan", Default = false })
+
+SeaEventTab:AddParagraph({ Title = "── Kitsune Event ──", Content = "" })
+SeaEventTab:AddButton({
+    Title = "Fly To Kitsune Shrine",
+    Callback = function()
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            char.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(5000,200,3000)) -- thay tọa độ thực
+        end
+    end
+})
+SeaEventTab:AddToggle("AutoCollectAzureEmbers", { Title = "Auto Collect Azure Embers", Default = false })
+SeaEventTab:AddButton({ Title = "Click To Trade", Callback = function() print("Trade click") end })
+-- ===== TAB DRAGON DOJO =====
+local DragonDojoTab = Tabs.DragonDojo
+
+DragonDojoTab:AddParagraph({ Title = "── Tộc Rồng ──", Content = "Tự động nâng cấp tộc rồng" })
+DragonDojoTab:AddToggle("AutoDragonV1", { Title = "Auto Up Tộc Rồng V1", Default = false })
+DragonDojoTab:AddToggle("AutoDragonV2", { Title = "Auto Up Tộc Rồng V2", Default = false })
+DragonDojoTab:AddToggle("AutoDragonV3", { Title = "Auto Up Tộc Rồng V3", Default = false })
+DragonDojoTab:AddToggle("AutoDragonV4", { Title = "Auto Up Tộc Rồng V4", Default = false })
+-- ===== TAB FRUIT RAID / DUNGEON =====
+local FruitRaidTab = Tabs.FruitRaid
+
+FruitRaidTab:AddParagraph({ Title = "── Fruit ──", Content = "" })
+FruitRaidTab:AddToggle("AutoRandomFruit", { Title = "Auto Random", Default = false })
+FruitRaidTab:AddToggle("AutoStoreFruit", { Title = "Auto Lưu Trữ", Default = false })
+FruitRaidTab:AddToggle("AutoDropFruit", { Title = "Auto Thả Trái", Default = false })
+FruitRaidTab:AddButton({ Title = "Bay Đến Trái Spawn", Callback = function()
+    print("Flying to fruit spawn...")
+end })
+
+FruitRaidTab:AddParagraph({ Title = "── Raid ──", Content = "" })
+FruitRaidTab:AddDropdown("SelectChip", {
+    Title = "Chọn Chip Raid",
+    Values = {"Flame", "Ice", "Dark", "Light", "Dragon"},
+    Default = "Flame"
+})
+FruitRaidTab:AddToggle("AutoBuyChip", { Title = "Auto Mua Chip", Default = false })
+FruitRaidTab:AddToggle("AutoRaid", { Title = "Auto Raid", Default = false })
+
+FruitRaidTab:AddParagraph({ Title = "── Dungeon ──", Content = "" })
+FruitRaidTab:AddButton({ Title = "Teleport Dungeon", Callback = function()
+    print("Teleport to dungeon...")
+end })
+FruitRaidTab:AddToggle("AutoDungeon", { Title = "Auto Dungeon", Default = false })
+-- ===== TAB ESP =====
+local ESPTab = Tabs.ESP
+
+ESPTab:AddParagraph({ Title = "── Sea 1 ──", Content = "" })
+ESPTab:AddToggle("ESP_Player_S1", { Title = "ESP Player", Default = false })
+ESPTab:AddToggle("ESP_Berry_S1", { Title = "ESP Berry", Default = false })
+ESPTab:AddToggle("ESP_Fruit_S1", { Title = "ESP Fruit", Default = false })
+ESPTab:AddToggle("ESP_Island_S1", { Title = "ESP Đảo", Default = false })
+
+ESPTab:AddParagraph({ Title = "── Sea 2 ──", Content = "" })
+ESPTab:AddToggle("ESP_Player_S2", { Title = "ESP Player", Default = false })
+ESPTab:AddToggle("ESP_Berry_S2", { Title = "ESP Berry", Default = false })
+ESPTab:AddToggle("ESP_Fruit_S2", { Title = "ESP Fruit", Default = false })
+ESPTab:AddToggle("ESP_Island_S2", { Title = "ESP Đảo", Default = false })
+ESPTab:AddToggle("ESP_SwordSeller_S2", { Title = "ESP Người bán kiếm huyền thoại", Default = false })
+ESPTab:AddToggle("ESP_Flower_S2", { Title = "ESP Hoa", Default = false })
+ESPTab:AddToggle("ESP_HakiColor_S2", { Title = "ESP Người bán màu haki", Default = false })
+
+ESPTab:AddParagraph({ Title = "── Sea 3 ──", Content = "" })
+ESPTab:AddToggle("ESP_Player_S3", { Title = "ESP Player", Default = false })
+ESPTab:AddToggle("ESP_Berry_S3", { Title = "ESP Berry", Default = false })
+ESPTab:AddToggle("ESP_Fruit_S3", { Title = "ESP Fruit", Default = false })
+ESPTab:AddToggle("ESP_Island_S3", { Title = "ESP Đảo", Default = false })
+ESPTab:AddToggle("ESP_EventIsland_S3", { Title = "ESP Đảo Event", Default = false })
+ESPTab:AddToggle("ESP_Leviathan_S3", { Title = "ESP Đảo bí ẩn Leviathan", Default = false })
+ESPTab:AddToggle("ESP_Gear_S3", { Title = "ESP Gear", Default = false })
+-- ===== TAB PVP =====
+local PvPTab = Tabs.PvP
+
+PvPTab:AddParagraph({ Title = "── Player Targeting ──", Content = "" })
+PvPTab:AddDropdown("SelectPlayer", {
+    Title = "Chọn người chơi",
+    Values = {"Player1", "Player2", "Player3"},
+    Default = "Player1"
+})
+PvPTab:AddButton({ Title = "Click Reset Bảng người chơi", Callback = function()
+    print("Reset player list")
+end })
+PvPTab:AddButton({ Title = "Bay đến người chơi", Callback = function()
+    print("Teleport to selected player")
+end })
+PvPTab:AddButton({ Title = "Xem góc nhìn người chơi", Callback = function()
+    print("Spectate player")
+end })
+
+PvPTab:AddParagraph({ Title = "── Speed / Jump ──", Content = "" })
+PvPTab:AddSlider("SpeedMax", {
+    Title = "Speed Max",
+    Default = 16,
+    Min = 16,
+    Max = 500,
+    Rounding = 1
+})
+PvPTab:AddSlider("JumpMax", {
+    Title = "Jump Max",
+    Default = 7,
+    Min = 7,
+    Max = 500,
+    Rounding = 1
+})
+-- ===== TAB SETTINGS =====
+local SettingsTab = Tabs.Settings
+
+SettingsTab:AddParagraph({ Title = "── Server ──", Content = "" })
+SettingsTab:AddInput("ServerCode", {
+    Title = "Mã sever",
+    Default = "",
+    Placeholder = "Nhập mã sever..."
+})
+SettingsTab:AddButton({ Title = "Vào sever", Callback = function()
+    print("Join server: " .. Options.ServerCode.Value)
+end })
+SettingsTab:AddButton({ Title = "Copy mã sever", Callback = function()
+    setclipboard(game.JobId or "N/A")
+    print("Copied server code")
+end })
+SettingsTab:AddButton({ Title = "Hop sever ngẫu nhiên", Callback = function()
+    print("Hop random server")
+end })
+
+SettingsTab:AddParagraph({ Title = "── Miss / Shader ──", Content = "" })
+SettingsTab:AddToggle("Miss", { Title = "Miss", Default = false })
+SettingsTab:AddToggle("ShaderModel", { Title = "Shader Model", Default = false })
+
+SettingsTab:AddParagraph({ Title = "── Attack ──", Content = "" })
+SettingsTab:AddToggle("FastAttack", { Title = "Fast Attack", Default = false })
+SettingsTab:AddToggle("SuperAttack", { Title = "Super Attack", Default = false })
+SettingsTab:AddToggle("SuperFastAttack", { Title = "Super Fast Attack", Default = false })
+SettingsTab:AddToggle("HTDAttack", { Title = "HTD Attack", Default = false })
+
+SettingsTab:AddParagraph({ Title = "── Visual ──", Content = "" })
+SettingsTab:AddSlider("Brightness", {
+    Title = "Chỉnh siêu sáng",
+    Default = 1,
+    Min = 0,
+    Max = 10,
+    Rounding = 1
+})
+SettingsTab:AddToggle("AlwaysBright", { Title = "Chọn luôn luôn sáng là tối", Default = false })
+SettingsTab:AddButton({ Title = "Click Rain Fruit", Callback = function()
+    print("Rain fruit clicked")
+end })
+-- ===== PHẦN KẾT THÚC (BẮT BUỘC) =====
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("HTDRoblox")
+SaveManager:SetFolder("HTDRoblox/BloxFruit")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "HTD.roblox",
+    Content = "Đã tải UI thành công!",
+    Duration = 5
+})
+
+SaveManager:LoadAutoloadConfig()
