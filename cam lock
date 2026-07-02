@@ -1,0 +1,172 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Cấu hình Premium V4 (BẢN GHIM CHẾT)
+local AimlockEnabled = false
+local CurrentTarget = nil
+local AimPart = "HumanoidRootPart" -- Ghim chặt vào phần thân
+local MaxDistance = 300 -- Khoảng cách tối đa để quét mục tiêu
+local FovRadius = 150 -- Bán kính vòng tròn quét mục tiêu
+
+-- 1. TẠO GUI NÚT BẤM V4 (Nút to hơn, ghim chặt)
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "HiruzAimlockV4"
+
+local ToggleButton = Instance.new("TextButton", ScreenGui)
+ToggleButton.Size = UDim2.new(0, 190, 0, 60) -- Nút rất to, dễ bấm
+ToggleButton.Position = UDim2.new(0.8, 0, 0.2, 0) -- Vị trí góc phải
+ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50) -- Đỏ lúc tắt
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 16
+ToggleButton.Text = "PREMIUM AIMLOCK V4: OFF"
+ToggleButton.Active = true
+ToggleButton.Draggable = true -- Có thể kéo di chuyển
+
+local UICorner = Instance.new("UICorner", ToggleButton)
+UICorner.CornerRadius = UDim.new(0, 12)
+
+local UIStroke = Instance.new("UIStroke", ToggleButton)
+UIStroke.Color = Color3.fromRGB(255, 255, 255)
+UIStroke.Thickness = 2.0
+
+-- 2. HỆ THỐNG ESP GLOW (PHỦ XANH MỤC TIÊU)
+local EspGlow = Instance.new("Highlight")
+EspGlow.Name = "HiruzAimGlow"
+EspGlow.FillColor = Color3.fromRGB(0, 150, 255) -- Màu xanh dương
+EspGlow.FillTransparency = 0.5 -- Độ trong suốt của phần thân
+EspGlow.OutlineColor = Color3.fromRGB(255, 255, 255) -- Viền trắng
+EspGlow.OutlineTransparency = 0 -- Viền đậm
+EspGlow.Enabled = false
+EspGlow.Parent = CoreGui -- Đặt vào CoreGui để không bị lẫn vào Map
+
+-- Hàm gán Glow cho mục tiêu
+local function applyGlow(targetCharacter)
+    EspGlow.Parent = targetCharacter
+    EspGlow.Enabled = true
+end
+
+-- Hàm hủy Glow
+local function removeGlow()
+    EspGlow.Enabled = false
+    EspGlow.Parent = CoreGui
+end
+
+-- 3. TẠO VÒNG TRÒN FOV (Hiển thị phạm vi quét)
+local FovCircle = Drawing.new("Circle")
+FovCircle.Color = Color3.fromRGB(0, 255, 0) -- Màu xanh lá
+FovCircle.Thickness = 1.5
+FovCircle.NumSides = 64
+FovCircle.Radius = FovRadius
+FovCircle.Filled = false
+FovCircle.Visible = false
+
+-- 4. HÀM TÌM MỤC TIÊU GẦN TÂM GÓC NHÌN NHẤT
+local function getClosestPlayerToCursor()
+    local closestTarget = nil
+    local shortestDistance = math.huge
+
+    local character = LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return nil end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild(AimPart) then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                -- Kiểm tra khoảng cách thực tế giữa 2 người
+                local actualDistance = (character.HumanoidRootPart.Position - player.Character[AimPart].Position).Magnitude
+                if actualDistance > MaxDistance then continue end -- Bỏ qua nếu quá xa
+
+                -- Chuyển tọa độ 3D của đối thủ sang 2D màn hình để check hướng nhìn
+                local screenPos, onScreen = Camera:WorldToViewportPoint(player.Character[AimPart].Position)
+                
+                if onScreen then
+                    -- Tính khoảng cách từ đối thủ đến chính giữa tâm màn hình của ông
+                    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                    local distanceToCenter = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+
+                    -- Tìm người nằm trong vòng tròn và gần tâm nhất
+                    if distanceToCenter < FovRadius and distanceToCenter < shortestDistance then
+                        shortestDistance = distanceToCenter
+                        closestTarget = player.Character
+                    end
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+-- 5. BẢN NÂNG CẤP GHIM CHẾT CAMERA (V4 HARD-LOCK)
+RunService.RenderStepped:Connect(function()
+    -- Cập nhật vị trí vòng tròn luôn ở giữa màn hình
+    FovCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    FovCircle.Visible = AimlockEnabled
+
+    if AimlockEnabled and CurrentTarget and CurrentTarget:FindFirstChild(AimPart) then
+        local humanoid = CurrentTarget:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            -- GHIM CHẾT: Đặt Camera.CFrame nghiêm ngặt mỗi frame, chặn input
+            local targetPosition = CurrentTarget[AimPart].Position
+            local cameraPosition = Camera.CFrame.Position
+            
+            -- Đặt CFrame trực tiếp để camera *luôn* đối mặt với mục tiêu
+            Camera.CFrame = CFrame.lookAt(cameraPosition, targetPosition)
+            
+            -- Chặn input di chuyển camera của người dùng khi đang ghim chết
+            Camera.CameraType = Enum.CameraType.Scriptable
+        else
+            -- Nếu đối thủ chết thì tự hủy aim để không bị loạn cam
+            CurrentTarget = nil
+            removeGlow()
+            AimlockEnabled = false
+            ToggleButton.Text = "AIMLOCK: OFF"
+            ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+            Camera.CameraType = Enum.CameraType.Custom -- Trả camera tự do
+        end
+    elseif AimlockEnabled and (not CurrentTarget or (CurrentTarget and not CurrentTarget:FindFirstChild(AimPart))) then
+        -- Nếu đã bật nhưng không có mục tiêu, hoặc mục tiêu mất HumanoidRootPart
+        AimlockEnabled = false
+        ToggleButton.Text = "AIMLOCK: NO TARGET"
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+        Camera.CameraType = Enum.CameraType.Custom
+        task.wait(1)
+        ToggleButton.Text = "PREMIUM AIMLOCK V4: OFF"
+    end
+end)
+
+-- 6. SỰ KIỆN NÚT BẤM BẬT / TẮT (V4)
+ToggleButton.MouseButton1Click:Connect(function()
+    AimlockEnabled = not AimlockEnabled
+    
+    if AimlockEnabled then
+        -- Quét và ghim chặt người ở gần tâm hướng nhìn nhất tại thời điểm bấm
+        CurrentTarget = getClosestPlayerToCursor()
+        
+        if CurrentTarget then
+            applyGlow(CurrentTarget) -- Hiện màu xanh dương phủ lên người
+            ToggleButton.Text = "AIMLOCK V4: ACTIVE"
+            ToggleButton.TextColor3 = Color3.fromRGB(50, 255, 50) -- Đổi màu xanh lá khi bật
+            Camera.CameraType = Enum.CameraType.Scriptable -- Vô hiệu hóa input cam
+        else
+            -- Nếu xung quanh không có ai hoặc ở quá xa
+            AimlockEnabled = false
+            ToggleButton.Text = "NO TARGET FOUND"
+            ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+            Camera.CameraType = Enum.CameraType.Custom
+            task.wait(1)
+            ToggleButton.Text = "PREMIUM AIMLOCK V4: OFF"
+        end
+    else
+        -- Khi chủ động tắt: Trả camera tự do, xóa màu xanh dương
+        CurrentTarget = nil
+        removeGlow()
+        ToggleButton.Text = "PREMIUM AIMLOCK V4: OFF"
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+        Camera.CameraType = Enum.CameraType.Custom -- Trả camera tự do
+    end
+end)
