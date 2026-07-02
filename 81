@@ -1,0 +1,730 @@
+--// =========================
+--// BLOX FRUIT HELPER V1
+--// =========================
+
+-- Load libraries
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+-- Create main window
+local Window = Fluent:CreateWindow({
+    Title = "Blox Fruit Helper",
+    SubTitle = "Version 1.0",
+    TabWidth = 170,
+    Size = UDim2.fromOffset(600, 430),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+-- Define tabs
+local Tabs = {
+    Farming = Window:AddTab({ Title = "Farming", Icon = "swords" }),
+    Fishing = Window:AddTab({ Title = "Fishing", Icon = "fish" }),
+    FarmItem = Window:AddTab({ Title = "Farm Item", Icon = "backpack" }),
+    SeaEvent = Window:AddTab({ Title = "Sea Event", Icon = "waves" }),
+    Volcano = Window:AddTab({ Title = "Volcano", Icon = "flame" }),
+    DragonDojo = Window:AddTab({ Title = "Dragon Dojo", Icon = "shield" }),
+    Dungeon = Window:AddTab({ Title = "Dungeon", Icon = "castle" }),
+    ESP = Window:AddTab({ Title = "ESP", Icon = "eye" }),
+    PvP = Window:AddTab({ Title = "PvP", Icon = "crosshair" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+-- Select first tab
+Window:SelectTab(1)
+
+-- ===================================================
+--   FARMING TAB
+-- ===================================================
+local farmTab = Tabs.Farming
+
+farmTab:AddSection("Main Farm")
+
+farmTab:AddToggle("AutoFarm", {
+    Title = "Auto Farm",
+    Description = "Automatically kill selected NPCs",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoFarm = value
+        if value then
+            -- Start farming loop (custom function)
+            print("Auto Farm started")
+        else
+            print("Auto Farm stopped")
+        end
+    end
+})
+
+farmTab:AddDropdown("FarmNPC", {
+    Title = "Select NPC",
+    Description = "Choose NPC to farm",
+    Values = {"Bandit", "Gorilla", "Pirate", "Marine", "Shark"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value)
+        getgenv().FarmTarget = value
+    end
+})
+
+farmTab:AddSlider("FarmRange", {
+    Title = "Farm Range",
+    Description = "Attack range",
+    Default = 20,
+    Min = 5,
+    Max = 100,
+    Rounding = 1,
+    Callback = function(value)
+        getgenv().FarmRange = value
+    end
+})
+
+farmTab:AddSection("Boss Farm")
+farmTab:AddToggle("AutoBoss", {
+    Title = "Auto Boss Farm",
+    Description = "Automatically hunt bosses",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoBoss = value
+    end
+})
+farmTab:AddDropdown("BossList", {
+    Title = "Select Boss",
+    Values = {"Diamond", "Prisoner", "Vice Admiral", "Don Swan", "Cursed Captain"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value) getgenv().BossTarget = value end
+})
+
+farmTab:AddSection("Chest Farm")
+farmTab:AddToggle("AutoChest", {
+    Title = "Auto Chest Farm",
+    Description = "Collect nearby chests",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoChest = value
+    end
+})
+farmTab:AddToggle("ChestESP", {
+    Title = "Chest ESP",
+    Description = "Highlight chests",
+    Default = false,
+    Callback = function(value)
+        getgenv().ChestESP = value
+        -- Toggle ESP logic
+    end
+})
+
+farmTab:AddSection("Weapon")
+farmTab:AddDropdown("EquipWeapon", {
+    Title = "Equip Weapon",
+    Values = {"Sword", "Gun", "Fruit", "Fighting Style"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value)
+        getgenv().WeaponType = value
+    end
+})
+
+farmTab:AddSection("Quest")
+farmTab:AddToggle("AutoQuest", {
+    Title = "Auto Quest",
+    Description = "Auto accept and complete quests",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoQuest = value
+    end
+})
+farmTab:AddDropdown("QuestNPC", {
+    Title = "Quest Giver",
+    Values = {"Bandit", "Pirate", "Marine"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value) getgenv().QuestNPC = value end
+})
+
+farmTab:AddSection("Misc")
+farmTab:AddToggle("FastAttack", {
+    Title = "Fast Attack",
+    Description = "Increase attack speed",
+    Default = false,
+    Callback = function(value)
+        getgenv().FastAttack = value
+    end
+})
+farmTab:AddToggle("NoClip", {
+    Title = "NoClip",
+    Description = "Walk through walls",
+    Default = false,
+    Callback = function(value)
+        getgenv().NoClip = value
+        -- Implement noclip
+    end
+})
+
+-- ===================================================
+--   FISHING TAB
+-- ===================================================
+local fishTab = Tabs.Fishing
+
+fishTab:AddSection("Fishing")
+fishTab:AddToggle("AutoFish", {
+    Title = "Auto Fish",
+    Description = "Automatically cast and catch fish",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoFish = value
+    end
+})
+fishTab:AddToggle("InstantCatch", {
+    Title = "Instant Catch",
+    Description = "Instantly catch fish",
+    Default = false,
+    Callback = function(value)
+        getgenv().InstantCatch = value
+    end
+})
+
+fishTab:AddSection("Fishing Rod")
+fishTab:AddDropdown("SelectRod", {
+    Title = "Select Rod",
+    Values = {"Training Rod", "Starter Rod", "Good Rod", "Premium Rod"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value) getgenv().RodType = value end
+})
+fishTab:AddButton("Equip Rod", function()
+    -- Equip selected rod
+    print("Equipping rod")
+end)
+
+fishTab:AddSection("Fish")
+fishTab:AddToggle("AutoSellFish", {
+    Title = "Auto Sell Fish",
+    Description = "Automatically sell caught fish",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoSellFish = value
+    end
+})
+fishTab:AddToggle("AutoStoreFish", {
+    Title = "Auto Store Fish",
+    Description = "Store fish for later",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoStoreFish = value
+    end
+})
+
+fishTab:AddSection("Misc")
+fishTab:AddToggle("FishESP", {
+    Title = "Fish ESP",
+    Description = "Highlight fish in water",
+    Default = false,
+    Callback = function(value)
+        getgenv().FishESP = value
+    end
+})
+fishTab:AddSlider("FishSpeed", {
+    Title = "Fishing Speed",
+    Description = "Speed of auto fishing",
+    Default = 1,
+    Min = 0.5,
+    Max = 5,
+    Rounding = 0.1,
+    Callback = function(value)
+        getgenv().FishSpeed = value
+    end
+})
+
+-- ===================================================
+--   FARM ITEM TAB
+-- ===================================================
+local itemTab = Tabs.FarmItem
+
+itemTab:AddSection("Materials")
+itemTab:AddToggle("AutoFarmMaterials", {
+    Title = "Auto Farm Materials",
+    Description = "Farm specific materials",
+    Default = false,
+    Callback = function(value) getgenv().AutoFarmMaterials = value end
+})
+itemTab:AddDropdown("MaterialType", {
+    Title = "Material Type",
+    Values = {"Scrap", "Iron", "Gold", "Diamond", "Crystal"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value) getgenv().MaterialType = value end
+})
+
+itemTab:AddSection("Quest Items")
+itemTab:AddToggle("AutoQuestItems", {
+    Title = "Auto Farm Quest Items",
+    Description = "Farm items needed for quests",
+    Default = false,
+    Callback = function(value) getgenv().AutoQuestItems = value end
+})
+
+itemTab:AddSection("Accessories")
+itemTab:AddToggle("AutoAccessory", {
+    Title = "Auto Farm Accessories",
+    Description = "Farm accessory drops from bosses",
+    Default = false,
+    Callback = function(value) getgenv().AutoAccessory = value end
+})
+
+itemTab:AddSection("Swords")
+itemTab:AddToggle("AutoSword", {
+    Title = "Auto Farm Swords",
+    Description = "Farm sword drops",
+    Default = false,
+    Callback = function(value) getgenv().AutoSword = value end
+})
+itemTab:AddDropdown("SwordTarget", {
+    Title = "Sword",
+    Values = {"Katana", "Saber", "Trident", "Dark Dagger"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value) getgenv().SwordTarget = value end
+})
+
+itemTab:AddSection("Guns")
+itemTab:AddToggle("AutoGun", {
+    Title = "Auto Farm Guns",
+    Default = false,
+    Callback = function(value) getgenv().AutoGun = value end
+})
+
+itemTab:AddSection("Fruits")
+itemTab:AddToggle("AutoFruit", {
+    Title = "Auto Farm Fruits",
+    Description = "Collect fruits on ground",
+    Default = false,
+    Callback = function(value) getgenv().AutoFruit = value end
+})
+itemTab:AddToggle("FruitESP", {
+    Title = "Fruit ESP",
+    Default = false,
+    Callback = function(value) getgenv().FruitESP = value end
+})
+
+itemTab:AddSection("Misc")
+itemTab:AddToggle("CollectAll", {
+    Title = "Collect All Items",
+    Description = "Collect every item in range",
+    Default = false,
+    Callback = function(value) getgenv().CollectAll = value end
+})
+
+-- ===================================================
+--   SEA EVENT TAB
+-- ===================================================
+local seaTab = Tabs.SeaEvent
+
+seaTab:AddSection("Sea Beast")
+seaTab:AddToggle("AutoSeaBeast", {
+    Title = "Auto Sea Beast",
+    Description = "Auto hunt sea beasts",
+    Default = false,
+    Callback = function(value) getgenv().AutoSeaBeast = value end
+})
+seaTab:AddSlider("SeaBeastRange", {
+    Title = "Search Range",
+    Default = 300,
+    Min = 100,
+    Max = 1000,
+    Rounding = 10,
+    Callback = function(value) getgenv().SeaBeastRange = value end
+})
+
+seaTab:AddSection("Shark")
+seaTab:AddToggle("AutoShark", {
+    Title = "Auto Shark Farm",
+    Description = "Farm sharks",
+    Default = false,
+    Callback = function(value) getgenv().AutoShark = value end
+})
+
+seaTab:AddSection("Leviathan")
+seaTab:AddToggle("AutoLeviathan", {
+    Title = "Auto Leviathan",
+    Description = "Hunt Leviathan",
+    Default = false,
+    Callback = function(value) getgenv().AutoLeviathan = value end
+})
+
+seaTab:AddSection("Ship Raid")
+seaTab:AddToggle("AutoShipRaid", {
+    Title = "Auto Ship Raid",
+    Description = "Automatically do ship raids",
+    Default = false,
+    Callback = function(value) getgenv().AutoShipRaid = value end
+})
+
+seaTab:AddSection("Pirate Ship")
+seaTab:AddToggle("AutoPirateShip", {
+    Title = "Auto Pirate Ship",
+    Description = "Farm pirate ships",
+    Default = false,
+    Callback = function(value) getgenv().AutoPirateShip = value end
+})
+
+seaTab:AddSection("Misc")
+seaTab:AddToggle("SeaESP", {
+    Title = "Sea Event ESP",
+    Description = "Highlight sea events",
+    Default = false,
+    Callback = function(value) getgenv().SeaESP = value end
+})
+seaTab:AddToggle("AutoTeleportSea", {
+    Title = "Auto Teleport to Sea Events",
+    Default = false,
+    Callback = function(value) getgenv().AutoTeleportSea = value end
+})
+
+-- ===================================================
+--   VOLCANO TAB
+-- ===================================================
+local volcanoTab = Tabs.Volcano
+
+volcanoTab:AddSection("Volcano")
+volcanoTab:AddToggle("AutoVolcano", {
+    Title = "Auto Volcano Farm",
+    Description = "Farm in volcano area",
+    Default = false,
+    Callback = function(value) getgenv().AutoVolcano = value end
+})
+
+volcanoTab:AddSection("Rewards")
+volcanoTab:AddToggle("CollectRewards", {
+    Title = "Collect Volcano Rewards",
+    Description = "Auto collect rewards from volcano",
+    Default = false,
+    Callback = function(value) getgenv().CollectRewards = value end
+})
+volcanoTab:AddToggle("AutoSellRewards", {
+    Title = "Auto Sell Rewards",
+    Default = false,
+    Callback = function(value) getgenv().AutoSellRewards = value end
+})
+
+volcanoTab:AddSection("Misc")
+volcanoTab:AddToggle("LavaWalk", {
+    Title = "Lava Walk",
+    Description = "Walk on lava without damage",
+    Default = false,
+    Callback = function(value)
+        getgenv().LavaWalk = value
+        -- implement lava walk
+    end
+})
+volcanoTab:AddToggle("VolcanoESP", {
+    Title = "Volcano ESP",
+    Default = false,
+    Callback = function(value) getgenv().VolcanoESP = value end
+})
+
+-- ===================================================
+--   DRAGON DOJO TAB
+-- ===================================================
+local dojoTab = Tabs.DragonDojo
+
+dojoTab:AddSection("Dragon Trainer")
+dojoTab:AddToggle("AutoTrain", {
+    Title = "Auto Train with Dragon Trainer",
+    Description = "Auto train at Dragon Dojo",
+    Default = false,
+    Callback = function(value) getgenv().AutoTrain = value end
+})
+
+dojoTab:AddSection("Belts")
+dojoTab:AddToggle("AutoBelts", {
+    Title = "Auto Collect Belts",
+    Description = "Automatically collect belts",
+    Default = false,
+    Callback = function(value) getgenv().AutoBelts = value end
+})
+dojoTab:AddDropdown("BeltTier", {
+    Title = "Belt Tier",
+    Values = {"White", "Yellow", "Green", "Blue", "Red", "Black"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value) getgenv().BeltTier = value end
+})
+
+dojoTab:AddSection("Dragon Hunter")
+dojoTab:AddToggle("AutoDragonHunter", {
+    Title = "Auto Dragon Hunter Quest",
+    Description = "Auto complete dragon hunter quests",
+    Default = false,
+    Callback = function(value) getgenv().AutoDragonHunter = value end
+})
+
+dojoTab:AddSection("Dragon Quest")
+dojoTab:AddToggle("AutoDragonQuest", {
+    Title = "Auto Dragon Quest",
+    Default = false,
+    Callback = function(value) getgenv().AutoDragonQuest = value end
+})
+
+dojoTab:AddSection("Misc")
+dojoTab:AddToggle("DojoESP", {
+    Title = "Dojo ESP",
+    Default = false,
+    Callback = function(value) getgenv().DojoESP = value end
+})
+
+-- ===================================================
+--   DUNGEON TAB
+-- ===================================================
+local dungeonTab = Tabs.Dungeon
+
+dungeonTab:AddSection("Raid")
+dungeonTab:AddToggle("AutoRaid", {
+    Title = "Auto Raid",
+    Description = "Auto complete raids",
+    Default = false,
+    Callback = function(value) getgenv().AutoRaid = value end
+})
+dungeonTab:AddDropdown("RaidType", {
+    Title = "Raid Type",
+    Values = {"Flame", "Ice", "Dark", "Light", "Earth"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value) getgenv().RaidType = value end
+})
+
+dungeonTab:AddSection("Dungeon")
+dungeonTab:AddToggle("AutoDungeon", {
+    Title = "Auto Dungeon",
+    Description = "Auto run dungeons",
+    Default = false,
+    Callback = function(value) getgenv().AutoDungeon = value end
+})
+
+dungeonTab:AddSection("Fragments")
+dungeonTab:AddToggle("AutoFarmFragments", {
+    Title = "Auto Farm Fragments",
+    Description = "Farm fragments from dungeons",
+    Default = false,
+    Callback = function(value) getgenv().AutoFarmFragments = value end
+})
+
+dungeonTab:AddSection("Chips")
+dungeonTab:AddToggle("AutoChips", {
+    Title = "Auto Collect Chips",
+    Description = "Collect chips in dungeon",
+    Default = false,
+    Callback = function(value) getgenv().AutoChips = value end
+})
+
+dungeonTab:AddSection("Misc")
+dungeonTab:AddToggle("DungeonESP", {
+    Title = "Dungeon ESP",
+    Default = false,
+    Callback = function(value) getgenv().DungeonESP = value end
+})
+dungeonTab:AddToggle("FastDungeon", {
+    Title = "Fast Dungeon",
+    Description = "Speed up dungeon completion",
+    Default = false,
+    Callback = function(value) getgenv().FastDungeon = value end
+})
+
+-- ===================================================
+--   ESP TAB
+-- ===================================================
+local espTab = Tabs.ESP
+
+espTab:AddSection("Players")
+espTab:AddToggle("PlayerESP", {
+    Title = "Player ESP",
+    Description = "Show other players",
+    Default = false,
+    Callback = function(value)
+        getgenv().PlayerESP = value
+    end
+})
+espTab:AddColorPicker("PlayerColor", {
+    Title = "Player Color",
+    Default = Color3.fromRGB(0, 200, 255),
+    Callback = function(color)
+        getgenv().PlayerESPColor = color
+    end
+})
+
+espTab:AddSection("NPC")
+espTab:AddToggle("NPCESP", {
+    Title = "NPC ESP",
+    Default = false,
+    Callback = function(value) getgenv().NPCESP = value end
+})
+espTab:AddColorPicker("NPCColor", {
+    Title = "NPC Color",
+    Default = Color3.fromRGB(255, 255, 100),
+    Callback = function(color) getgenv().NPCESPColor = color end
+})
+
+espTab:AddSection("Boss")
+espTab:AddToggle("BossESP", {
+    Title = "Boss ESP",
+    Default = false,
+    Callback = function(value) getgenv().BossESP = value end
+})
+espTab:AddColorPicker("BossColor", {
+    Title = "Boss Color",
+    Default = Color3.fromRGB(255, 0, 0),
+    Callback = function(color) getgenv().BossESPColor = color end
+})
+
+espTab:AddSection("Chest")
+espTab:AddToggle("ChestESP", {
+    Title = "Chest ESP",
+    Default = false,
+    Callback = function(value) getgenv().ChestESP = value end
+})
+espTab:AddColorPicker("ChestColor", {
+    Title = "Chest Color",
+    Default = Color3.fromRGB(255, 200, 0),
+    Callback = function(color) getgenv().ChestESPColor = color end
+})
+
+espTab:AddSection("Fruit")
+espTab:AddToggle("FruitESP", {
+    Title = "Fruit ESP",
+    Default = false,
+    Callback = function(value) getgenv().FruitESP = value end
+})
+espTab:AddColorPicker("FruitColor", {
+    Title = "Fruit Color",
+    Default = Color3.fromRGB(255, 100, 200),
+    Callback = function(color) getgenv().FruitESPColor = color end
+})
+
+espTab:AddSection("Island")
+espTab:AddToggle("IslandESP", {
+    Title = "Island ESP",
+    Description = "Show islands on map",
+    Default = false,
+    Callback = function(value) getgenv().IslandESP = value end
+})
+
+espTab:AddSection("Misc")
+espTab:AddToggle("NameTags", {
+    Title = "Name Tags",
+    Description = "Show names above objects",
+    Default = true,
+    Callback = function(value) getgenv().NameTags = value end
+})
+espTab:AddToggle("BoxESP", {
+    Title = "Box ESP",
+    Description = "Use boxes instead of circles",
+    Default = false,
+    Callback = function(value) getgenv().BoxESP = value end
+})
+espTab:AddSlider("ESPDistance", {
+    Title = "ESP Distance",
+    Default = 500,
+    Min = 100,
+    Max = 2000,
+    Rounding = 10,
+    Callback = function(value) getgenv().ESPDistance = value end
+})
+
+-- ===================================================
+--   PVP TAB
+-- ===================================================
+local pvpTab = Tabs.PvP
+
+pvpTab:AddSection("Combat")
+pvpTab:AddToggle("AutoCombat", {
+    Title = "Auto Combat",
+    Description = "Automatically fight enemies",
+    Default = false,
+    Callback = function(value) getgenv().AutoCombat = value end
+})
+pvpTab:AddDropdown("CombatStyle", {
+    Title = "Combat Style",
+    Values = {"Melee", "Fruit", "Sword", "Gun"},
+    Multi = false,
+    Default = 1,
+    Callback = function(value) getgenv().CombatStyle = value end
+})
+
+pvpTab:AddSection("Aim")
+pvpTab:AddToggle("AimBot", {
+    Title = "Aim Bot",
+    Description = "Auto aim at enemies",
+    Default = false,
+    Callback = function(value) getgenv().AimBot = value end
+})
+pvpTab:AddToggle("HeadAim", {
+    Title = "Aim Head",
+    Description = "Aim for headshots",
+    Default = false,
+    Callback = function(value) getgenv().HeadAim = value end
+})
+pvpTab:AddSlider("AimSmoothness", {
+    Title = "Aim Smoothness",
+    Default = 5,
+    Min = 1,
+    Max = 20,
+    Rounding = 1,
+    Callback = function(value) getgenv().AimSmoothness = value end
+})
+
+pvpTab:AddSection("Skills")
+pvpTab:AddToggle("AutoDodge", {
+    Title = "Auto Dodge",
+    Description = "Automatically dodge attacks",
+    Default = false,
+    Callback = function(value) getgenv().AutoDodge = value end
+})
+pvpTab:AddToggle("AutoSkill", {
+    Title = "Auto Use Skills",
+    Description = "Auto use skills on cooldown",
+    Default = false,
+    Callback = function(value) getgenv().AutoSkill = value end
+})
+pvpTab:AddToggle("SkillSpam", {
+    Title = "Skill Spam",
+    Description = "Spam skills rapidly",
+    Default = false,
+    Callback = function(value) getgenv().SkillSpam = value end
+})
+
+pvpTab:AddToggle("AutoHeal",{Title="Auto Heal",Description="Auto heal when low HP",Default=false,Callback=function(v)getgenv().AutoHeal=v end})
+pvpTab:AddSlider("HealThreshold",{Title="Heal %",Default=30,Min=10,Max=80,Rounding=1,Callback=function(v)getgenv().HealThreshold=v end})
+pvpTab:AddToggle("AutoShield",{Title="Auto Shield",Default=false,Callback=function(v)getgenv().AutoShield=v end})
+pvpTab:AddSection("Misc")
+pvpTab:AddToggle("Spy",{Title="Spy",Default=false,Callback=function(v)getgenv().Spy=v end})
+pvpTab:AddToggle("PvPESP",{Title="PvP ESP",Default=false,Callback=function(v)getgenv().PvPESP=v end})
+
+-- Settings
+local s=Tabs.Settings
+s:AddSection("Config")
+s:AddButton("Save",function()SaveManager:Save()Fluent:Notify({Title="Saved",Duration=3})end)
+s:AddButton("Load",function()SaveManager:Load()Fluent:Notify({Title="Loaded",Duration=3})end)
+s:AddButton("Reset",function()SaveManager:Reset()Fluent:Notify({Title="Reset",Duration=3})end)
+s:AddSection("Interface")
+s:AddDropdown("Theme",{Title="Theme",Values={"Dark","Light","Darker","Blue","Red"},Default=1,Callback=function(v)Fluent:SetTheme(v)end})
+s:AddToggle("Acrylic",{Title="Blur",Default=true,Callback=function(v)end})
+s:AddSlider("UISize",{Title="Scale",Default=1,Min=0.8,Max=1.5,Rounding=.05,Callback=function(v)end})
+s:AddSection("Theme")
+s:AddColorPicker("Primary",{Title="Primary",Default=Color3.fromRGB(0,120,255),Callback=function(c)Fluent:SetThemeColor("Primary",c)end})
+s:AddColorPicker("BG",{Title="BG",Default=Color3.fromRGB(30,30,30),Callback=function(c)Fluent:SetThemeColor("Background",c)end})
+s:AddSection("Credits")
+s:AddParagraph("","Blox Fruit Helper V1\nby YourName")
+s:AddButton("Discord",function()print("Discord")end)
+
+-- SaveManager
+SaveManager:SetLibrary(Fluent) InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings() SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("BloxFruitHelper") SaveManager:SetFolder("BloxFruitHelper/Configs")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings) SaveManager:BuildConfigSection(Tabs.Settings)
+Fluent:Notify({Title="Blox Fruit Helper",Content="Loaded!",Duration=5})
+SaveManager:LoadAutoloadConfig()
+
+-- Init new vars
+getgenv().AutoHeal=false getgenv().HealThreshold=30 getgenv().AutoShield=false getgenv().Spy=false getgenv().PvPESP=false
