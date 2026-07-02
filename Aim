@@ -1,0 +1,138 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Cấu hình Premium V3 (Đã xóa vòng tròn)
+local AimlockEnabled = false
+local CurrentTarget = nil
+local AimPart = "HumanoidRootPart" -- Ghim vào phần thân
+local MaxDistance = 300 -- Khoảng cách tối đa nhận diện mục tiêu
+
+-- 1. GIAO DIỆN NÚT BẤM (Nút to hệ Classic, kéo di chuyển được)
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "HiruzAimlockV3"
+
+local ToggleButton = Instance.new("TextButton", ScreenGui)
+ToggleButton.Size = UDim2.new(0, 180, 0, 50)
+ToggleButton.Position = UDim2.new(0.8, 0, 0.18, 0)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50) -- Màu đỏ lúc tắt
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 15
+ToggleButton.Text = "AIMLOCK: OFF"
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+local UICorner = Instance.new("UICorner", ToggleButton)
+UICorner.CornerRadius = UDim.new(0, 10)
+
+local UIStroke = Instance.new("UIStroke", ToggleButton)
+UIStroke.Color = Color3.fromRGB(255, 255, 255)
+UIStroke.Thickness = 1.8
+
+-- 2. HỆ THỐNG PHỦ MÀU XANH DƯƠNG CHO NGƯỜI BỊ AIM (HIGHLIGHT)
+local EspGlow = Instance.new("Highlight")
+EspGlow.Name = "HiruzAimGlow"
+EspGlow.FillColor = Color3.fromRGB(0, 120, 255) -- Màu xanh dương phủ lên người
+EspGlow.FillTransparency = 0.4 -- Độ đậm nhạt của màu phủ
+EspGlow.OutlineColor = Color3.fromRGB(255, 255, 255) -- Viền trắng bên ngoài cho nét
+EspGlow.OutlineTransparency = 0
+EspGlow.Enabled = false
+EspGlow.Parent = CoreGui
+
+local function applyGlow(targetCharacter)
+    EspGlow.Parent = targetCharacter
+    EspGlow.Enabled = true
+end
+
+local function removeGlow()
+    EspGlow.Enabled = false
+    EspGlow.Parent = CoreGui
+end
+
+-- 3. HÀM TÌM MỤC TIÊU GẦN TÂM GÓC NHÌN NHẤT
+local function getClosestPlayerToCursor()
+    local closestTarget = nil
+    local shortestDistance = math.huge
+    local character = LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return nil end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild(AimPart) then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                -- Kiểm tra khoảng cách thực tế giữa 2 người
+                local actualDistance = (character.HumanoidRootPart.Position - player.Character[AimPart].Position).Magnitude
+                if actualDistance > MaxDistance then continue end
+
+                -- Chuyển tọa độ 3D của đối thủ sang 2D màn hình để check hướng nhìn
+                local screenPos, onScreen = Camera:WorldToViewportPoint(player.Character[AimPart].Position)
+                
+                if onScreen then
+                    -- Tính khoảng cách từ đối thủ đến chính giữa tâm màn hình của ông
+                    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                    local distanceToCenter = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+
+                    -- Lấy người nằm gần hướng camera ông đang nhìn nhất
+                    if distanceToCenter < shortestDistance then
+                        shortestDistance = distanceToCenter
+                        closestTarget = player.Character
+                    end
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+-- 4. VÒNG LẶP GHIM CAMERA KHÔNG CHO LỆCH GÓC NHÌN
+RunService.RenderStepped:Connect(function()
+    if AimlockEnabled and CurrentTarget and CurrentTarget:FindFirstChild(AimPart) then
+        local humanoid = CurrentTarget:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            -- Ghim chết góc nhìn thẳng vào vị trí đối thủ
+            local targetPosition = CurrentTarget[AimPart].Position
+            local cameraPosition = Camera.CFrame.Position
+            
+            Camera.CFrame = CFrame.lookAt(cameraPosition, targetPosition)
+        else
+            -- Nếu đối thủ chết thì tự hủy aim để không bị loạn cam
+            CurrentTarget = nil
+            removeGlow()
+            AimlockEnabled = false
+            ToggleButton.Text = "AIMLOCK: OFF"
+            ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+        end
+    end
+end)
+
+-- 5. SỰ KIỆN NÚT BẤM BẬT / TẮT
+ToggleButton.MouseButton1Click:Connect(function()
+    AimlockEnabled = not AimlockEnabled
+    
+    if AimlockEnabled then
+        -- Quét và ghim chặt người ở gần hướng camera nhìn nhất tại thời điểm bấm
+        CurrentTarget = getClosestPlayerToCursor()
+        
+        if CurrentTarget then
+            applyGlow(CurrentTarget) -- Hiện màu xanh dương trên người đó
+            ToggleButton.Text = "AIMLOCK: ACTIVE"
+            ToggleButton.TextColor3 = Color3.fromRGB(50, 255, 50) -- Đổi màu chữ sang xanh lá
+        else
+            -- Nếu xung quanh không có ai hoặc ở quá xa
+            AimlockEnabled = false
+            ToggleButton.Text = "NO TARGET FOUND"
+            ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+            task.wait(1)
+            ToggleButton.Text = "AIMLOCK: OFF"
+        end
+    else
+        -- Khi chủ động tắt: Trả camera tự do, xóa màu xanh dương
+        CurrentTarget = nil
+        removeGlow()
+        ToggleButton.Text = "AIMLOCK: OFF"
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+    end
+end)
