@@ -1,0 +1,109 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- Cấu hình thông số
+local AimlockEnabled = false
+local CurrentTarget = nil
+local Smoothness = 0.15 -- Độ mượt (Càng nhỏ càng mượt, không bị giật cam)
+local FovRadius = 150 -- Bán kính vòng tròn quét mục tiêu
+
+-- 1. TẠO VÒNG TRÒN MÀU XANH (FOV CIRCLE)
+local FovCircle = Drawing.new("Circle")
+FovCircle.Color = Color3.fromRGB(0, 255, 0) -- Màu xanh lá
+FovCircle.Thickness = 1.5
+FovCircle.NumSides = 64
+FovCircle.Radius = FovRadius
+FovCircle.Filled = false
+FovCircle.Visible = false
+
+-- 2. GIAO DIỆN NÚT BẤM (Thiết kế TO HƠN, dễ bấm)
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "HiruzPremiumAimlock"
+
+local ToggleButton = Instance.new("TextButton", ScreenGui)
+ToggleButton.Size = UDim2.new(0, 160, 0, 45) -- Nút to hơn bản cũ
+ToggleButton.Position = UDim2.new(0.82, 0, 0.15, 0)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50) -- Màu đỏ lúc tắt
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 14
+ToggleButton.Text = "AIMLOCK: OFF"
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+local UICorner = Instance.new("UICorner", ToggleButton)
+UICorner.CornerRadius = UDim.new(0, 8)
+
+local UIStroke = Instance.new("UIStroke", ToggleButton)
+UIStroke.Color = Color3.fromRGB(255, 255, 255)
+UIStroke.Thickness = 1.5
+
+-- 3. HÀM TÌM MỤC TIÊU THEO GÓC NHÌN NGƯỜI CHƠI (NẰM TRONG VÒNG TRÒN)
+local function getClosestPlayerToCursor()
+    local closestTarget = nil
+    local shortestDistance = math.huge
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                -- Chuyển vị trí đối thủ từ 3D sang màn hình 2D
+                local screenPos, onScreen = Camera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+                
+                if onScreen then
+                    -- Tính khoảng cách từ đối thủ đến tâm vòng tròn xanh
+                    local mousePos = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                    local distance = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+                    -- Nếu nằm trong vòng tròn và gần tâm nhất
+                    if distance < FovRadius and distance < shortestDistance then
+                        shortestDistance = distance
+                        closestTarget = player.Character
+                    end
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+-- 4. VÒNG LẶP XỬ LÝ MƯỢT CAM (SMOOTH LERP)
+RunService.RenderStepped:Connect(function()
+    -- Cập nhật vị trí vòng tròn luôn ở giữa màn hình
+    FovCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    FovCircle.Visible = AimlockEnabled
+
+    if AimlockEnabled and CurrentTarget and CurrentTarget:FindFirstChild("HumanoidRootPart") then
+        local humanoid = CurrentTarget:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            -- Tính toán góc nhìn mới cần hướng tới
+            local targetCFrame = CFrame.new(Camera.CFrame.Position, CurrentTarget.HumanoidRootPart.Position)
+            -- LERP giúp camera di chuyển mượt mà từ từ, chống rung lắc/loạn cam
+            Camera.CFrame = Camera.CFrame:Lerp(targetCFrame, Smoothness)
+        else
+            -- Nếu mục tiêu chết, hủy khóa để tránh bị rối người
+            CurrentTarget = nil
+        end
+    end
+end)
+
+-- 5. SỰ KIỆN BẬT / TẮT (BẬT LẠI ĐỂ AIM MỤC TIÊU MỚI)
+ToggleButton.MouseButton1Click:Connect(function()
+    AimlockEnabled = not AimlockEnabled
+    
+    if AimlockEnabled then
+        -- Khi bật: Quét tìm mục tiêu theo hướng nhìn hiện tại và khóa cứng vào người đó
+        CurrentTarget = getClosestPlayerToCursor()
+        
+        ToggleButton.Text = "AIMLOCK: LOCKED"
+        ToggleButton.TextColor3 = Color3.fromRGB(50, 255, 50) -- Màu xanh khi đã khóa
+    else
+        -- Khi tắt: Hủy khóa hoàn toàn, trả lại tự do cho Camera
+        CurrentTarget = nil
+        ToggleButton.Text = "AIMLOCK: OFF"
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+    end
+end)
