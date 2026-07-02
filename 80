@@ -1,0 +1,135 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local AimlockEnabled = false
+local CurrentTarget = nil
+local AimPart = "HumanoidRootPart"
+local MaxDistance = 300
+
+-- 1. GUI NÚT BẤM (Dài và nhỏ gọn)
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "HiruzAimlockV9"
+
+local ToggleButton = Instance.new("TextButton", ScreenGui)
+ToggleButton.Size = UDim2.new(0, 110, 0, 30)
+ToggleButton.Position = UDim2.new(0.82, 0, 0.25, 0)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 12
+ToggleButton.Text = "LOCK: OFF"
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+local UICorner = Instance.new("UICorner", ToggleButton)
+UICorner.CornerRadius = UDim.new(0, 5)
+
+local UIStroke = Instance.new("UIStroke", ToggleButton)
+UIStroke.Color = Color3.fromRGB(255, 255, 255)
+UIStroke.Thickness = 1.2
+
+-- 2. HỆ THỐNG GLOW (Bảo vệ UI game)
+local EspGlow = Instance.new("Highlight")
+EspGlow.Name = "HiruzAimGlow"
+EspGlow.FillColor = Color3.fromRGB(0, 150, 255)
+EspGlow.FillTransparency = 0.5
+EspGlow.OutlineColor = Color3.fromRGB(255, 255, 255)
+EspGlow.OutlineTransparency = 0
+EspGlow.Enabled = false
+EspGlow.Parent = workspace
+
+local function applyGlow(target)
+    EspGlow.Adornee = target
+    EspGlow.Enabled = true
+end
+
+local function removeGlow()
+    EspGlow.Enabled = false
+    EspGlow.Adornee = nil
+end
+
+-- 3. HÀM QUÉT MỤC TIÊU (NPC + PLAYER)
+local function getClosestTarget()
+    local closestTarget = nil
+    local shortestDistance = math.huge
+    local myChar = LocalPlayer.Character
+    if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return nil end
+
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj ~= myChar and obj:FindFirstChild(AimPart) then
+            local humanoid = obj:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.Health > 0 and not obj:IsA("Accessory") then
+                if Players:GetPlayerFromCharacter(obj) == LocalPlayer then continue end
+                
+                local actualDistance = (myChar.HumanoidRootPart.Position - obj[AimPart].Position).Magnitude
+                if actualDistance > MaxDistance then continue end
+
+                local screenPos, onScreen = Camera:WorldToViewportPoint(obj[AimPart].Position)
+                if onScreen then
+                    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                    local distanceToCenter = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+                    
+                    if distanceToCenter < shortestDistance then
+                        shortestDistance = distanceToCenter
+                        closestTarget = obj
+                    end
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+-- 4. BIND TO RENDER STEP (PRIORITY 1000 - CHỐNG LỎNG, KHÓA CHẶT TUYỆT ĐỐI)
+RunService:BindToRenderStep("HiruzHardLock", 100000, function()
+    if AimlockEnabled and CurrentTarget and CurrentTarget:FindFirstChild(AimPart) then
+        local humanoid = CurrentTarget:FindFirstChildOfClass("Humanoid")
+        local myChar = LocalPlayer.Character
+        
+        if humanoid and humanoid.Health > 0 and myChar and myChar:FindFirstChild("HumanoidRootPart") then
+            local targetPos = CurrentTarget[AimPart].Position
+            local myHRP = myChar.HumanoidRootPart
+            
+            -- Ép camera tuyệt đối vào mục tiêu (vô hiệu hóa vuốt tay)
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, targetPos)
+            
+            -- Ép nhân vật xoay mặt về đối thủ để dùng chiêu trúng 100% (giữ nguyên trục Y)
+            local lookPos = Vector3.new(targetPos.X, myHRP.Position.Y, targetPos.Z)
+            myHRP.CFrame = CFrame.lookAt(myHRP.Position, lookPos)
+        else
+            -- Reset nếu mục tiêu bị hạ gục
+            CurrentTarget = nil
+            removeGlow()
+            AimlockEnabled = false
+            ToggleButton.Text = "LOCK: OFF"
+            ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+        end
+    end
+end)
+
+-- 5. SỰ KIỆN NÚT BẤM
+ToggleButton.MouseButton1Click:Connect(function()
+    AimlockEnabled = not AimlockEnabled
+    if AimlockEnabled then
+        CurrentTarget = getClosestTarget()
+        if CurrentTarget then
+            applyGlow(CurrentTarget)
+            ToggleButton.Text = "LOCK: ON"
+            ToggleButton.TextColor3 = Color3.fromRGB(50, 255, 50)
+        else
+            AimlockEnabled = false
+            ToggleButton.Text = "NO TARGET"
+            ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+            task.wait(1)
+            ToggleButton.Text = "LOCK: OFF"
+        end
+    else
+        CurrentTarget = nil
+        removeGlow()
+        ToggleButton.Text = "LOCK: OFF"
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+    end
+end)
