@@ -1,0 +1,127 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local AimlockEnabled = false
+local CurrentTarget = nil
+local AimPart = "HumanoidRootPart"
+local MaxDistance = 300
+
+-- 1. TẠO GUI NÚT BẤM (Gọn gàng, nhỏ nhắn, hơi vuông)
+local ScreenGui = Instance.new("ScreenGui", CoreGui)
+ScreenGui.Name = "Aimlock"
+
+local ToggleButton = Instance.new("TextButton", ScreenGui)
+ToggleButton.Size = UDim2.new(0, 80, 0, 60) -- Làm vuông vắn và nhỏ lại
+ToggleButton.Position = UDim2.new(0.8, 0, 0.2, 0)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 13 -- Chữ nhỏ vừa mắt
+ToggleButton.Text = "AIM\nOFF" -- Xuống dòng cho gọn
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+local UICorner = Instance.new("UICorner", ToggleButton)
+UICorner.CornerRadius = UDim.new(0, 8)
+
+local UIStroke = Instance.new("UIStroke", ToggleButton)
+UIStroke.Color = Color3.fromRGB(255, 255, 255)
+UIStroke.Thickness = 1.5
+
+-- 2. HỆ THỐNG GLOW PHỦ XANH DƯƠNG (Highlight)
+local EspGlow = Instance.new("Highlight")
+EspGlow.Name = "HiruzAimGlow"
+EspGlow.FillColor = Color3.fromRGB(0, 150, 255)
+EspGlow.FillTransparency = 0.5
+EspGlow.OutlineColor = Color3.fromRGB(255, 255, 255)
+EspGlow.OutlineTransparency = 0
+EspGlow.Enabled = false
+EspGlow.Parent = CoreGui
+
+local function applyGlow(target)
+    EspGlow.Parent = target
+    EspGlow.Enabled = true
+end
+
+local function removeGlow()
+    EspGlow.Enabled = false
+    EspGlow.Parent = CoreGui
+end
+
+-- 3. HÀM TÌM MỤC TIÊU KHÔNG CẦN VÒNG TRÒN
+local function getClosestPlayerToCursor()
+    local closestTarget = nil
+    local shortestDistance = math.huge
+    local character = LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return nil end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild(AimPart) then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                local actualDistance = (character.HumanoidRootPart.Position - player.Character[AimPart].Position).Magnitude
+                if actualDistance > MaxDistance then continue end
+
+                local screenPos, onScreen = Camera:WorldToViewportPoint(player.Character[AimPart].Position)
+                if onScreen then
+                    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+                    local distanceToCenter = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+                    
+                    if distanceToCenter < shortestDistance then
+                        shortestDistance = distanceToCenter
+                        closestTarget = player.Character
+                    end
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+-- 4. ÉP GÓC NHÌN CHỐNG KÉO TAY (BindToRenderStep)
+-- Kỹ thuật này chạy SAU KHI camera gốc cập nhật, đảm bảo vô hiệu hóa mọi thao tác kéo tay
+local function hardLockCamera()
+    if AimlockEnabled and CurrentTarget and CurrentTarget:FindFirstChild(AimPart) then
+        local humanoid = CurrentTarget:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            -- Ép CFrame đối mặt với mục tiêu
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, CurrentTarget[AimPart].Position)
+        else
+            -- Hủy khóa nếu mục tiêu dẹo
+            CurrentTarget = nil
+            removeGlow()
+            AimlockEnabled = false
+            ToggleButton.Text = "AIM\nOFF"
+            ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+        end
+    end
+end
+
+RunService:BindToRenderStep("HiruzHardLock", Enum.RenderPriority.Camera.Value + 1, hardLockCamera)
+
+-- 5. NÚT BẬT / TẮT
+ToggleButton.MouseButton1Click:Connect(function()
+    AimlockEnabled = not AimlockEnabled
+    if AimlockEnabled then
+        CurrentTarget = getClosestPlayerToCursor()
+        if CurrentTarget then
+            applyGlow(CurrentTarget)
+            ToggleButton.Text = "AIM\nON"
+            ToggleButton.TextColor3 = Color3.fromRGB(50, 255, 50)
+        else
+            AimlockEnabled = false
+            ToggleButton.Text = "NO\nTARGET"
+            ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+            task.wait(1)
+            ToggleButton.Text = "AIM\nOFF"
+        end
+    else
+        CurrentTarget = nil
+        removeGlow()
+        ToggleButton.Text = "AIM\nOFF"
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+    end
+end)
